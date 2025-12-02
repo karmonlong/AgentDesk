@@ -58,6 +58,13 @@ async def login_page(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
 
+@app.get("/test-mention", response_class=HTMLResponse)
+async def test_mention_page():
+    """测试 mention 功能"""
+    with open("test_mention.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
+
+
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     """返回主页"""

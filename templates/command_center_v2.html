@@ -5,11 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Command Center v2</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.0/mermaid.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
+    <link href="/static/css/fontawesome.min.css" rel="stylesheet">
+    <script src="/static/js/mermaid.min.js"></script>
+    <script src="/static/js/mammoth.browser.min.js"></script>
+    <script src="/static/js/xlsx.full.min.js"></script>
+    <script src="/static/js/marked.min.js"></script>
     <script>
         // Markdown parser fallback
         function parseMarkdown(text) {
@@ -186,6 +186,41 @@
             transform: translateY(-50%) scale(1.1);
         }
 
+        .landing-agent-mode-btn {
+            position: absolute;
+            right: -180px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #1a1a1a 30%, #FF6B00 100%);
+            border: 1px solid rgba(255, 107, 0, 0.3);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            opacity: 0.9;
+            z-index: 10;
+        }
+        
+        .landing-agent-mode-btn:hover {
+            opacity: 1;
+            transform: translateY(-52%) scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
+            border-color: #FF6B00;
+        }
+
+        body.mode-workspace .landing-agent-mode-btn {
+            display: none;
+            pointer-events: none;
+        }
+
         /* Landing Agents */
         .landing-agents {
             display: flex;
@@ -253,6 +288,50 @@
             display: none;
             opacity: 0;
             pointer-events: none;
+        }
+
+        /* Landing Dropdown Override */
+        .landing-dropdown {
+            position: absolute !important;
+            top: 100% !important;
+            bottom: auto !important;
+            left: 0 !important;
+            right: 0 !important;
+            border-radius: 0 0 12px 12px !important;
+            margin-top: 4px !important;
+            max-height: 400px !important;
+            overflow-y: auto !important;
+            background: rgba(20, 20, 20, 0.98) !important;
+            backdrop-filter: blur(20px) !important;
+            border: 2px solid #FF6B00 !important;
+            box-shadow: 0 8px 32px rgba(255, 107, 0, 0.5), 0 0 20px rgba(255, 107, 0, 0.3) !important;
+            display: none !important;
+            z-index: 999999 !important;
+            pointer-events: auto !important;
+        }
+
+        .landing-dropdown.show {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            animation: slideDownFade 0.2s ease-out !important;
+        }
+
+        @keyframes slideDownFade {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 确保 landing-input-wrapper 正确定位 */
+        .landing-input-wrapper {
+            position: relative !important;
+            z-index: 100 !important;
         }
 
         /* ==================== Workspace Mode (VS Code Style) ==================== */
@@ -1613,18 +1692,18 @@
         
         <!-- 全局折叠控制按钮 -->
         <div class="global-controls" id="globalControls" style="display: none;">
-            <button class="global-control-btn" onclick="toggleSidebar('left')" title="切换左侧栏 (Ctrl+B)">
-                <i class="fas fa-folder-open"></i>
-            </button>
-            <button class="global-control-btn" onclick="toggleCanvas()" title="切换智能体画布">
-                <i class="fas fa-project-diagram"></i>
-            </button>
-            <button class="global-control-btn" onclick="toggleSidebar('right')" title="切换右侧面板">
-                <i class="fas fa-comments"></i>
-            </button>
-            <button class="global-control-btn" onclick="toggleAllPanels()" title="展开/折叠所有">
-                <i class="fas fa-expand-arrows-alt" id="expandAllIcon"></i>
-            </button>
+                <button class="global-control-btn" onclick="toggleSidebar('left')" title="切换左侧栏 (Ctrl+B)">
+                    <i class="fas fa-folder-open"></i>
+                </button>
+                <button class="global-control-btn" onclick="toggleCanvas()" title="切换智能体画布">
+                    <i class="fas fa-project-diagram"></i>
+                </button>
+                <button class="global-control-btn" onclick="toggleSidebar('right')" title="切换右侧面板">
+                    <i class="fas fa-comments"></i>
+                </button>
+                <button class="global-control-btn" onclick="toggleAllPanels()" title="展开/折叠所有">
+                    <i class="fas fa-expand-arrows-alt" id="expandAllIcon"></i>
+                </button>
         </div>
 
         <!-- Agent Avatars -->
@@ -1634,8 +1713,15 @@
 
         <div class="landing-input-wrapper">
             <input type="text" class="landing-input" id="globalInput" placeholder="想让我帮你做什么？(例如：分析这份财报)">
-            <button class="landing-submit" onclick="enterWorkspace()">
+            <!-- Mention Dropdown for Landing -->
+            <div id="landingMentionDropdown" class="mention-dropdown landing-dropdown" style="display: none;"></div>
+
+            <button class="landing-submit" onclick="enterWorkspace()" title="开始工作">
                 <i class="fas fa-arrow-right"></i>
+            </button>
+            <!-- Agent Mode Entry Button -->
+            <button class="landing-agent-mode-btn" onclick="enterWorkspace()">
+                <i class="fas fa-cube"></i> Agent Mode
             </button>
         </div>
     </div>
@@ -2169,8 +2255,8 @@
                 <div class="welcome-message" style="max-width: 800px; margin: 50px auto; text-align: center;">
                     <div style="width: 120px; height: 120px; margin: 0 auto 30px; background: linear-gradient(135deg, #FF8800 0%, #FF6B00 50%, #FF5500 100%); border-radius: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 40px rgba(255, 107, 0, 0.4); position: relative; overflow: hidden;">
                         <span style="font-size: 48px; font-weight: 900; color: white;">AD</span>
-                        <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.15), transparent); transform: rotate(45deg); animation: shine 3s infinite;"></div>
-                    </div>
+                            <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.15), transparent); transform: rotate(45deg); animation: shine 3s infinite;"></div>
+                        </div>
                     <h1 style="color: var(--text-primary); margin-bottom: 15px;">欢迎使用 AgentDesk</h1>
                     <p style="color: var(--text-secondary); line-height: 1.8; font-size: 16px;">
                         在左侧选择文件或智能体开始工作<br>
@@ -2298,8 +2384,8 @@
     </div>
 
     <!-- Scripts for File Preview -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="/static/js/mammoth.browser.min.js"></script>
+    <script src="/static/js/xlsx.full.min.js"></script>
 
     <script>
         // ==================== Core Logic & State ====================
@@ -2342,16 +2428,25 @@
 
         // ==================== Initialization ====================
         document.addEventListener('DOMContentLoaded', function () {
-            initCanvas();
-            loadAgents();
+            console.log('[Init] DOM Content Loaded');
+            console.log('[Init] Elements check:', {
+                globalInput: !!document.getElementById('globalInput'),
+                landingMentionDropdown: !!document.getElementById('landingMentionDropdown'),
+                chatInput: !!document.getElementById('chatInput'),
+                mentionDropdown: !!document.getElementById('mentionDropdown')
+            });
+            
             initCanvas();
             loadAgents();
             loadFiles(); // Load files on startup
-            renderLandingAgents(); // Render landing page agents
             startAnimation();
 
             // Auto-focus landing input
-            document.getElementById('globalInput').focus();
+            const globalInput = document.getElementById('globalInput');
+            if (globalInput) {
+                globalInput.focus();
+                console.log('[Init] Global input focused');
+            }
         });
 
         function initCanvas() {
@@ -2397,6 +2492,10 @@
                     buildMarketAgents();
                     renderMarket();
                     renderLandingAgents();
+                    
+                    // 初始化 mention 逻辑（需要在 marketAgents 构建完成后）
+                    setupMentionLogic(document.getElementById('chatInput'), document.getElementById('mentionDropdown'));
+                    setupMentionLogic(document.getElementById('globalInput'), document.getElementById('landingMentionDropdown'));
                 }
             } catch (error) {
                 console.error('Failed to load agents:', error);
@@ -2613,16 +2712,20 @@
         const chatInput = document.getElementById('chatInput');
 
         // Landing Page Input
+        // 注意：这个监听器已被 setupMentionLogic 中的监听器取代
+        // 不再需要单独的 Enter 监听器，因为 mention 逻辑已经处理了
+        /*
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 enterWorkspace();
             }
         });
+        */
 
         function enterWorkspace() {
             const val = input.value.trim();
-            document.body.classList.add('mode-workspace');
-
+                document.body.classList.add('mode-workspace');
+                
             if (val) {
                 // Transfer value to chat input and execute
                 chatInput.value = val;
@@ -3055,10 +3158,14 @@
             let processedContent = content.replace(htmlRegex, (match, code) => {
                 let cleanCode = code.trim();
                 
-                // 自动修复常见的 CDN 问题
+                // 自动修复常见的 CDN 问题 - 使用本地资源
                 cleanCode = cleanCode.replace(
                     /https:\/\/cdn\.jsdelivr\.net\/npm\/mermaid.*\/mermaid(\.esm)?\.min\.js/g, 
-                    'https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.0/mermaid.min.js'
+                    '/static/js/mermaid.min.js'
+                );
+                cleanCode = cleanCode.replace(
+                    /https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/mermaid\/[^"']+/g,
+                    '/static/js/mermaid.min.js'
                 );
                 
                 htmlBlocks.push(`<div class="html-preview-container">
@@ -4047,18 +4154,17 @@
 
         function selectLandingAgent(index) {
             const agent = marketAgents[index];
-
-            // 1. Enter Workspace
-            enterWorkspace();
-
-            // 2. Simulate Agent Greeting
-            setTimeout(() => {
-                const greeting = `你好！我是**${agent.name}**。\n${agent.desc}。\n\n我可以帮你：\n${agent.capabilities.map(c => `- ${c}`).join('\n')}`;
-                addChatMessage('agent', greeting, agent.name);
-
-                // Optional: Open their details panel too?
-                // showAgentDetails(index); 
-            }, 600);
+            const input = document.getElementById('globalInput');
+                const mention = `@${agent.name} `;
+            input.value += mention;
+            input.focus();
+            
+            // Animation feedback
+            const items = document.querySelectorAll('.landing-agent-item');
+            if (items[index]) {
+                items[index].style.transform = 'scale(0.9)';
+                setTimeout(() => items[index].style.transform = '', 150);
+            }
         }
         // Scenario Selection
         function selectScenario(card, type) {
@@ -4366,26 +4472,53 @@
 
         // ==================== @ Mention Logic ====================
         const mentionDropdown = document.getElementById('mentionDropdown');
+        const landingMentionDropdown = document.getElementById('landingMentionDropdown');
         let mentionIndex = -1;
+        let isDropdownActive = false; // 全局标记下拉框是否激活
 
-        if (chatInput) {
-            chatInput.addEventListener('input', function (e) {
+        function setupMentionLogic(inputElement, dropdownElement) {
+            if (!inputElement || !dropdownElement) {
+                console.warn('[Mention] Setup failed - missing element:', {
+                    input: !!inputElement,
+                    dropdown: !!dropdownElement
+                });
+                return;
+            }
+
+            console.log('[Mention] Setup complete for:', {
+                inputId: inputElement.id,
+                dropdownId: dropdownElement.id,
+                marketAgentsCount: marketAgents.length
+            });
+
+            inputElement.addEventListener('input', function (e) {
                 const value = this.value;
                 const cursorPos = this.selectionStart;
                 const lastAtPos = value.lastIndexOf('@', cursorPos - 1);
 
-                // Auto resize logic
+                console.log('[Mention] Input event:', {
+                    value,
+                    lastAtPos,
+                    marketAgentsCount: marketAgents.length
+                });
+
+                // Auto resize logic only for textarea
+                if (this.tagName.toLowerCase() === 'textarea') {
                 this.style.height = 'auto';
                 this.style.height = (this.scrollHeight) + 'px';
-                if (this.value === '') {
-                     this.style.height = 'auto';
+                    if (this.value === '') {
+                        this.style.height = 'auto';
+                    }
                 }
 
                 if (lastAtPos !== -1) {
                     const query = value.substring(lastAtPos + 1, cursorPos);
-                    // Check if there's a space after @, if so, close dropdown (unless query is empty which means just typed @)
+                    console.log('[Mention] Found @, query:', query);
+                    
+                    // Check if there's a space after @, if so, close dropdown
                     if (query.includes(' ')) {
-                        hideMentionDropdown();
+                        console.log('[Mention] Space found, hiding dropdown');
+                        hideMentionDropdown(dropdownElement);
                         return;
                     }
 
@@ -4394,19 +4527,33 @@
                         agent.desc.toLowerCase().includes(query.toLowerCase())
                     );
 
+                    console.log('[Mention] Matches found:', matches.length);
+
                     if (matches.length > 0) {
-                        showMentionDropdown(matches, lastAtPos);
+                        showMentionDropdown(matches, lastAtPos, dropdownElement, inputElement);
                     } else {
-                        hideMentionDropdown();
+                        hideMentionDropdown(dropdownElement);
                     }
                 } else {
-                    hideMentionDropdown();
+                    hideMentionDropdown(dropdownElement);
                 }
             });
 
-            chatInput.addEventListener('keydown', function (e) {
-                if (mentionDropdown.style.display === 'block') {
-                    const items = mentionDropdown.querySelectorAll('.mention-item');
+            inputElement.addEventListener('keydown', function (e) {
+                // 使用全局标记判断，更可靠
+                const isDropdownVisible = isDropdownActive;
+                
+                console.log('[Mention] Keydown:', {
+                    key: e.key,
+                    isDropdownVisible,
+                    isDropdownActive,
+                    mentionIndex,
+                    hasShowClass: dropdownElement.classList.contains('show'),
+                    displayStyle: dropdownElement.style.display
+                });
+                
+                if (isDropdownVisible) {
+                    const items = dropdownElement.querySelectorAll('.mention-item');
                     if (e.key === 'ArrowDown') {
                         e.preventDefault();
                         mentionIndex = (mentionIndex + 1) % items.length;
@@ -4417,34 +4564,54 @@
                         updateMentionSelection(items);
                     } else if (e.key === 'Enter') {
                         e.preventDefault();
-                        if (mentionIndex !== -1) {
+                        e.stopPropagation();
+                        if (mentionIndex !== -1 && items[mentionIndex]) {
+                            console.log('[Mention] Selecting agent at index:', mentionIndex);
                             items[mentionIndex].click();
                         }
+                        return false;
                     } else if (e.key === 'Escape') {
-                        hideMentionDropdown();
+                        e.preventDefault();
+                        hideMentionDropdown(dropdownElement);
                     }
                 } else if (e.key === 'Enter') {
                     if (!e.shiftKey) {
-                        // Send message
-                        e.preventDefault();
-                        executeTask(this.value);
-                        this.value = '';
-                        this.style.height = 'auto'; // Reset height
+                        // Only prevent default if it's the landing input or chat input (no shift)
+                        if (this.id === 'globalInput') {
+                            e.preventDefault();
+                            console.log('[Mention] Enter without dropdown - entering workspace');
+                            enterWorkspace();
+                        } else {
+                            e.preventDefault();
+                            executeTask(this.value);
+                            this.value = '';
+                            this.style.height = 'auto';
+                        }
                     }
                 }
             });
 
             // Close dropdown when clicking outside
             document.addEventListener('click', function (e) {
-                if (e.target !== chatInput && !mentionDropdown.contains(e.target)) {
-                    hideMentionDropdown();
+                if (e.target !== inputElement && !dropdownElement.contains(e.target)) {
+                    hideMentionDropdown(dropdownElement);
                 }
             });
         }
 
-        function showMentionDropdown(agents, atPos) {
-            mentionDropdown.innerHTML = agents.map((agent, index) => `
-                <div class="mention-item" onclick="selectMention('${agent.name}', ${atPos})">
+        // Initialize for both inputs (moved to loadAgents after marketAgents is built)
+        // setupMentionLogic will be called after agents are loaded
+
+        function showMentionDropdown(agents, atPos, dropdownElement, inputElement) {
+            console.log('[Mention] Showing dropdown:', {
+                agentsCount: agents.length,
+                dropdownId: dropdownElement.id,
+                inputId: inputElement.id,
+                dropdownElement: dropdownElement
+            });
+            
+            dropdownElement.innerHTML = agents.map((agent, index) => `
+                <div class="mention-item" onclick="selectMention('${agent.name}', ${atPos}, document.getElementById('${inputElement.id}'), document.getElementById('${dropdownElement.id}'))">
                     <div class="mention-item-icon" style="color: ${agent.color}; background: ${agent.color}15;">
                         <i class="${agent.icon}"></i>
                     </div>
@@ -4455,16 +4622,46 @@
                 </div>
             `).join('');
 
-            mentionDropdown.classList.add('show');
-            mentionDropdown.style.display = 'block';
+            // 强制显示
+            dropdownElement.classList.add('show');
+            dropdownElement.style.cssText = `
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                position: absolute !important;
+                z-index: 999999 !important;
+                pointer-events: auto !important;
+            `;
+            
+            // 设置全局标记
+            isDropdownActive = true;
+            
             mentionIndex = 0;
-            updateMentionSelection(mentionDropdown.querySelectorAll('.mention-item'));
+            updateMentionSelection(dropdownElement.querySelectorAll('.mention-item'));
+            
+            // 验证显示状态
+            setTimeout(() => {
+                const computed = window.getComputedStyle(dropdownElement);
+                console.log('[Mention] Dropdown computed styles:', {
+                    display: computed.display,
+                    visibility: computed.visibility,
+                    opacity: computed.opacity,
+                    zIndex: computed.zIndex,
+                    position: computed.position,
+                    isDropdownActive: isDropdownActive
+                });
+            }, 100);
+            
+            console.log('[Mention] Dropdown should be visible now, isDropdownActive:', isDropdownActive);
         }
 
-        function hideMentionDropdown() {
-            mentionDropdown.classList.remove('show');
-            mentionDropdown.style.display = 'none';
+        function hideMentionDropdown(dropdownElement) {
+            if (!dropdownElement) return;
+            dropdownElement.classList.remove('show');
+            dropdownElement.style.display = 'none';
             mentionIndex = -1;
+            isDropdownActive = false; // 重置全局标记
+            console.log('[Mention] Dropdown hidden, isDropdownActive:', isDropdownActive);
         }
 
         function updateMentionSelection(items) {
@@ -4473,25 +4670,26 @@
                 else item.classList.remove('selected');
             });
 
-            // Scroll to selected
             if (mentionIndex !== -1 && items[mentionIndex]) {
                 items[mentionIndex].scrollIntoView({ block: 'nearest' });
             }
         }
 
-        function selectMention(name, atPos) {
-            const value = chatInput.value;
-            const cursorPos = chatInput.selectionStart;
+        function selectMention(name, atPos, inputElement, dropdownElement) {
+            console.log('[Mention] Selecting mention:', name);
+            const value = inputElement.value;
+            const cursorPos = inputElement.selectionStart;
             const before = value.substring(0, atPos);
             const after = value.substring(cursorPos);
 
-            chatInput.value = `${before}@${name} ${after}`;
-            hideMentionDropdown();
-            chatInput.focus();
+            inputElement.value = `${before}@${name} ${after}`;
+            hideMentionDropdown(dropdownElement);
+            inputElement.focus();
 
-            // Move cursor to after the inserted name
-            const newCursorPos = atPos + name.length + 2; // @ + name + space
-            chatInput.setSelectionRange(newCursorPos, newCursorPos);
+            const newCursorPos = atPos + name.length + 2; 
+            inputElement.setSelectionRange(newCursorPos, newCursorPos);
+            
+            console.log('[Mention] Mention selected, dropdown hidden, isDropdownActive:', isDropdownActive);
         }
 
         // ==================== Prompt Studio Functions ====================

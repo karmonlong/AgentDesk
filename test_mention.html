@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mention 功能测试</title>
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 40px;
+        }
+        .test-wrapper {
+            position: relative;
+            width: 600px;
+            margin: 0 auto;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid rgba(255, 107, 0, 0.3);
+            border-radius: 12px;
+            color: #fff;
+            outline: none;
+        }
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(20, 20, 20, 0.98);
+            border: 2px solid rgba(255, 107, 0, 0.8);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            display: none;
+            z-index: 9999;
+        }
+        .dropdown.show {
+            display: block !important;
+        }
+        .item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .item:hover {
+            background: rgba(255, 107, 0, 0.2);
+        }
+        .debug {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(30, 30, 30, 0.5);
+            border: 1px solid #333;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">@ Mention 功能测试</h1>
+    <div class="test-wrapper">
+        <input type="text" id="testInput" placeholder="输入 @ 测试...">
+        <div id="testDropdown" class="dropdown"></div>
+    </div>
+    <div class="debug" id="debug">
+        等待输入...
+    </div>
+
+    <script>
+        const agents = [
+            { name: '文档分析师', desc: '信息提取与分析专家', color: '#795548' },
+            { name: '内容创作者', desc: '专业内容撰写专家', color: '#9C27B0' },
+            { name: '数据专家', desc: '数据分析与洞察专家', color: '#00BCD4' },
+            { name: '校对编辑', desc: '内容质量把控专家', color: '#4CAF50' },
+            { name: '翻译专家', desc: '专业翻译与本地化专家', color: '#2196F3' }
+        ];
+
+        const input = document.getElementById('testInput');
+        const dropdown = document.getElementById('testDropdown');
+        const debug = document.getElementById('debug');
+
+        function log(msg) {
+            debug.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${msg}</div>`;
+            console.log(msg);
+        }
+
+        log('页面加载完成');
+        log(`智能体数量: ${agents.length}`);
+
+        input.addEventListener('input', function(e) {
+            const value = this.value;
+            const cursorPos = this.selectionStart;
+            const lastAtPos = value.lastIndexOf('@', cursorPos - 1);
+
+            log(`输入事件: value="${value}", lastAtPos=${lastAtPos}`);
+
+            if (lastAtPos !== -1) {
+                const query = value.substring(lastAtPos + 1, cursorPos);
+                log(`找到 @, query="${query}"`);
+
+                if (query.includes(' ')) {
+                    log('包含空格，隐藏下拉框');
+                    dropdown.classList.remove('show');
+                    return;
+                }
+
+                const matches = agents.filter(agent =>
+                    agent.name.toLowerCase().includes(query.toLowerCase())
+                );
+
+                log(`匹配到 ${matches.length} 个智能体`);
+
+                if (matches.length > 0) {
+                    dropdown.innerHTML = matches.map(agent => `
+                        <div class="item" onclick="selectAgent('${agent.name}')" style="color: ${agent.color}">
+                            <strong>${agent.name}</strong> - ${agent.desc}
+                        </div>
+                    `).join('');
+                    dropdown.classList.add('show');
+                    log('显示下拉框');
+                } else {
+                    dropdown.classList.remove('show');
+                    log('无匹配，隐藏下拉框');
+                }
+            } else {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        function selectAgent(name) {
+            log(`选择了: ${name}`);
+            const value = input.value;
+            const cursorPos = input.selectionStart;
+            const lastAtPos = value.lastIndexOf('@', cursorPos - 1);
+            
+            const before = value.substring(0, lastAtPos);
+            const after = value.substring(cursorPos);
+            input.value = before + '@' + name + ' ' + after;
+            dropdown.classList.remove('show');
+        }
+    </script>
+</body>
+</html>
+
