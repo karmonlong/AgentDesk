@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentDesk Login</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B00;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --bg-dark: #050505;
+            --glass-panel: rgba(30, 30, 30, 0.4);
+            --border-light: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* Left Side - Image */
+        .login-visual {
+            flex: 6; /* 60% width */
+            position: relative;
+            background-image: url('/static/login.jpg');
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Blurred Background Overlay */
+        .login-visual::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1;
+        }
+
+        /* Inner Image Card */
+
+        /* Inner Image Card */
+        .visual-inner {
+            position: relative;
+            z-index: 2;
+            width: calc(100% - 200px); /* Increased margin from 80px to 200px */
+            height: calc(100% - 200px);
+            background-image: url('/static/login.jpg');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            transition: transform 0.1s ease-out; /* Faster transition for parallax */
+            overflow: hidden;
+        }
+        
+        /* Scanning Line Effect */
+        .visual-inner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 107, 0, 0.5);
+            box-shadow: 0 0 15px rgba(255, 107, 0, 0.8);
+            animation: scan 4s linear infinite;
+            opacity: 0.6;
+            z-index: 5;
+        }
+
+        /* Breathing Glow */
+        @keyframes breathe {
+            0%, 100% { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 rgba(255, 107, 0, 0); }
+            50% { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 107, 0, 0.2); }
+        }
+
+        @keyframes scan {
+            0% { top: -10%; opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { top: 110%; opacity: 0; }
+        }
+        
+        .visual-inner:hover {
+            /* Hover effect handled by JS now */
+            animation: breathe 4s infinite ease-in-out;
+        }
+
+        /* Right Side - Login Form */
+        .login-panel {
+            flex: 4; /* 40% width */
+            background: var(--glass-panel);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-left: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+            box-shadow: -10px 0 50px rgba(0,0,0,0.5);
+        }
+
+        /* Decorative elements on the right */
+        .login-panel::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            opacity: 0.1;
+            filter: blur(60px);
+            pointer-events: none;
+        }
+
+        .login-content {
+            width: 100%;
+            max-width: 400px;
+            z-index: 2;
+        }
+
+        .brand {
+            margin-bottom: 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .brand h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 0%, #ccc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255, 107, 0, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 42px; /* Adjusted for label */
+            color: var(--text-secondary);
+            transition: color 0.3s;
+        }
+
+        .input-field:focus + .input-icon {
+            color: var(--primary);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            margin-top: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn:hover {
+            background: #e65c00;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.3);
+        }
+        
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .error-msg {
+            color: #ff4444;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            min-height: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copyright {
+            position: absolute;
+            bottom: 30px;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.8rem;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+            }
+            .login-visual {
+                flex: 1;
+                min-height: 200px;
+            }
+            .login-panel {
+                flex: 2;
+                border-left: none;
+                border-top: 1px solid var(--border-light);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Left Side: Visual -->
+    <div class="login-visual">
+        <div class="visual-inner"></div>
+    </div>
+
+    <!-- Right Side: Form -->
+    <div class="login-panel">
+        <div class="login-content">
+            <div class="brand">
+                <h1>欢迎回来</h1>
+                <p>AgentDesk 智能办公助手</p>
+            </div>
+
+            <div class="error-msg" id="errorMsg">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>用户名或密码错误</span>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label class="input-label">用户名</label>
+                    <input type="text" class="input-field" id="username" placeholder="请输入用户名" value="admin" required>
+                    <i class="fas fa-user input-icon"></i>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">密码</label>
+                    <input type="password" class="input-field" id="password" placeholder="请输入密码" value="admin" required>
+                    <i class="fas fa-lock input-icon"></i>
+                </div>
+
+                <button type="submit" class="login-btn">
+                    登 录 <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                </button>
+            </form>
+        </div>
+
+        <div class="copyright">
+            &copy; 2025 AgentDesk. 智驭未来 (Master Intelligence, Drive the Future).
+        </div>
+    </div>
+
+    <script>
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+            const btn = document.querySelector('.login-btn');
+
+            if (username === 'admin' && password === 'admin') {
+                btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> 正在验证...';
+                btn.style.opacity = '0.8';
+                
+                // Success Animation
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 800);
+            } else {
+                errorMsg.style.opacity = '1';
+                // Shake animation on inputs
+                const inputs = document.querySelectorAll('.input-field');
+                inputs.forEach(input => {
+                    input.style.borderColor = '#ff4444';
+                    input.style.animation = 'shake 0.5s';
+                    setTimeout(() => {
+                        input.style.animation = 'none';
+                        input.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                    }, 500);
+                });
+            }
+        }
+
+        // Add shake keyframes
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Mouse Parallax Effect
+        const visualContainer = document.querySelector('.login-visual');
+        const visualInner = document.querySelector('.visual-inner');
+
+        if (visualContainer && visualInner) {
+            visualContainer.addEventListener('mousemove', (e) => {
+                const rect = visualContainer.getBoundingClientRect();
+                const x = e.clientX - rect.left; // x position within the element.
+                const y = e.clientY - rect.top;  // y position within the element.
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -5; // Max rotation deg
+                const rotateY = ((x - centerX) / centerX) * 5;
+
+                visualInner.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+            });
+
+            visualContainer.addEventListener('mouseleave', () => {
+                visualInner.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+            });
+        }
+    </script>
+</body>
+</html>

@@ -16,7 +16,7 @@ class GenericAgent:
     
     def __init__(self):
         self.llm = ChatGoogleGenerativeAI(
-            model=os.getenv("GEMINI_MODEL", "gemini-1.5-flash-latest"),
+            model=os.getenv("GEMINI_MODEL", "gemini-3-pro-preview"),
             temperature=0.5,  # 妥协的温度值
             google_api_key=os.getenv("GEMINI_API_KEY"),
             convert_system_message_to_human=True
@@ -332,4 +332,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

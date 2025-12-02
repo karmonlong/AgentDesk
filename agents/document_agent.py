@@ -20,7 +20,7 @@ load_dotenv()
 def get_gemini_llm():
     """创建 Gemini LLM 实例"""
     api_key = os.getenv("GEMINI_API_KEY")
-    model = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+    model = os.getenv("GEMINI_MODEL", "gemini-3-pro-preview")
     temperature = float(os.getenv("GEMINI_TEMPERATURE", "0.3"))
 
     if not api_key:

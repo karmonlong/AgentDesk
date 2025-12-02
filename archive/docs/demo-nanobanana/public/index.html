@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nano Banana Pro 文生图</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Nano Banana Pro 文生图</h1>
+      <form id="gen-form">
+        <label>提示词</label>
+        <textarea id="prompt" placeholder="请输入你想生成的图片描述" rows="4"></textarea>
+        <div class="row">
+          <label>模型</label>
+          <select id="model">
+            <option value="gemini-3-pro-image-preview">gemini-3-pro-image-preview</option>
+            <option value="gemini-2.5-flash-image">gemini-2.5-flash-image</option>
+          </select>
+        </div>
+        <button id="submit" type="submit">生成图片</button>
+        <div id="status" class="status"></div>
+      </form>
+      <div class="result">
+        <img id="output" alt="生成结果" />
+        <a id="download" href="#" download>下载图片</a>
+      </div>
+    </div>
+    <script src="/app.js"></script>
+  </body>
+  </html>

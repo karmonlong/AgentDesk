@@ -109,8 +109,8 @@ test:
 # 代码检查
 lint:
 	@echo "🔍 代码检查..."
-	$(PYTHON_VENV) -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-	$(PYTHON_VENV) -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+	$(PYTHON_VENV) -m flake8 . --exclude venv,.venv,__pycache__,.trae --count --select=E9,F63,F7,F82 --show-source --statistics
+	$(PYTHON_VENV) -m flake8 . --exclude venv,.venv,__pycache__,.trae --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
 # 代码格式化
 format:

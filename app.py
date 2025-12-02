@@ -4,9 +4,10 @@ FastAPI + 前端界面
 """
 
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+import json
 import os
 import uuid
 import asyncio
@@ -51,8 +52,14 @@ UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    """返回登录页"""
+    return templates.TemplateResponse("login.html", {"request": request})
+
+
 @app.get("/", response_class=HTMLResponse)
-async def home():
+async def home(request: Request):
     """返回主页"""
     html_content = """
     <!DOCTYPE html>
@@ -634,7 +641,7 @@ async def home():
     </html>
     """
 
-    return HTMLResponse(content=html_content)
+    return templates.TemplateResponse("command_center_v2.html", {"request": request})
 
 
 @app.post("/upload")
@@ -1057,9 +1064,9 @@ async def get_model_settings():
 # ==================== 多智能体聊天功能 ====================
 
 @app.get("/chat", response_class=HTMLResponse)
-async def chat_page(request: Request):
-    """多智能体聊天页面"""
-    return templates.TemplateResponse("chat.html", {"request": request})
+async def chat_page():
+    """多智能体聊天页面重定向到指挥中心"""
+    return RedirectResponse(url="/")
 
 
 @app.get("/command", response_class=HTMLResponse)
@@ -1069,9 +1076,9 @@ async def command_center(request: Request):
 
 
 @app.get("/analytics", response_class=HTMLResponse)
-async def analytics_page(request: Request):
-    """数据分析仪表盘"""
-    return templates.TemplateResponse("analytics.html", {"request": request})
+async def analytics_page():
+    """数据分析仪表盘重定向到指挥中心"""
+    return RedirectResponse(url="/")
 
 
 @app.get("/api/analytics/data")
@@ -1100,7 +1107,7 @@ async def get_analytics_data():
 async def get_agents():
     """获取所有智能体列表"""
     try:
-        agents = multi_agent_system.list_agents()
+        agents = multi_agent_system.registry.get_agent_info()
         return {
             "success": True,
             "agents": agents
@@ -1121,7 +1128,8 @@ async def chat_with_agent(
     document: Optional[UploadFile] = File(None),
     document_text: Optional[str] = Form(None),
     filename: Optional[str] = Form(None),
-    scenario: Optional[str] = Form(None)
+    scenario: Optional[str] = Form(None),
+    agent_id: Optional[str] = Form(None)
 ):
     """与智能体对话"""
     try:
@@ -1183,17 +1191,29 @@ async def chat_with_agent(
         print(f"   消息: {message}")
         print(f"   场景: {scenario}")
         print(f"   有文档内容: {document_content is not None}")
+
+        if agent_id:
+            try:
+                agent_obj = multi_agent_system.registry.get(agent_id)
+            except Exception:
+                agent_obj = None
+            if agent_obj:
+                message = f"@{agent_obj.name} {message}"
         
-        # Special handling for Compliance Scenario
-        if scenario == 'compliance' and not document_content:
-             # Assume message is the topic
+        # Special handling for Compliance Scenario (respect explicit @mentions)
+        try:
+            explicit_mentions = multi_agent_system.router.parse_mentions(message)
+        except Exception:
+            explicit_mentions = []
+
+        if scenario == 'compliance' and not document_content and not explicit_mentions:
             print("⚖️ 触发合规营销工作流...")
             result = run_compliance_flow(message)
-            
+
             final_content = result.get('content', '')
             review_result = result.get('review_result', '')
             status = result.get('status', '')
-            
+
             response_text = f"""**合规营销文案生成报告**
 
 **最终状态**: {status}
@@ -1221,21 +1241,31 @@ async def chat_with_agent(
                 }
             }
 
-        result = multi_agent_system.chat(message, document_content, scenario)
+        result = await multi_agent_system.chat(message, document_content, scenario)
+        
+        print(f"[聊天API] multi_agent_system.chat 返回结果:")
+        print(f"  success: {result.get('success')}")
+        print(f"  agent: {result.get('agent')}")
+        print(f"  response 长度: {len(str(result.get('response', '')))}")
+        print(f"  response 前100字符: {str(result.get('response', ''))[:100]}")
         
         if result["success"]:
-            return {
+            response_data = {
                 "success": True,
-                "agent": result["agent"],
-                "response": result["response"],
-                "routing_info": result["routing_info"]
+                "agent": result.get("agent", {}),
+                "response": result.get("response", ""),
+                "routing_info": result.get("routing_info", {})
             }
+            print(f"[聊天API] 返回数据: success={response_data['success']}, agent={response_data.get('agent', {}).get('name', 'N/A')}, response长度={len(str(response_data['response']))}")
+            return response_data
         else:
+            error_msg = result.get("error", "处理失败")
+            print(f"[聊天API] 返回错误: {error_msg}")
             return JSONResponse(
                 status_code=500,
                 content={
                     "success": False,
-                    "error": result.get("error", "处理失败")
+                    "error": error_msg
                 }
             )
     
@@ -1250,6 +1280,116 @@ async def chat_with_agent(
             }
         )
 
+
+@app.post("/api/image/generate")
+async def generate_image(
+    prompt: str = Form(...),
+    model: Optional[str] = Form("nano-banana-pro"),
+    size: Optional[str] = Form("1024x1024")
+):
+    try:
+        agent = multi_agent_system.registry.get("图像生成专家")
+        if not agent:
+            return JSONResponse(
+                status_code=404,
+                content={"success": False, "error": "图像生成专家未注册"}
+            )
+        data = agent._gen_via_api(prompt, model=model, size=size)
+        if not data.get("success"):
+            return {
+                "success": False,
+                "error": data.get("error", "生成失败"),
+                "hint": data.get("hint")
+            }
+        d = data.get("data", {})
+        html = None
+        url = None
+        image_base64 = None
+        if isinstance(d, dict) and d.get("image_base64"):
+            image_base64 = d["image_base64"]
+            html = f"<img src=\"data:image/png;base64,{image_base64}\" style=\"max-width:100%\"/>"
+        elif isinstance(d, dict) and d.get("url"):
+            url = d["url"]
+            html = f"<img src=\"{url}\" style=\"max-width:100%\"/>"
+        else:
+            html = json.dumps(d, ensure_ascii=False)
+        return {
+            "success": True,
+            "agent": {
+                "id": "image_generator",
+                "name": "图像生成专家",
+                "role": "图像生成与编辑",
+                "emoji": "fas fa-image"
+            },
+            "html": html,
+            "url": url,
+            "image_base64": image_base64
+        }
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
+        )
+
+@app.post("/api/draw/generate")
+async def draw_generate(
+    prompt: str = Form(...),
+    tools: Optional[str] = Form(None)
+):
+    try:
+        agent = multi_agent_system.registry.get("绘画智能体")
+        if not agent:
+            return JSONResponse(status_code=404, content={"success": False, "error": "绘画智能体未注册"})
+        tool_list = []
+        if tools:
+            tool_list = [t.strip() for t in tools.split(",") if t.strip()]
+        results = agent.generate_images(prompt, tool_list)
+        items = []
+        for r in results:
+            if r.get("image_base64"):
+                b64 = r["image_base64"]
+                mime = r.get("mime", "image/png")
+                ext = "svg" if "svg" in mime else ("png" if "png" in mime else "png")
+                tool_name = r.get('tool', 'unknown')
+                source_code = r.get('source_code', '')
+                
+                # 如果有源代码，显示可展开的代码块
+                code_section = ""
+                if source_code:
+                    code_section = f"""<details style="margin-top: 8px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 6px;">
+                        <summary style="cursor: pointer; color: var(--text-secondary); font-size: 0.85rem;">查看源代码</summary>
+                        <pre style="margin-top: 8px; padding: 10px; background: #1e1e1e; border-radius: 4px; overflow-x: auto; font-size: 0.75rem; color: #d4d4d4;"><code>{source_code}</code></pre>
+                    </details>"""
+                
+                # 优化样式：添加白色背景以适配深色模式，添加 padding 防止贴边，max-height 防止过高
+                items.append(f"""<div style="border:1px solid var(--border); border-radius:12px; overflow:hidden; background: var(--glass-bg);">
+                    <div style="padding:8px; font-weight:600; border-bottom:1px solid var(--border);">{tool_name}</div>
+                    <div style="background-color: white; padding: 10px; display: flex; justify-content: center; align-items: center; min-height: 200px;">
+                        <img src="data:{mime};base64,{b64}" style="max-width:100%; height:auto; display:block; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"/>
+                    </div>
+                    <div style="padding:8px;">
+                        <a download="{tool_name}.{ext}" href="data:{mime};base64,{b64}" style="color: var(--primary); text-decoration: none;">
+                            <i class="fas fa-download"></i> 下载图片
+                        </a>
+                    </div>
+                    {code_section}
+                </div>""")
+            else:
+                err = r.get("error") or "生成失败"
+                hint = r.get("hint")
+                items.append(f"<div style=\"border:1px dashed var(--border); border-radius:12px; padding:12px; color:var(--text-secondary);\">{r.get('tool')}：{err}{('，' + hint) if hint else ''}</div>")
+        grid = f"<div style=\"display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:12px;\">{''.join(items)}</div>"
+        # 这里添加一个重新生成按钮，调用前端的 runDrawingGenerator()
+        grid += """
+        <div style="margin-top: 16px; text-align: center;">
+            <button onclick="runDrawingGenerator()" class="btn btn-primary btn-sm">
+                <i class="fas fa-redo"></i> 重新生成
+            </button>
+        </div>
+        """
+        return {"success": True, "html": grid, "results": results}
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
 
 @app.post("/api/chat/clear")
 async def clear_chat():
@@ -1291,9 +1431,45 @@ async def get_chat_history():
 
 # ==================== 向量存储 API ====================
 from tools.vector_store import vector_store_manager
+# MCP Service
+from services.mcp_service import mcp_manager
+import sys
 
+@app.post("/api/mcp/connect")
+async def connect_mcp(
+    command: str = Form(...),
+    args: str = Form("")
+):
+    """连接到 MCP Server 并获取工具列表"""
+    try:
+        arg_list = [a.strip() for a in args.split(" ") if a.strip()]
+        
+        # Special case for internal python script
+        if command == "python" and arg_list and "mcp_server_fs.py" in arg_list[0]:
+             # Ensure absolute path if needed, or keep relative
+             pass
 
-@app.post("/api/knowledge/add")
+        tools = await mcp_manager.list_tools(command, arg_list)
+        
+        # 注册到多智能体系统 (暂存配置)
+        # 我们将配置保存到环境变量或单例中，供 MCPAgent 使用
+        os.environ["MCP_ACTIVE_COMMAND"] = command
+        os.environ["MCP_ACTIVE_ARGS"] = json.dumps(arg_list)
+        
+        # 触发智能体刷新
+        multi_agent_system.reload_agents()
+        
+        return {
+            "success": True,
+            "tools": tools,
+            "count": len(tools)
+        }
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
+
+@app.get("/api/knowledge/add")
 async def add_to_knowledge_base(file: UploadFile = File(...)):
     """
     将文档添加到知识库（向量化存储）
@@ -1558,6 +1734,38 @@ async def workflow_document_review(
         """
         analyst_result = analyst.invoke([HumanMessage(content=analyst_prompt)])
         
+        # 提取文本内容 - Agent 可能直接返回列表
+        if isinstance(analyst_result, list):
+            text_parts = []
+            for item in analyst_result:
+                if isinstance(item, dict) and 'text' in item:
+                    text_parts.append(item['text'])
+                elif isinstance(item, str):
+                    text_parts.append(item)
+                else:
+                    text_parts.append(str(item))
+            analyst_text = "\n".join(text_parts)
+        elif hasattr(analyst_result, 'content'):
+            content = analyst_result.content
+            if isinstance(content, list):
+                text_parts = []
+                for item in content:
+                    if isinstance(item, dict) and 'text' in item:
+                        text_parts.append(item['text'])
+                    elif isinstance(item, str):
+                        text_parts.append(item)
+                    else:
+                        text_parts.append(str(item))
+                analyst_text = "\n".join(text_parts)
+            elif isinstance(content, str):
+                analyst_text = content
+            else:
+                analyst_text = str(content)
+        else:
+            analyst_text = str(analyst_result)
+        
+        print(f"[审查工作流] 文档分析师完成，输出长度: {len(analyst_text)}")
+        
         # 3.2 合规官
         compliance = multi_agent_system.registry.get("合规官")
         compliance_prompt = f"""请作为合规官审查以下文档，指出潜在的风险点、合规漏洞或不当表述。
@@ -1566,6 +1774,37 @@ async def workflow_document_review(
         {doc_content[:10000]}... (略)
         """
         compliance_result = compliance.invoke([HumanMessage(content=compliance_prompt)])
+        # 提取文本内容 - Agent 可能直接返回列表
+        if isinstance(compliance_result, list):
+            text_parts = []
+            for item in compliance_result:
+                if isinstance(item, dict) and 'text' in item:
+                    text_parts.append(item['text'])
+                elif isinstance(item, str):
+                    text_parts.append(item)
+                else:
+                    text_parts.append(str(item))
+            compliance_text = "\n".join(text_parts)
+        elif hasattr(compliance_result, 'content'):
+            content = compliance_result.content
+            if isinstance(content, list):
+                text_parts = []
+                for item in content:
+                    if isinstance(item, dict) and 'text' in item:
+                        text_parts.append(item['text'])
+                    elif isinstance(item, str):
+                        text_parts.append(item)
+                    else:
+                        text_parts.append(str(item))
+                compliance_text = "\n".join(text_parts)
+            elif isinstance(content, str):
+                compliance_text = content
+            else:
+                compliance_text = str(content)
+        else:
+            compliance_text = str(compliance_result)
+        
+        print(f"[审查工作流] 合规官完成，输出长度: {len(compliance_text)}")
         
         # Step 2: 汇总 (Creator)
         
@@ -1574,10 +1813,10 @@ async def workflow_document_review(
         creator_prompt = f"""请根据以下两份分析报告，撰写一份《智能文档多维审查报告》。
         
         【分析师摘要】
-        {analyst_result}
+        {analyst_text}
         
         【合规审查意见】
-        {compliance_result}
+        {compliance_text}
         
         【输出要求】
         1. 标题：智能文档审查报告 - {file.filename}
@@ -1588,14 +1827,46 @@ async def workflow_document_review(
         3. 语气：专业、客观、严谨
         """
         final_report = creator.invoke([HumanMessage(content=creator_prompt)])
+        # 提取文本内容 - Agent 可能直接返回列表
+        if isinstance(final_report, list):
+            text_parts = []
+            for item in final_report:
+                if isinstance(item, dict) and 'text' in item:
+                    text_parts.append(item['text'])
+                elif isinstance(item, str):
+                    text_parts.append(item)
+                else:
+                    text_parts.append(str(item))
+            final_text = "\n".join(text_parts)
+        elif hasattr(final_report, 'content'):
+            content = final_report.content
+            if isinstance(content, list):
+                text_parts = []
+                for item in content:
+                    if isinstance(item, dict) and 'text' in item:
+                        text_parts.append(item['text'])
+                    elif isinstance(item, str):
+                        text_parts.append(item)
+                    else:
+                        text_parts.append(str(item))
+                final_text = "\n".join(text_parts)
+            elif isinstance(content, str):
+                final_text = content
+            else:
+                final_text = str(content)
+        else:
+            final_text = str(final_report)
+        
+        print(f"[审查工作流] 内容创作者完成，输出长度: {len(final_text)}")
+        print(f"[审查工作流] 内容创作者前100字符: {final_text[:100]}")
         
         return {
             "success": True,
-            "report": final_report,
+            "report": final_text,
             "steps": [
-                {"agent": "文档分析师", "output": analyst_result},
-                {"agent": "合规官", "output": compliance_result},
-                {"agent": "内容创作者", "output": final_report}
+                {"agent": "文档分析师", "output": analyst_text},
+                {"agent": "合规官", "output": compliance_text},
+                {"agent": "内容创作者", "output": final_text}
             ]
         }
 
@@ -1740,7 +2011,7 @@ if __name__ == "__main__":
         print("="*60)
         print("配置示例:")
         print("  GEMINI_API_KEY=AIzaxxxxxxxxxxxxxx")
-        print("  GEMINI_MODEL=gemini-1.5-flash")
+        print("  GEMINI_MODEL=gemini-3-pro-preview")
         print("="*60)
 
     print("="*60)

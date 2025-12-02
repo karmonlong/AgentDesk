@@ -1,0 +1,6 @@
+# AgentDesk 截图列表
+
+1. 01-homepage.png
+2. 02-chat-interface.png
+3. 03-command-center.png
+4. 04-agents-list.png
