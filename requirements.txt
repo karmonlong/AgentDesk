@@ -20,4 +20,6 @@ requests>=2.31.0
 nest-asyncio>=1.6.0
 mcp
 asgiref>=3.7.0
+reportlab>=4.0.0
+Pillow>=10.0.0
 

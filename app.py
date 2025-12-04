@@ -67,7 +67,12 @@ async def test_mention_page():
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    """返回主页"""
+    """返回控制台主页"""
+    return templates.TemplateResponse("command_center_v2.html", {"request": request})
+
+@app.get("/old", response_class=HTMLResponse)
+async def old_home(request: Request):
+    """旧版主页（保留作为备份）"""
     html_content = """
     <!DOCTYPE html>
     <html lang="zh-CN">
@@ -648,7 +653,7 @@ async def home(request: Request):
     </html>
     """
 
-    return templates.TemplateResponse("command_center_v2.html", {"request": request})
+    return HTMLResponse(content=html_content)
 
 
 @app.post("/upload")
@@ -1263,6 +1268,13 @@ async def chat_with_agent(
                 "response": result.get("response", ""),
                 "routing_info": result.get("routing_info", {})
             }
+            
+            # 如果响应中包含 PDF 文件名（通过上下文传递）
+            context = multi_agent_system.conversation.get_context()
+            if context and context.get("pdf_filename"):
+                response_data["pdf_filename"] = context["pdf_filename"]
+                print(f"[聊天API] 包含 PDF 文件: {context['pdf_filename']}")
+            
             print(f"[聊天API] 返回数据: success={response_data['success']}, agent={response_data.get('agent', {}).get('name', 'N/A')}, response长度={len(str(response_data['response']))}")
             return response_data
         else:

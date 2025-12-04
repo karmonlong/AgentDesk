@@ -52,7 +52,8 @@ AGENT_IDS.update({
     "基金数据分析师": "fund_analyst",
     "投研报告助手": "report_assistant",
     "图像生成专家": "image_generator",
-    "绘画智能体": "drawing_agent"
+    "绘画智能体": "drawing_agent",
+    "PPT生成专家": "ppt_generator"
 })
 
 AGENT_ALIASES: Dict[str, List[str]] = {
@@ -1393,6 +1394,252 @@ class PromptAgent(Agent):
         self.capabilities = ["提示词优化", "框架设计", "角色设定", "思维链拆解"]
         self.example = "优化这个提示词：‘帮我写个 Python 脚本’。"
 
+class PPTGeneratorAgent(Agent):
+    """PPT 生成专家 - 智能生成演示文稿"""
+    
+    def __init__(self):
+        super().__init__(
+            id=AGENT_IDS["PPT生成专家"],
+            name="PPT生成专家",
+            role="演示文稿生成",
+            emoji="fas fa-file-powerpoint",
+            temperature=0.3,
+            system_prompt="""你是一个专业的演示文稿生成专家。你可以：
+1. 根据主题或文档内容生成 PPT 大纲
+2. 为每张幻灯片生成精美的图片
+3. 支持多种视觉风格（现代简约、商务科技、创意艺术、深色模式、自然清新）
+4. 支持不同复杂度级别（通用、专业、学术、行政高管）
+5. 支持多语言（简体中文、English 等）
+
+当用户请求生成 PPT 时，你需要：
+- 理解用户的需求（主题、风格、数量等）
+- 生成结构化的幻灯片大纲
+- 为每张幻灯片生成对应的图片
+- 提供下载或预览功能
+
+如果用户没有明确指定参数，使用默认值：
+- 幻灯片数量：5
+- 复杂度：专业
+- 风格：现代简约
+- 语言：简体中文"""
+        )
+        self.color = "#FF6B00"
+        self.desc = "智能生成演示文稿，支持多种风格和复杂度"
+        self.capabilities = ["PPT大纲生成", "幻灯片图片生成", "多风格支持", "多语言支持", "文档解析"]
+        self.example = "请为'人工智能在金融行业的应用'生成一个5页的PPT，风格使用商务科技"
+    
+    async def invoke(self, messages: List[Any], context: Optional[Dict] = None) -> str:
+        """处理 PPT 生成请求"""
+        from tools.ppt_generator import generate_presentation_outline, generate_slide_image
+        
+        user_message = messages[-1].content if messages else ""
+        
+        # 解析用户请求中的参数
+        import re
+        
+        # 提取主题（优先从引号中提取，否则使用整个消息）
+        topic_match = re.search(r'[""]([^""]+)[""]', user_message)
+        if topic_match:
+            topic = topic_match.group(1)
+        else:
+            # 如果没有引号，尝试提取"为"后面的内容
+            topic_match = re.search(r'为[""]?([^""]+)[""]?生成', user_message)
+            if topic_match:
+                topic = topic_match.group(1)
+            else:
+                # 移除 @提及 和常见指令词，保留主题
+                topic = re.sub(r'@\w+\s*', '', user_message)
+                topic = re.sub(r'请为|生成.*?PPT|复杂度.*|风格.*|语言.*', '', topic, flags=re.IGNORECASE)
+                topic = topic.strip()
+                if not topic:
+                    topic = user_message  # 如果都提取不到，使用原始消息
+        
+        # 提取幻灯片数量
+        slide_count_match = re.search(r'(\d+)\s*[页张]', user_message)
+        slide_count = int(slide_count_match.group(1)) if slide_count_match else 5
+        
+        # 提取风格
+        styles = ["现代简约", "商务科技", "创意艺术", "深色模式", "自然清新"]
+        visual_style = "现代简约"
+        for style in styles:
+            if style in user_message:
+                visual_style = style
+                break
+        
+        # 提取复杂度
+        complexity_levels = ["通用", "专业", "学术", "行政高管"]
+        complexity_level = "专业"
+        for level in complexity_levels:
+            if level in user_message:
+                complexity_level = level
+                break
+        
+        # 提取语言
+        languages = ["简体中文", "English", "Spanish", "French", "German", "Japanese"]
+        language = "简体中文"
+        for lang in languages:
+            if lang in user_message:
+                language = lang
+                break
+        
+        # 检查是否有文档内容
+        document_content = None
+        if context and context.get("document"):
+            document_content = context["document"]
+        
+        try:
+            # 步骤1：生成大纲
+            print(f"[PPTGen] 开始生成 PPT 大纲...")
+            outline_result = generate_presentation_outline(
+                topic=topic,
+                document_content=document_content,
+                complexity_level=complexity_level,
+                visual_style=visual_style,
+                language=language,
+                slide_count=slide_count
+            )
+            
+            if not outline_result.get("success"):
+                return f"❌ 生成 PPT 大纲失败: {outline_result.get('error', '未知错误')}"
+            
+            outline = outline_result.get("outline", [])
+            sources = outline_result.get("sources", [])
+            
+            if not outline:
+                return "❌ 未能生成有效的幻灯片大纲"
+            
+            # 步骤2：生成每张幻灯片的图片
+            print(f"[PPTGen] 开始生成 {len(outline)} 张幻灯片图片...")
+            slides = []
+            
+            for idx, slide_outline in enumerate(outline):
+                print(f"[PPTGen] 生成第 {idx + 1}/{len(outline)} 张幻灯片...")
+                image_result = generate_slide_image(slide_outline, visual_style)
+                
+                if image_result.get("success"):
+                    slides.append({
+                        "title": slide_outline.get("title", ""),
+                        "content": slide_outline.get("content", ""),
+                        "image_base64": image_result.get("image_base64"),
+                        "mime_type": image_result.get("mime_type", "image/png")
+                    })
+                else:
+                    # 如果图片生成失败，仍然保留大纲信息
+                    slides.append({
+                        "title": slide_outline.get("title", ""),
+                        "content": slide_outline.get("content", ""),
+                        "image_base64": None,
+                        "error": image_result.get("error", "图片生成失败")
+                    })
+            
+            # 步骤3：生成 PDF 文件
+            pdf_filename = None
+            try:
+                from tools.ppt_generator import create_pdf_from_slides
+                import os
+                from datetime import datetime
+                
+                # 生成文件名
+                safe_topic = "".join(c for c in topic[:30] if c.isalnum() or c in (' ', '-', '_')).strip()
+                safe_topic = safe_topic.replace(' ', '_')
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                pdf_filename = f"PPT_{safe_topic}_{timestamp}.pdf"
+                pdf_path = os.path.join("uploads", pdf_filename)
+                
+                # 确保 uploads 目录存在
+                os.makedirs("uploads", exist_ok=True)
+                
+                # 生成 PDF
+                pdf_result = create_pdf_from_slides(slides, pdf_path, topic)
+                if pdf_result.get("success"):
+                    print(f"[PPTGen] ✅ PDF 文件已生成: {pdf_filename}")
+                else:
+                    print(f"[PPTGen] ⚠️ PDF 生成失败: {pdf_result.get('error')}")
+                    pdf_filename = None
+            except Exception as e:
+                print(f"[PPTGen] ⚠️ PDF 生成异常: {e}")
+                import traceback
+                traceback.print_exc()
+                pdf_filename = None
+            
+            # 步骤4：格式化输出
+            output_parts = []
+            output_parts.append(f"✅ **PPT 生成完成！**\n")
+            output_parts.append(f"- 主题：{topic[:50]}{'...' if len(topic) > 50 else ''}\n")
+            output_parts.append(f"- 幻灯片数量：{len(slides)}\n")
+            output_parts.append(f"- 风格：{visual_style}\n")
+            output_parts.append(f"- 复杂度：{complexity_level}\n")
+            output_parts.append(f"- 语言：{language}\n\n")
+            
+            # 如果有 PDF，添加预览和下载链接
+            if pdf_filename:
+                output_parts.append("---\n")
+                output_parts.append("**📄 PDF 预览与下载：**\n\n")
+                output_parts.append(f'<div style="margin: 20px 0; padding: 15px; background: rgba(255,107,0,0.1); border-radius: 8px; border: 1px solid rgba(255,107,0,0.3);">')
+                output_parts.append(f'<p style="margin: 0 0 10px 0;"><strong>📄 {pdf_filename}</strong></p>')
+                output_parts.append(f'<div style="display: flex; gap: 10px; margin-top: 10px;">')
+                output_parts.append(f'<button onclick="previewPPT(\'{pdf_filename}\')" style="padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">📖 预览 PDF</button>')
+                output_parts.append(f'<button onclick="downloadPPT(\'{pdf_filename}\')" style="padding: 8px 16px; background: rgba(255,255,255,0.1); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-weight: 600;">⬇️ 下载 PDF</button>')
+                output_parts.append(f'</div>')
+                output_parts.append(f'</div>\n\n')
+            
+            # 显示每张幻灯片
+            for idx, slide in enumerate(slides, 1):
+                output_parts.append(f"### 幻灯片 {idx}: {slide['title']}\n")
+                output_parts.append(f"**内容：** {slide['content']}\n")
+                
+                if slide.get("image_base64"):
+                    img_data = slide["image_base64"]
+                    mime_type = slide.get("mime_type", "image/png")
+                    output_parts.append(f'<img src="data:{mime_type};base64,{img_data}" style="max-width:100%; border-radius:8px; margin:10px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"/>')
+                elif slide.get("error"):
+                    output_parts.append(f"⚠️ 图片生成失败: {slide['error']}")
+                
+                output_parts.append("\n")
+            
+            # 如果有来源，显示来源
+            if sources:
+                output_parts.append("\n---\n")
+                output_parts.append("**📚 参考来源：**\n")
+                output_parts.append("*以下是在生成 PPT 时参考的信息来源*\n\n")
+                for idx, source in enumerate(sources[:5], 1):  # 最多显示5个来源
+                    # 尝试从 URL 中提取域名作为显示名称
+                    import urllib.parse
+                    try:
+                        parsed_url = urllib.parse.urlparse(source['url'])
+                        # 如果是 Google 重定向链接，尝试提取原始域名
+                        if 'vertexaisearch.cloud.google.com' in source['url']:
+                            # 从重定向链接中提取原始域名（如果可能）
+                            domain = "来源网站"
+                        else:
+                            domain = parsed_url.netloc.replace('www.', '')
+                        display_name = source.get('title', domain) or domain
+                    except:
+                        display_name = source.get('title', '参考来源') or '参考来源'
+                    
+                    output_parts.append(f"{idx}. **{display_name}**  \n   <{source['url']}>\n")
+                output_parts.append("\n*提示：这些来源是 AI 在生成内容时参考的信息，你可以点击链接查看原文。*\n")
+            
+            # 添加提示
+            output_parts.append("\n💡 **提示：** 你可以要求我调整风格、增加或减少幻灯片数量，或者基于特定文档生成 PPT。")
+            
+            result = "\n".join(output_parts)
+            
+            # 将 PDF 文件名保存到智能体实例，以便后续访问
+            if pdf_filename:
+                self.last_pdf_filename = pdf_filename
+                # 也保存到上下文
+                if context:
+                    context["pdf_filename"] = pdf_filename
+            
+            return result
+            
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return f"❌ 生成 PPT 时出错: {str(e)}"
+
+
 class MCPAgent(Agent):
     """MCP 助手 - 能够连接外部工具的通用智能体"""
     
@@ -1671,6 +1918,7 @@ class AgentRegistry:
             ResearchReportAssistantAgent(),
             ImageGeneratorAgent(),
             DrawingAgent(),
+            PPTGeneratorAgent(),
             MCPAgent()
         ]
         
@@ -1922,6 +2170,11 @@ class MultiAgentSystem:
             
             # 添加响应到历史
             self.conversation.add_message("assistant", response, agent.name)
+            
+            # 如果响应中包含 PDF 文件名，保存到上下文
+            if hasattr(agent, 'last_pdf_filename') and agent.last_pdf_filename:
+                context = self.conversation.get_context()
+                context["pdf_filename"] = agent.last_pdf_filename
             
             # 检查是否是协调者的计划
             if agent.name == "协调者":

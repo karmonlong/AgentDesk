@@ -344,6 +344,8 @@
             /* 初始不可点击 */
             transition: opacity 0.8s ease 0.3s;
             /* 延迟显示 */
+            min-width: 0;
+            overflow: hidden;
         }
 
         /* 1. Activity Bar (最左侧) */
@@ -472,6 +474,7 @@
         /* 2. Sidebar (侧边栏) */
         .sidebar {
             width: var(--sidebar-width);
+            min-width: 0;
             background-color: var(--bg-primary);
             border-right: 1px solid var(--border);
             display: flex;
@@ -480,6 +483,7 @@
             transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             /* Fix: Create stacking context for absolute panels */
             z-index: 10;
+            overflow: hidden;
         }
 
         .sidebar.expanded {
@@ -493,9 +497,29 @@
         }
 
         .sidebar.collapsed {
-            width: 0;
-            margin-left: calc(var(--sidebar-width) * -1);
+            width: 0 !important;
+            min-width: 0;
             overflow: hidden;
+            border-right: none;
+        }
+
+        /* Left Sidebar Resizer */
+        .left-resizer {
+            flex: 0 0 6px;
+            cursor: col-resize;
+            background: rgba(255,255,255,0.06);
+            border-right: 1px solid var(--border);
+            transition: background 0.2s;
+            z-index: 20;
+            position: relative;
+        }
+
+        .left-resizer:hover {
+            background: rgba(255,255,255,0.12);
+        }
+
+        .sidebar.collapsed + .left-resizer {
+            display: none;
         }
 
         .sidebar-header {
@@ -876,6 +900,8 @@
             background-color: var(--bg-tertiary);
             position: relative;
             border-right: 1px solid var(--border);
+            min-width: 0;
+            overflow: hidden;
         }
 
         .editor-tabs {
@@ -890,8 +916,10 @@
         .editor-area {
             flex: 1;
             min-height: 0;
+            min-width: 0;
             padding: 20px;
             overflow-y: auto;
+            overflow-x: hidden;
             border-bottom: 1px solid var(--border);
             transition: all 0.3s ease;
             position: relative;
@@ -1163,6 +1191,9 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
+            overflow: hidden;
+            min-width: 0;
+            max-width: 100%;
         }
 
         .canvas-area.active {
@@ -1370,11 +1401,13 @@
         /* 4. Right Panel (右侧) */
         .right-panel {
             flex: 0 0 var(--right-panel-width);
+            min-width: 0;
             background-color: var(--bg-primary);
             border-left: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             transition: width 0.3s ease, margin-right 0.3s ease;
+            overflow: hidden;
         }
 
         .right-resizer {
@@ -1383,6 +1416,8 @@
             background: rgba(255,255,255,0.06);
             border-left: 1px solid var(--border);
             transition: background 0.2s;
+            z-index: 20;
+            position: relative;
         }
 
         .right-resizer:hover {
@@ -1396,9 +1431,15 @@
         }
 
         .right-panel.collapsed {
-            flex: 0 0 0;
-            margin-right: calc(var(--right-panel-width) * -1);
+            flex: 0 0 0 !important;
+            min-width: 0;
+            width: 0 !important;
             overflow: hidden;
+            border-left: none;
+        }
+
+        .right-panel.collapsed + .right-resizer {
+            display: none;
         }
 
         /* 状态类：激活 Workspace 模式 */
@@ -1741,6 +1782,9 @@
             </div>
             <div id="activity-drawing" class="activity-item" onclick="switchSidebar('drawing')" title="绘画智能体">
                 <i class="fas fa-palette"></i>
+            </div>
+            <div id="activity-ppt" class="activity-item" onclick="switchSidebar('ppt')" title="PPT生成专家">
+                <i class="fas fa-file-powerpoint"></i>
             </div>
             <div id="activity-notebooklm" class="activity-item" onclick="switchSidebar('notebooklm')" title="NotebookLM Pro">
                 <i class="fas fa-brain"></i>
@@ -2088,6 +2132,63 @@
                 </div>
             </div>
 
+            <!-- Panel: PPT生成专家 -->
+            <div id="panel-ppt" class="sidebar-panel" style="display: none;">
+                <div class="sidebar-header">
+                    <span><i class="fas fa-file-powerpoint" style="color: #FF6B00; margin-right:6px;"></i> PPT生成专家</span>
+                    <i class="fas fa-angle-left collapse-btn" onclick="toggleSidebar('left')" title="折叠"></i>
+                </div>
+                <div class="sidebar-content" style="padding: 15px;">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">主题或内容</div>
+                    <textarea id="ppt-topic-sidebar" rows="3" style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 0.9rem;" placeholder="例如：人工智能在金融行业的应用"></textarea>
+                    
+                    <div style="margin-top: 12px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">幻灯片数量</div>
+                            <input type="number" id="ppt-slide-count" value="5" min="3" max="20" style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 0.85rem;">
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">复杂度</div>
+                            <select id="ppt-complexity" style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 0.85rem;">
+                                <option value="通用">通用</option>
+                                <option value="专业" selected>专业</option>
+                                <option value="学术">学术</option>
+                                <option value="行政高管">行政高管</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 10px;">
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">视觉风格</div>
+                        <select id="ppt-style" style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 0.85rem;">
+                            <option value="现代简约" selected>现代简约</option>
+                            <option value="商务科技">商务科技</option>
+                            <option value="创意艺术">创意艺术</option>
+                            <option value="深色模式">深色模式</option>
+                            <option value="自然清新">自然清新</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-top: 10px;">
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">语言</div>
+                        <select id="ppt-language" style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 0.85rem;">
+                            <option value="简体中文" selected>简体中文</option>
+                            <option value="English">English</option>
+                            <option value="Spanish">Spanish</option>
+                            <option value="French">French</option>
+                            <option value="German">German</option>
+                            <option value="Japanese">Japanese</option>
+                        </select>
+                    </div>
+
+                    <button onclick="generatePPTFromSidebar()" style="margin-top: 15px; width: 100%; padding: 12px; background: linear-gradient(135deg, #FF8800 0%, #FF6B00 100%); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s;">
+                        <i class="fas fa-magic" style="margin-right: 6px;"></i> 生成PPT
+                    </button>
+
+                    <div id="ppt-status" style="margin-top: 10px; font-size: 0.75rem; color: var(--text-secondary); display: none;"></div>
+                </div>
+            </div>
+
             <!-- Panel: MCP Market -->
             <div id="panel-mcp" class="sidebar-panel">
                 <div class="sidebar-header">
@@ -2221,6 +2322,9 @@
             </div>
 
         </div>
+
+        <!-- Left Sidebar Resizer -->
+        <div class="left-resizer" id="leftResizer"></div>
 
         <!-- 3. Main Content -->
         <div class="main-content">
@@ -3077,6 +3181,38 @@
         }
 
         function typeWriter(element, text, speed = 10) {
+            // 如果文本包含 HTML 标签（如 <img>），直接渲染，不使用打字机效果
+            if (text.includes('<img') || text.includes('<div') || text.includes('<iframe')) {
+                // 使用 parseMarkdown 处理 markdown，然后直接设置 HTML
+                let processedText = text;
+                
+                // 处理 Markdown 格式
+                if (typeof parseMarkdown === 'function') {
+                    try {
+                        processedText = parseMarkdown(text);
+                    } catch (e) {
+                        console.warn('Markdown parsing failed, using raw text:', e);
+                    }
+                } else {
+                    // 简单的 markdown 处理
+                    processedText = text
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/### (.*?)\n/g, '<h3>$1</h3>')
+                        .replace(/## (.*?)\n/g, '<h2>$1</h2>')
+                        .replace(/# (.*?)\n/g, '<h1>$1</h1>')
+                        .replace(/\n/g, '<br>');
+                }
+                
+                element.innerHTML = processedText;
+                
+                // 滚动到底部
+                const container = element.closest('.chat-messages') || element.closest('#chat-messages');
+                if (container) {
+                    container.scrollTop = container.scrollHeight;
+                }
+                return;
+            }
+            
             let i = 0;
             element.innerHTML = '';
 
@@ -3190,13 +3326,28 @@
                 return `__MERMAID_BLOCK_${mermaidBlocks.length - 1}__`;
             });
 
-            // 3. Simple markdown rendering
-            let htmlContent = processedContent
+            // 3. Simple markdown rendering (保留已有的 HTML 标签，如 <img>)
+            // 先提取所有 HTML 标签（如 <img>），避免被后续处理破坏
+            const htmlTags = [];
+            const htmlTagRegex = /<[^>]+>/g;
+            let tempContent = processedContent;
+            let match;
+            while ((match = htmlTagRegex.exec(processedContent)) !== null) {
+                htmlTags.push(match[0]);
+                tempContent = tempContent.replace(match[0], `__HTML_TAG_${htmlTags.length - 1}__`);
+            }
+            
+            let htmlContent = tempContent
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/### (.*?)\n/g, '<h3>$1</h3>')
                 .replace(/## (.*?)\n/g, '<h2>$1</h2>')
                 .replace(/# (.*?)\n/g, '<h1>$1</h1>')
                 .replace(/\n/g, '<br>');
+            
+            // 恢复 HTML 标签
+            htmlTags.forEach((tag, index) => {
+                htmlContent = htmlContent.replace(`__HTML_TAG_${index}__`, tag);
+            });
 
             // 4. Restore HTML blocks
             htmlBlocks.forEach((block, index) => {
@@ -3613,7 +3764,17 @@
         function toggleSidebar(side) {
             if (side === 'left') {
                 const sidebar = document.getElementById('leftSidebar');
+                const resizer = document.getElementById('leftResizer');
                 sidebar.classList.toggle('collapsed');
+                
+                // 隐藏/显示resizer
+                if (resizer) {
+                    if (sidebar.classList.contains('collapsed')) {
+                        resizer.style.display = 'none';
+                    } else {
+                        resizer.style.display = 'block';
+                    }
+                }
                 
                 // 更新所有左侧面板的折叠按钮图标
                 const buttons = sidebar.querySelectorAll('.collapse-btn');
@@ -3630,18 +3791,30 @@
                 });
             } else if (side === 'right') {
                 const panel = document.getElementById('rightPanel');
+                const resizer = document.getElementById('rightResizer');
                 panel.classList.toggle('collapsed');
+                
+                // 隐藏/显示resizer
+                if (resizer) {
+                    if (panel.classList.contains('collapsed')) {
+                        resizer.style.display = 'none';
+                    } else {
+                        resizer.style.display = 'block';
+                    }
+                }
                 
                 // 更新右侧面板的折叠按钮图标
                 const btn = panel.querySelector('.collapse-btn');
-                if (panel.classList.contains('collapsed')) {
-                    btn.classList.remove('fa-angle-right');
-                    btn.classList.add('fa-angle-left');
-                    btn.setAttribute('title', '展开');
-                } else {
-                    btn.classList.remove('fa-angle-left');
-                    btn.classList.add('fa-angle-right');
-                    btn.setAttribute('title', '折叠');
+                if (btn) {
+                    if (panel.classList.contains('collapsed')) {
+                        btn.classList.remove('fa-angle-right');
+                        btn.classList.add('fa-angle-left');
+                        btn.setAttribute('title', '展开');
+                    } else {
+                        btn.classList.remove('fa-angle-left');
+                        btn.classList.add('fa-angle-right');
+                        btn.setAttribute('title', '折叠');
+                    }
                 }
             }
             
@@ -4336,7 +4509,17 @@
             else if (ext === 'pdf') {
                  const pdfUrl = `/download/${encodedFilename}?preview=true`;
                  const contentHtml = `
-                    <iframe src="${pdfUrl}" style="width: 100%; height: calc(100vh - 200px); border: none; border-radius: 8px; background: #333;"></iframe>
+                    <div style="position: relative; width: 100%; height: calc(100vh - 200px);">
+                        <iframe src="${pdfUrl}" style="width: 100%; height: 100%; border: none; border-radius: 8px; background: #333;"></iframe>
+                        <div style="position: absolute; bottom: 20px; right: 20px; display: flex; gap: 10px;">
+                            <button onclick="window.open('${pdfUrl}', '_blank')" style="padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                <i class="fas fa-external-link-alt"></i> 新窗口打开
+                            </button>
+                            <button onclick="downloadFile('${filename}')" style="padding: 10px 20px; background: rgba(255,255,255,0.1); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                <i class="fas fa-download"></i> 下载
+                            </button>
+                        </div>
+                    </div>
                  `;
                  renderPreviewContainer(editorArea, filename, contentHtml);
             }
@@ -5870,6 +6053,116 @@
         })();
     </script>
     <script>
+        // Left Sidebar Resizer
+        (function(){
+            const root = document.documentElement;
+            const el = document.getElementById('leftResizer');
+            let startX = 0;
+            let startW = 0;
+            function onMove(e){
+                const dx = e.clientX - startX;
+                const w = Math.min(Math.max(startW + dx, 200), 600);
+                root.style.setProperty('--sidebar-width', w + 'px');
+            }
+            function onUp(){
+                window.removeEventListener('mousemove', onMove);
+                window.removeEventListener('mouseup', onUp);
+                try {
+                    const v = getComputedStyle(root).getPropertyValue('--sidebar-width').trim();
+                    localStorage.setItem('leftSidebarWidth', v);
+                } catch(e) {}
+            }
+            if (el){
+                el.addEventListener('mousedown', (e)=>{
+                    e.preventDefault();
+                    startX = e.clientX;
+                    const v = parseInt(getComputedStyle(root).getPropertyValue('--sidebar-width')) || 250;
+                    startW = v;
+                    window.addEventListener('mousemove', onMove);
+                    window.addEventListener('mouseup', onUp);
+                });
+                el.addEventListener('dblclick', ()=>{
+                    const target = Math.round(Math.min(Math.max(window.innerWidth * 0.15, 200), 400));
+                    root.style.setProperty('--sidebar-width', target + 'px');
+                    try { localStorage.setItem('leftSidebarWidth', target + 'px'); } catch(e) {}
+                });
+            }
+            try {
+                const saved = localStorage.getItem('leftSidebarWidth');
+                if (saved) root.style.setProperty('--sidebar-width', saved);
+            } catch(e) {}
+        })();
+    </script>
+    <script>
+        async function generatePPTFromSidebar() {
+            const topic = document.getElementById('ppt-topic-sidebar').value.trim();
+            if (!topic) {
+                alert('请输入主题或内容');
+                return;
+            }
+
+            const slideCount = parseInt(document.getElementById('ppt-slide-count').value) || 5;
+            const complexity = document.getElementById('ppt-complexity').value;
+            const style = document.getElementById('ppt-style').value;
+            const language = document.getElementById('ppt-language').value;
+
+            const statusEl = document.getElementById('ppt-status');
+            statusEl.style.display = 'block';
+            statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在生成PPT，请稍候...';
+            statusEl.style.color = 'var(--primary)';
+
+            try {
+                // 调用后端 API 生成 PPT（使用 FormData 格式）
+                const formData = new FormData();
+                formData.append('message', `@PPT生成专家 请为"${topic}"生成一个${slideCount}页的PPT，复杂度使用${complexity}，风格使用${style}，语言使用${language}`);
+
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText || '请求失败'}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.response) {
+                    statusEl.innerHTML = '<i class="fas fa-check-circle" style="color: #4CAF50;"></i> PPT生成完成！';
+                    statusEl.style.color = '#4CAF50';
+                    
+                    // 将结果添加到聊天区
+                    addChatMessage('agent', data.response, 'PPT生成专家');
+                    
+                    // 更新中间面板显示 PPT 内容
+                    updateCenterPanel(data.response, 'PPT生成专家');
+                    
+                    // 切换到主视图（确保中间面板可见）
+                    switchMainView('editor');
+                    
+                    // 如果有 PDF 文件名，保存到全局变量
+                    if (data.pdf_filename) {
+                        window.currentPPT_PDF = data.pdf_filename;
+                    }
+                    
+                    // 切换到聊天面板查看结果
+                    setTimeout(() => {
+                        const chatPanel = document.getElementById('rightSidebar');
+                        if (chatPanel) {
+                            chatPanel.style.display = 'flex';
+                        }
+                    }, 500);
+                } else {
+                    throw new Error(data.error || '生成失败');
+                }
+            } catch (error) {
+                console.error('PPT生成失败:', error);
+                statusEl.innerHTML = `<i class="fas fa-exclamation-circle" style="color: #F44336;"></i> 生成失败: ${error.message}`;
+                statusEl.style.color = '#F44336';
+            }
+        }
+
         async function runDrawingGeneratorFromSidebar() {
             switchMainView('editor');
             const prompt = document.getElementById('draw-prompt-sidebar').value;
