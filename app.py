@@ -2082,6 +2082,228 @@ async def start_alphafund_workflow(
     )
 
 
+# ============================================
+# 首页问答 API（渐进式工作模式）
+# ============================================
+
+from services.qa_database import (
+    init_database, create_session, save_qa_record,
+    get_session_history, get_recent_sessions, get_recent_qa_history,
+    search_qa_history, get_statistics
+)
+
+class IntentRequest(BaseModel):
+    """意图识别请求"""
+    message: str
+    session_id: Optional[str] = None
+
+class QARequest(BaseModel):
+    """问答请求"""
+    message: str
+    session_id: Optional[str] = None
+    user_id: str = "default"
+
+
+@app.post("/api/parse-intent")
+async def parse_intent(request: IntentRequest):
+    """
+    解析用户意图：判断是问答还是任务
+    
+    判断规则：
+    - 问答类：询问信息、解释概念、查询知识（不需要执行具体工作）
+    - 任务类：需要生成报告、分析文档、创建内容等具体工作
+    """
+    message = request.message.strip()
+    
+    # 简单规则判断（后续可用 LLM 增强）
+    task_keywords = [
+        "生成", "创建", "写一份", "撰写", "分析", "审核", "处理", 
+        "制作", "帮我做", "执行", "开始", "启动", "进入",
+        "上传", "导出", "转换", "翻译这份", "整理",
+        "报告", "文档", "PPT", "幻灯片", "表格",
+        "投研", "研报", "财报分析"
+    ]
+    
+    qa_keywords = [
+        "什么是", "是什么", "为什么", "怎么样", "如何理解",
+        "请解释", "请问", "告诉我", "介绍一下", "说说",
+        "有什么区别", "有哪些", "是谁", "在哪里",
+        "多少", "什么时候", "是否", "能不能",
+        "你好", "谢谢", "你是谁", "你能做什么"
+    ]
+    
+    # 计算意图得分
+    task_score = sum(1 for kw in task_keywords if kw in message)
+    qa_score = sum(1 for kw in qa_keywords if kw in message)
+    
+    # 短消息且无明显任务关键词，倾向于问答
+    if len(message) < 20 and task_score == 0:
+        qa_score += 1
+    
+    # 包含 @ 提及，倾向于任务
+    if "@" in message:
+        task_score += 2
+    
+    # 判断意图
+    if task_score > qa_score:
+        intent = "task"
+        confidence = min(0.9, 0.5 + task_score * 0.1)
+    else:
+        intent = "qa"
+        confidence = min(0.9, 0.5 + qa_score * 0.1)
+    
+    return {
+        "intent": intent,
+        "confidence": confidence,
+        "message": message,
+        "scores": {
+            "task": task_score,
+            "qa": qa_score
+        }
+    }
+
+
+@app.post("/api/landing-qa")
+async def landing_qa(request: QARequest):
+    """
+    首页问答 API - 不进入工作台，直接在首页回答
+    
+    使用 Gemini 进行通用问答，并存档到数据库
+    """
+    import httpx
+    
+    message = request.message.strip()
+    session_id = request.session_id
+    user_id = request.user_id
+    
+    # 如果没有 session_id，创建一个新会话
+    if not session_id:
+        session_id = create_session(user_id, message[:50] if len(message) > 50 else message)
+    
+    # 获取会话历史作为上下文
+    history = get_session_history(session_id, limit=10)
+    
+    # 构建对话历史
+    conversation_context = ""
+    for item in history:
+        conversation_context += f"用户: {item['question']}\n助手: {item['answer']}\n\n"
+    
+    # 调用 Gemini API 进行问答
+    gemini_api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+    if not gemini_api_key:
+        return JSONResponse(
+            status_code=500,
+            content={"error": "未配置 Gemini API Key"}
+        )
+    
+    # 构建 prompt
+    system_prompt = """你是 AgentDesk 的智能助手，一个友好、专业的 AI 问答助手。
+
+你的职责：
+1. 回答用户的各类问题，提供准确、有帮助的信息
+2. 如果问题涉及到需要执行具体工作任务（如生成报告、分析文档等），建议用户使用对应的智能体工作台
+3. 回答要简洁明了，避免过于冗长
+4. 对于专业问题，可以适当详细解释
+
+AgentDesk 系统包含以下智能体工作台：
+- 投研分析（AlphaFund）：分析股票、生成投研报告
+- 文档分析：分析、总结文档内容
+- 合规审核：审核营销文案合规性
+- 内容创作：撰写报告、邮件等
+- 数据可视化：生成图表和数据分析
+- 翻译本地化：中英文互译
+"""
+
+    full_prompt = f"""{system_prompt}
+
+{f'对话历史：' + conversation_context if conversation_context else ''}
+
+用户问题: {message}
+
+请回答："""
+
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(
+                f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gemini_api_key}",
+                json={
+                    "contents": [{"parts": [{"text": full_prompt}]}],
+                    "generationConfig": {
+                        "temperature": 0.7,
+                        "maxOutputTokens": 1024
+                    }
+                },
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                answer = result.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "抱歉，我无法生成回答。")
+            else:
+                answer = f"API 调用失败: {response.status_code}"
+    except Exception as e:
+        answer = f"问答服务暂时不可用: {str(e)}"
+    
+    # 保存问答记录
+    record_id = save_qa_record(
+        session_id=session_id,
+        question=message,
+        answer=answer,
+        agent_name="通用助手",
+        agent_role="问答",
+        intent_type="qa",
+        confidence=0.8,
+        user_id=user_id
+    )
+    
+    return {
+        "success": True,
+        "session_id": session_id,
+        "record_id": record_id,
+        "question": message,
+        "answer": answer,
+        "agent": {
+            "name": "通用助手",
+            "avatar": "🤖"
+        }
+    }
+
+
+@app.get("/api/qa/sessions")
+async def get_qa_sessions(user_id: str = "default", limit: int = 10):
+    """获取问答会话列表"""
+    sessions = get_recent_sessions(user_id, limit)
+    return {"sessions": sessions}
+
+
+@app.get("/api/qa/history/{session_id}")
+async def get_qa_history(session_id: str, limit: int = 50):
+    """获取指定会话的历史记录"""
+    history = get_session_history(session_id, limit)
+    return {"session_id": session_id, "history": history}
+
+
+@app.get("/api/qa/recent")
+async def get_recent_qa(user_id: str = "default", limit: int = 20):
+    """获取最近的问答记录"""
+    history = get_recent_qa_history(user_id, limit)
+    return {"history": history}
+
+
+@app.get("/api/qa/search")
+async def search_qa(keyword: str, user_id: str = "default", limit: int = 20):
+    """搜索问答历史"""
+    results = search_qa_history(keyword, user_id, limit)
+    return {"keyword": keyword, "results": results}
+
+
+@app.get("/api/qa/stats")
+async def get_qa_stats(user_id: str = "default"):
+    """获取问答统计信息"""
+    stats = get_statistics(user_id)
+    return stats
+
+
 if __name__ == "__main__":
     import uvicorn
     print("="*60)

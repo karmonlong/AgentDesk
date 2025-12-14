@@ -336,6 +336,190 @@
             z-index: 100 !important;
         }
 
+        /* ==================== Landing QA Container ==================== */
+        .landing-qa-container {
+            width: 700px;
+            max-width: 95%;
+            max-height: 400px;
+            margin-bottom: 20px;
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid rgba(255, 107, 0, 0.2);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .landing-qa-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, rgba(255, 107, 0, 0.15) 0%, rgba(255, 107, 0, 0.05) 100%);
+            border-bottom: 1px solid rgba(255, 107, 0, 0.2);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .landing-qa-clear {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .landing-qa-clear:hover {
+            background: rgba(255, 107, 0, 0.2);
+            color: var(--primary);
+        }
+
+        .landing-qa-messages {
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .landing-qa-message {
+            display: flex;
+            gap: 12px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .landing-qa-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .landing-qa-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .landing-qa-message.user .landing-qa-avatar {
+            background: linear-gradient(135deg, #FF8800 0%, #FF6B00 100%);
+        }
+
+        .landing-qa-message.assistant .landing-qa-avatar {
+            background: rgba(100, 100, 100, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .landing-qa-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .landing-qa-message.user .landing-qa-bubble {
+            background: rgba(255, 107, 0, 0.15);
+            border: 1px solid rgba(255, 107, 0, 0.3);
+            border-radius: 12px 12px 4px 12px;
+        }
+
+        .landing-qa-message.assistant .landing-qa-bubble {
+            background: rgba(40, 40, 40, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px 12px 12px 4px;
+        }
+
+        .landing-qa-loading {
+            display: flex;
+            gap: 4px;
+            padding: 8px 0;
+        }
+
+        .landing-qa-loading span {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .landing-qa-loading span:nth-child(1) { animation-delay: -0.32s; }
+        .landing-qa-loading span:nth-child(2) { animation-delay: -0.16s; }
+        .landing-qa-loading span:nth-child(3) { animation-delay: 0; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* 问答区域滚动条样式 */
+        .landing-qa-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .landing-qa-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .landing-qa-messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 107, 0, 0.3);
+            border-radius: 3px;
+        }
+
+        .landing-qa-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 107, 0, 0.5);
+        }
+
+        /* 工作台建议提示 */
+        .landing-qa-workspace-hint {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, rgba(255, 107, 0, 0.1) 0%, rgba(255, 107, 0, 0.05) 100%);
+            border: 1px solid rgba(255, 107, 0, 0.2);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .landing-qa-workspace-hint a {
+            color: var(--primary);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .landing-qa-workspace-hint a:hover {
+            color: #FF8800;
+        }
+
+        /* workspace 模式下隐藏问答区域 */
+        body.mode-workspace .landing-qa-container {
+            display: none !important;
+        }
+
         /* ==================== Workspace Mode (VS Code Style) ==================== */
         #workspace-container {
             display: flex;
@@ -1753,6 +1937,19 @@
             <!-- Dynamic Agents -->
         </div>
 
+        <!-- 问答对话显示区域（渐进式工作模式） -->
+        <div class="landing-qa-container" id="landingQaContainer" style="display: none;">
+            <div class="landing-qa-header">
+                <span>💬 对话</span>
+                <button class="landing-qa-clear" onclick="clearLandingQa()" title="清空对话">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+            <div class="landing-qa-messages" id="landingQaMessages">
+                <!-- 动态加载的对话消息 -->
+            </div>
+        </div>
+
         <div class="landing-input-wrapper">
             <input type="text" class="landing-input" id="globalInput" placeholder="想让我帮你做什么？(例如：分析这份财报)">
             <!-- Mention Dropdown for Landing -->
@@ -2980,25 +3177,209 @@
         const input = document.getElementById('globalInput');
         const chatInput = document.getElementById('chatInput');
 
-        // Landing Page Input
-        // 注意：这个监听器已被 setupMentionLogic 中的监听器取代
-        // 不再需要单独的 Enter 监听器，因为 mention 逻辑已经处理了
-        /*
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                enterWorkspace();
+        // 当前问答会话 ID
+        let currentQaSessionId = null;
+        
+        // 问答模式状态
+        let isQaMode = false;
+
+        // Landing Page Input - 处理 Enter 键
+        input.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                await handleLandingInput();
             }
         });
-        */
 
+        /**
+         * 处理首页输入：先进行意图识别，再决定是问答还是进入工作台
+         */
+        async function handleLandingInput() {
+            const val = input.value.trim();
+            if (!val) return;
+            
+            try {
+                // 1. 调用意图识别 API
+                const intentRes = await fetch('/api/parse-intent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: val })
+                });
+                const intentData = await intentRes.json();
+                
+                console.log('[意图识别]', intentData);
+                
+                // 2. 根据意图决定行为
+                if (intentData.intent === 'qa') {
+                    // 问答模式：在首页直接回答
+                    await handleLandingQa(val);
+                } else {
+                    // 任务模式：进入工作台
+                    enterWorkspaceWithTask(val);
+                }
+            } catch (error) {
+                console.error('[意图识别失败]', error);
+                // 降级处理：默认进入工作台
+                enterWorkspaceWithTask(val);
+            }
+        }
+
+        /**
+         * 处理首页问答
+         */
+        async function handleLandingQa(question) {
+            const qaContainer = document.getElementById('landingQaContainer');
+            const qaMessages = document.getElementById('landingQaMessages');
+            
+            // 显示问答区域
+            qaContainer.style.display = 'block';
+            isQaMode = true;
+            
+            // 添加用户消息
+            addLandingQaMessage('user', question);
+            
+            // 清空输入框
+            input.value = '';
+            
+            // 添加加载动画
+            const loadingId = 'loading-' + Date.now();
+            qaMessages.innerHTML += `
+                <div class="landing-qa-message assistant" id="${loadingId}">
+                    <div class="landing-qa-avatar">🤖</div>
+                    <div class="landing-qa-bubble">
+                        <div class="landing-qa-loading">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            scrollQaToBottom();
+            
+            try {
+                // 调用问答 API
+                const res = await fetch('/api/landing-qa', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: question,
+                        session_id: currentQaSessionId
+                    })
+                });
+                
+                const data = await res.json();
+                
+                // 保存会话 ID
+                if (data.session_id) {
+                    currentQaSessionId = data.session_id;
+                }
+                
+                // 移除加载动画
+                const loadingEl = document.getElementById(loadingId);
+                if (loadingEl) loadingEl.remove();
+                
+                // 添加 AI 回答
+                if (data.success) {
+                    addLandingQaMessage('assistant', data.answer, data.agent);
+                } else {
+                    addLandingQaMessage('assistant', '抱歉，暂时无法回答您的问题。');
+                }
+                
+            } catch (error) {
+                console.error('[问答失败]', error);
+                const loadingEl = document.getElementById(loadingId);
+                if (loadingEl) loadingEl.remove();
+                addLandingQaMessage('assistant', '网络错误，请稍后重试。');
+            }
+        }
+
+        /**
+         * 添加问答消息到界面
+         */
+        function addLandingQaMessage(role, content, agent = null) {
+            const qaMessages = document.getElementById('landingQaMessages');
+            
+            const avatar = role === 'user' ? '👤' : (agent?.avatar || '🤖');
+            const agentName = agent?.name || '';
+            
+            // 格式化内容（支持简单 Markdown）
+            const formattedContent = formatSimpleMarkdown(content);
+            
+            const messageHtml = `
+                <div class="landing-qa-message ${role}">
+                    <div class="landing-qa-avatar">${avatar}</div>
+                    <div class="landing-qa-bubble">
+                        ${agentName ? `<div style="font-size: 0.75rem; color: var(--primary); margin-bottom: 4px;">${agentName}</div>` : ''}
+                        <div>${formattedContent}</div>
+                    </div>
+                </div>
+            `;
+            
+            qaMessages.innerHTML += messageHtml;
+            scrollQaToBottom();
+        }
+
+        /**
+         * 简单的 Markdown 格式化
+         */
+        function formatSimpleMarkdown(text) {
+            if (!text) return '';
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code style="background: rgba(255,107,0,0.15); padding: 2px 6px; border-radius: 4px;">$1</code>')
+                .replace(/\n/g, '<br>');
+        }
+
+        /**
+         * 滚动问答区域到底部
+         */
+        function scrollQaToBottom() {
+            const qaMessages = document.getElementById('landingQaMessages');
+            setTimeout(() => {
+                qaMessages.scrollTop = qaMessages.scrollHeight;
+            }, 100);
+        }
+
+        /**
+         * 清空首页问答
+         */
+        function clearLandingQa() {
+            const qaContainer = document.getElementById('landingQaContainer');
+            const qaMessages = document.getElementById('landingQaMessages');
+            
+            qaMessages.innerHTML = '';
+            qaContainer.style.display = 'none';
+            currentQaSessionId = null;
+            isQaMode = false;
+        }
+
+        /**
+         * 带任务进入工作台
+         */
+        function enterWorkspaceWithTask(task) {
+            document.body.classList.add('mode-workspace');
+            
+            if (task) {
+                chatInput.value = task;
+                executeTask(task);
+            }
+            
+            // 清空输入框
+            input.value = '';
+        }
+
+        /**
+         * 直接进入工作台（点击按钮时）
+         */
         function enterWorkspace() {
             const val = input.value.trim();
-                document.body.classList.add('mode-workspace');
-                
+            
+            // 如果有输入内容，走意图识别流程
             if (val) {
-                // Transfer value to chat input and execute
-                chatInput.value = val;
-                executeTask(val);
+                handleLandingInput();
+            } else {
+                // 没有输入，直接进入工作台
+                document.body.classList.add('mode-workspace');
             }
         }
         
@@ -5161,9 +5542,9 @@
                     if (!e.shiftKey) {
                         // Only prevent default if it's the landing input or chat input (no shift)
                         if (this.id === 'globalInput') {
-                            e.preventDefault();
-                            console.log('[Mention] Enter without dropdown - entering workspace');
-                            enterWorkspace();
+                            // 由 handleLandingInput() 中的监听器处理，这里不再处理
+                            // 避免重复触发
+                            return;
                         } else {
                             e.preventDefault();
                             executeTask(this.value);
