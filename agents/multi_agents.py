@@ -53,7 +53,8 @@ AGENT_IDS.update({
     "投研报告助手": "report_assistant",
     "图像生成专家": "image_generator",
     "绘画智能体": "drawing_agent",
-    "PPT生成专家": "ppt_generator"
+    "PPT生成专家": "ppt_generator",
+    "AKShare数据专家": "akshare_expert"
 })
 
 AGENT_ALIASES: Dict[str, List[str]] = {
@@ -1137,16 +1138,414 @@ class NewsAggregatorAgent(Agent):
 - 追踪指定主题的资讯（RSS/网站）
 - 生成每日摘要与要点
 - 提取关键信息与来源链接
+- 查询股票实时行情、新闻、财务数据
 
 输出：
 - 列表化摘要，附带来源链接
 - 可选生成 Markdown 日报
+- 股票数据查询结果格式化展示
 """
         )
         self.color = "#FF5722"
         self.desc = "实时追踪 RSS 源与财经新闻"
-        self.capabilities = ["新闻聚合", "关键词订阅", "自动摘要", "早报生成"]
-        self.example = "帮我订阅‘半导体行业’相关的最新研报和新闻，每天早上8点推送摘要。"
+        self.capabilities = ["新闻聚合", "关键词订阅", "自动摘要", "早报生成", "股票数据查询"]
+        self.example = "帮我订阅'半导体行业'相关的最新研报和新闻，每天早上8点推送摘要。"
+        # 加载 akshare MCP 配置
+        self._akshare_config = None
+        self._akshare_tools = None
+        self._load_akshare_config()
+    
+    def _load_akshare_config(self):
+        """加载 akshare MCP 配置"""
+        try:
+            mcp_config_path = os.path.join(os.getcwd(), "mcp_servers.json")
+            if os.path.exists(mcp_config_path):
+                with open(mcp_config_path, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+                    aktools_config = config.get("mcpServers", {}).get("mcp-aktools")
+                    if aktools_config:
+                        self._akshare_config = {
+                            "command": aktools_config.get("command", "npx"),
+                            "args": aktools_config.get("args", [])
+                        }
+                        print(f"[NewsAggregatorAgent] ✅ 已加载 akshare MCP 配置")
+                    else:
+                        print(f"[NewsAggregatorAgent] ⚠️ 未找到 mcp-aktools 配置")
+            else:
+                print(f"[NewsAggregatorAgent] ⚠️ mcp_servers.json 文件不存在")
+        except Exception as e:
+            print(f"[NewsAggregatorAgent] ⚠️ 加载配置失败: {e}")
+    
+    async def _get_akshare_tools(self):
+        """获取 akshare 可用工具列表"""
+        if not self._akshare_config:
+            return []
+        
+        if self._akshare_tools is not None:
+            return self._akshare_tools
+        
+        try:
+            import asyncio
+            # 设置超时为 10 秒
+            tools = await asyncio.wait_for(
+                mcp_manager.list_tools(
+                    self._akshare_config["command"],
+                    self._akshare_config["args"]
+                ),
+                timeout=10.0
+            )
+            self._akshare_tools = tools
+            print(f"[NewsAggregatorAgent] ✅ 获取到 {len(tools)} 个 akshare 工具")
+            return tools
+        except asyncio.TimeoutError:
+            print(f"[NewsAggregatorAgent] ⚠️ 获取工具列表超时（10秒），将使用 LLM 知识回答")
+            self._akshare_tools = []  # 标记为已尝试
+            return []
+        except Exception as e:
+            print(f"[NewsAggregatorAgent] ⚠️ 获取工具列表失败: {e}")
+            self._akshare_tools = []  # 标记为已尝试
+            return []
+    
+    async def invoke(self, messages: List[Any], context: Optional[Dict] = None) -> str:
+        """异步调用，支持 akshare MCP 工具"""
+        import re
+        
+        # 如果没有 akshare 配置，回退到基类方法
+        if not self._akshare_config:
+            return super().invoke(messages, context)
+        
+        # 获取可用工具
+        tools = await self._get_akshare_tools()
+        if not tools:
+            # 如果没有工具，回退到基类方法
+            return super().invoke(messages, context)
+        
+        # 构建工具描述
+        tool_descriptions = []
+        for tool in tools:
+            tool_name = tool.get("name", "")
+            tool_desc = tool.get("description", "")
+            input_schema = tool.get("input_schema", {})
+            properties = input_schema.get("properties", {})
+            required = input_schema.get("required", [])
+            
+            # 格式化参数说明
+            params = []
+            for param_name, param_info in properties.items():
+                param_type = param_info.get("type", "string")
+                param_desc = param_info.get("description", "")
+                is_required = param_name in required
+                param_mark = "【必填】" if is_required else "【可选】"
+                params.append(f"  - {param_name} ({param_type}) {param_mark}: {param_desc}")
+            
+            tool_descriptions.append(f"- **{tool_name}**: {tool_desc}")
+            if params:
+                tool_descriptions.append("  参数:")
+                tool_descriptions.extend(params)
+        
+        tool_desc_text = "\n".join(tool_descriptions)
+        
+        # 增强系统提示词
+        enhanced_prompt = f"""{self.system_prompt}
+
+**可用工具（AKShare 财经数据）**:
+{tool_desc_text}
+
+**工具调用格式**:
+当你需要查询股票数据、新闻、行情等信息时，请输出 JSON 格式的工具调用：
+```json
+{{"tool": "工具名称", "args": {{"参数名": "参数值"}}}}
+```
+
+**示例**:
+用户: 查询平安银行(000001)的股票信息
+助手: ```json
+{{"tool": "stock_info", "args": {{"symbol": "000001", "market": "A"}}}}
+```
+
+用户: 查询招商银行的最新新闻
+助手: ```json
+{{"tool": "stock_news", "args": {{"symbol": "600036", "limit": 5}}}}
+```
+
+用户: 搜索"新能源"相关的股票
+助手: ```json
+{{"tool": "search", "args": {{"keyword": "新能源", "market": "sh"}}}}
+```
+
+**注意**: search 工具的 market 参数使用 "sh"(上证)、"sz"(深证)、"hk"(港股)、"us"(美股)，而不是 "A"
+
+**重要提示**:
+1. 股票代码使用纯数字格式，不要添加 .SZ 或 .SH 后缀
+2. **market 参数格式**:
+   - stock_info, stock_prices 等工具使用 market="A" 表示A股
+   - search 工具使用 market="sh"(上证) 或 market="sz"(深证) 表示A股市场
+3. 如果用户没有明确指定参数，使用合理的默认值
+4. **如果用户提供的是公司名称而不是股票代码，先使用 search 工具查找股票代码**
+5. 工具调用后，将结果格式化展示给用户
+
+**查询流程**:
+- 用户提供公司名称 → 先调用 search 工具查找股票代码 → 再使用股票代码查询详细信息
+- 用户提供股票代码 → 直接使用股票代码查询
+"""
+        
+        # ReAct 循环
+        max_steps = 5
+        current_messages = messages.copy()
+        
+        # 替换系统消息
+        if current_messages and isinstance(current_messages[0], SystemMessage):
+            current_messages[0] = SystemMessage(content=enhanced_prompt)
+        else:
+            current_messages.insert(0, SystemMessage(content=enhanced_prompt))
+        
+        for step in range(max_steps):
+            print(f"[NewsAggregatorAgent] Step {step+1}/{max_steps} - 调用 LLM...")
+            
+            # 1. 调用 LLM
+            try:
+                response = self.llm.invoke(current_messages)
+                content = response.content
+                
+                # 处理内容格式
+                if isinstance(content, list):
+                    text_parts = []
+                    for item in content:
+                        if isinstance(item, dict) and 'text' in item:
+                            text_parts.append(item['text'])
+                        elif isinstance(item, str):
+                            text_parts.append(item)
+                        else:
+                            text_parts.append(str(item))
+                    content = "\n".join(text_parts)
+                elif not isinstance(content, str):
+                    content = str(content)
+                
+                print(f"[NewsAggregatorAgent] LLM 响应长度: {len(content)}")
+                
+            except Exception as e:
+                print(f"[NewsAggregatorAgent] LLM 调用失败: {e}")
+                return f"❌ 模型调用出错: {e}"
+            
+            if not content or not content.strip():
+                return "我无法处理这个请求，请尝试更明确地描述您的需求。"
+            
+            # 2. 检查是否有工具调用
+            json_match = re.search(r'```json\s*(\{.*?\})\s*```', content, re.DOTALL)
+            if not json_match:
+                json_match = re.search(r'(\{.*?"tool".*?\})', content, re.DOTALL)
+            
+            if json_match:
+                json_str = json_match.group(1)
+                try:
+                    tool_call = json.loads(json_str)
+                    tool_name = tool_call.get("tool")
+                    tool_args = tool_call.get("args", {})
+                    
+                    print(f"[NewsAggregatorAgent] 调用工具: {tool_name}, 参数: {tool_args}")
+                    
+                    # 3. 格式化和验证参数
+                    from tools.akshare_helper import format_tool_args, validate_tool_args
+                    
+                    formatted_args = format_tool_args(tool_name, tool_args)
+                    is_valid, error_msg = validate_tool_args(tool_name, formatted_args)
+                    
+                    if not is_valid:
+                        error_response = f"❌ 参数验证失败: {error_msg}\n\n请检查工具调用参数。"
+                        current_messages.append(AIMessage(content=content))
+                        current_messages.append(HumanMessage(content=error_response))
+                        continue
+                    
+                    # 4. 执行工具调用
+                    try:
+                        result = await mcp_manager.call_tool(
+                            self._akshare_config["command"],
+                            self._akshare_config["args"],
+                            tool_name,
+                            formatted_args
+                        )
+                        
+                        # 5. 解析工具结果
+                        tool_output = self._format_tool_result(tool_name, result, formatted_args)
+                        print(f"[NewsAggregatorAgent] 工具执行成功，结果长度: {len(str(tool_output))}")
+                        
+                        # 检查是否返回了错误信息
+                        actual_content = str(result)
+                        if hasattr(result, 'content') and result.content:
+                            if isinstance(result.content, list) and len(result.content) > 0:
+                                if hasattr(result.content[0], 'text'):
+                                    actual_content = result.content[0].text
+                        
+                        # 如果返回 "Not Found"，尝试使用 search 工具查找股票代码
+                        if "Not Found" in actual_content and tool_name in ["stock_info", "stock_prices", "stock_news"]:
+                            symbol = formatted_args.get('symbol', '')
+                            if symbol and step == 0:
+                                print(f"[NewsAggregatorAgent] 股票代码 {symbol} 未找到，尝试搜索...")
+                                # 尝试搜索股票代码
+                                search_result = await self._try_search_stock(symbol)
+                                if search_result:
+                                    return search_result
+                        
+                        # 6. 对于单步查询，直接返回格式化结果
+                        if step == 0 and tool_name in ["stock_info", "stock_prices", "stock_news", "search", "get_current_time"]:
+                            return tool_output
+                        
+                        # 7. 对于多步操作，将结果添加到消息历史
+                        current_messages.append(AIMessage(content=content))
+                        current_messages.append(HumanMessage(content=f"工具执行结果:\n{tool_output[:1000]}{'...(结果较长，已截断)' if len(str(tool_output)) > 1000 else ''}"))
+                        
+                    except Exception as tool_error:
+                        print(f"[NewsAggregatorAgent] 工具调用失败: {tool_error}")
+                        import traceback
+                        traceback.print_exc()
+                        error_msg = f"❌ 工具调用失败: {str(tool_error)}"
+                        current_messages.append(AIMessage(content=content))
+                        current_messages.append(HumanMessage(content=error_msg))
+                        continue
+                        
+                except json.JSONDecodeError as e:
+                    print(f"[NewsAggregatorAgent] JSON 解析失败: {e}")
+                    # JSON 解析失败，返回 LLM 的原始响应
+                    return content
+                except Exception as e:
+                    print(f"[NewsAggregatorAgent] 工具执行异常: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    return f"❌ 执行出错: {str(e)}"
+            else:
+                # 没有工具调用，返回最终响应
+                return content
+        
+        return "⚠️ 执行步骤过多，已停止。请尝试更简单明确的查询。"
+    
+    async def _try_search_stock(self, symbol: str) -> Optional[str]:
+        """尝试搜索股票代码"""
+        try:
+            from tools.akshare_helper import format_tool_args
+            # 先尝试上证市场搜索
+            search_args = format_tool_args("search", {"keyword": symbol, "market": "sh"})
+            result = await mcp_manager.call_tool(
+                self._akshare_config["command"],
+                self._akshare_config["args"],
+                "search",
+                search_args
+            )
+            
+            actual_content = str(result)
+            if hasattr(result, 'content') and result.content:
+                if isinstance(result.content, list) and len(result.content) > 0:
+                    if hasattr(result.content[0], 'text'):
+                        actual_content = result.content[0].text
+            
+            if "Not Found" not in actual_content and actual_content.strip():
+                return f"""🔍 **股票代码搜索结果**
+
+**搜索关键词**: {symbol}
+
+{actual_content}
+
+**提示**: 请使用上述搜索结果中的正确股票代码重新查询。
+"""
+        except Exception as e:
+            print(f"[NewsAggregatorAgent] 搜索股票失败: {e}")
+        
+        return None
+    
+    def _format_tool_result(self, tool_name: str, result: Any, tool_args: Dict) -> str:
+        """格式化工具执行结果"""
+        try:
+            # 提取实际内容
+            actual_content = str(result)
+            if hasattr(result, 'content') and result.content:
+                if isinstance(result.content, list) and len(result.content) > 0:
+                    if hasattr(result.content[0], 'text'):
+                        actual_content = result.content[0].text
+                    else:
+                        actual_content = str(result.content[0])
+                else:
+                    actual_content = str(result.content)
+            
+            # 根据工具类型格式化输出
+            if tool_name == "stock_info":
+                return f"""📊 **股票信息查询结果**
+
+**股票代码**: {tool_args.get('symbol', 'N/A')}
+**市场**: {tool_args.get('market', 'N/A')}
+
+{actual_content}
+"""
+            
+            elif tool_name == "stock_prices":
+                # 检查是否有错误信息
+                if "Not Found" in actual_content:
+                    return f"""❌ **查询失败**
+
+**股票代码**: {tool_args.get('symbol', 'N/A')}
+**周期**: {tool_args.get('period', 'N/A')}
+
+**错误信息**: {actual_content}
+
+**可能的原因**:
+1. 股票代码不存在或已退市
+2. 数据源暂时不可用
+3. 非交易时间数据更新延迟
+
+**建议**:
+- 检查股票代码是否正确
+- 尝试使用 `@市场资讯捕手 搜索"公司名称"` 查找正确的股票代码
+- 稍后重试
+"""
+                
+                return f"""📈 **股票价格数据**
+
+**股票代码**: {tool_args.get('symbol', 'N/A')}
+**周期**: {tool_args.get('period', 'N/A')}
+**数据量**: {tool_args.get('limit', 'N/A')} 条
+
+{actual_content}
+"""
+            
+            elif tool_name == "stock_news":
+                return f"""📰 **股票相关新闻**
+
+**股票代码**: {tool_args.get('symbol', 'N/A')}
+**新闻数量**: {tool_args.get('limit', 'N/A')} 条
+
+{actual_content}
+"""
+            
+            elif tool_name == "search":
+                market = tool_args.get('market', 'N/A')
+                market_name = {
+                    'sh': '上证',
+                    'sz': '深证',
+                    'hk': '港股',
+                    'us': '美股'
+                }.get(market.lower() if isinstance(market, str) else '', market)
+                
+                return f"""🔍 **股票搜索结果**
+
+**关键词**: {tool_args.get('keyword', 'N/A')}
+**市场**: {market_name} ({market})
+
+{actual_content}
+"""
+            
+            elif tool_name == "get_current_time":
+                return f"""⏰ **当前时间信息**
+
+{actual_content}
+"""
+            
+            else:
+                return f"""✅ **工具执行结果** ({tool_name})
+
+{actual_content}
+"""
+                
+        except Exception as e:
+            print(f"[NewsAggregatorAgent] 格式化结果失败: {e}")
+            return f"✅ 工具执行成功，但格式化输出时出错: {str(e)}\n\n原始结果: {str(result)[:500]}"
 
 
 class SentimentAnalystAgent(Agent):
@@ -1393,6 +1792,334 @@ class PromptAgent(Agent):
         self.desc = "提示词优化与设计"
         self.capabilities = ["提示词优化", "框架设计", "角色设定", "思维链拆解"]
         self.example = "优化这个提示词：‘帮我写个 Python 脚本’。"
+
+class AKShareDataAgent(Agent):
+    """AKShare 数据专家 - 资本市场数据查询"""
+    
+    def __init__(self):
+        # 加载 MCP 配置
+        import json
+        import os
+        mcp_config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "mcp_servers.json")
+        self._akshare_config = None
+        
+        try:
+            with open(mcp_config_path, 'r', encoding='utf-8') as f:
+                mcp_config = json.load(f)
+                if "mcpServers" in mcp_config and "mcp-aktools" in mcp_config["mcpServers"]:
+                    akshare_server = mcp_config["mcpServers"]["mcp-aktools"]
+                    self._akshare_config = {
+                        "command": akshare_server.get("command", "npx"),
+                        "args": akshare_server.get("args", [])
+                    }
+                    print(f"[AKShareDataAgent] ✅ 已加载 AKShare MCP 配置")
+        except Exception as e:
+            print(f"[AKShareDataAgent] ⚠️ 无法加载 MCP 配置: {e}")
+        
+        super().__init__(
+            id=AGENT_IDS["AKShare数据专家"],
+            name="AKShare数据专家",
+            role="资本市场数据查询",
+            emoji="fas fa-chart-line",
+            temperature=0.1,
+            system_prompt="""你是一个专业的资本市场数据查询专家，专门使用 AKShare 工具查询中国股市数据。
+
+**你的核心能力：**
+1. 查询股票基本信息（公司名称、行业、市值等）
+2. 获取股票价格数据（历史价格、K线数据）
+3. 查询股票相关新闻
+4. 搜索股票代码
+5. 获取交易日信息
+
+**重要规则：**
+- 优先使用股票代码查询（如：600276、000001）
+- 公司名称搜索可能受数据源限制
+- 所有查询都必须通过 MCP 工具完成
+- 查询结果要清晰、结构化展示
+
+**可用工具：**
+{tools_description}
+
+**工具调用格式：**
+```json
+{{
+  "tool": "工具名称",
+  "args": {{
+    "参数名": "参数值"
+  }}
+}}
+```
+
+**示例查询：**
+- 查询平安银行信息：使用 stock_info，symbol=000001，market=A
+- 查询招商银行价格：使用 stock_prices，symbol=600036，market=A，limit=10
+- 搜索股票代码：使用 search，keyword=平安银行，market=sh
+
+请根据用户的查询需求，选择合适的工具并返回格式化的结果。"""
+        )
+        self.color = "#FF5722"
+        self.desc = "查询中国股市数据，支持股票信息、价格、新闻等"
+        self.capabilities = ["股票信息查询", "价格数据获取", "新闻查询", "股票代码搜索", "交易日查询"]
+        self.example = "查询 600276 的股票信息"
+    
+    async def invoke(self, messages: List[Any], context: Optional[Dict] = None) -> str:
+        """处理 AKShare 数据查询请求"""
+        import asyncio
+        from services.mcp_service import MCPClientManager
+        
+        if not self._akshare_config:
+            return "❌ AKShare MCP 服务未配置，请检查 mcp_servers.json 文件。"
+        
+        mcp_manager = MCPClientManager()
+        
+        # 1. 获取可用工具列表
+        try:
+            available_tools = await mcp_manager.list_tools(
+                self._akshare_config["command"],
+                self._akshare_config["args"]
+            )
+            print(f"[AKShareDataAgent] 可用工具数量: {len(available_tools)}")
+        except Exception as e:
+            print(f"[AKShareDataAgent] ⚠️ 无法获取工具列表: {e}")
+            return self._fallback_to_llm_knowledge(messages[-1].content, "无法连接到 AKShare MCP 服务")
+        
+        # 2. 构建工具描述
+        tools_description = self._format_tools_description(available_tools)
+        enhanced_prompt = self.system_prompt.replace("{tools_description}", tools_description)
+        
+        # ReAct 循环
+        max_steps = 5
+        current_messages = messages.copy()
+        
+        # 替换系统消息
+        if current_messages and isinstance(current_messages[0], SystemMessage):
+            current_messages[0] = SystemMessage(content=enhanced_prompt)
+        else:
+            current_messages.insert(0, SystemMessage(content=enhanced_prompt))
+        
+        for step in range(max_steps):
+            print(f"[AKShareDataAgent] Step {step+1}/{max_steps} - 调用 LLM...")
+            
+            # 调用 LLM
+            try:
+                response = await self.llm.ainvoke(current_messages)
+                content = response.content if hasattr(response, 'content') else str(response)
+            except Exception as e:
+                print(f"[AKShareDataAgent] LLM 调用失败: {e}")
+                return self._fallback_to_llm_knowledge(messages[-1].content)
+            
+            if not content or not content.strip():
+                return self._fallback_to_llm_knowledge(messages[-1].content)
+            
+            # 检查是否有工具调用
+            import json
+            import re
+            json_match = re.search(r'```json\s*(\{.*?\})\s*```', content, re.DOTALL)
+            if not json_match:
+                json_match = re.search(r'(\{.*?"tool".*?\})', content, re.DOTALL)
+            
+            if json_match:
+                json_str = json_match.group(1)
+                try:
+                    tool_call = json.loads(json_str)
+                    tool_name = tool_call.get("tool")
+                    tool_args = tool_call.get("args", {})
+                    
+                    print(f"[AKShareDataAgent] 调用工具: {tool_name}, 参数: {tool_args}")
+                    
+                    # 格式化和验证参数
+                    from tools.akshare_helper import format_tool_args, validate_tool_args
+                    
+                    formatted_args = format_tool_args(tool_name, tool_args)
+                    is_valid, error_msg = validate_tool_args(tool_name, formatted_args)
+                    
+                    if not is_valid:
+                        error_response = f"❌ 参数验证失败: {error_msg}\n\n请检查工具调用参数。"
+                        current_messages.append(AIMessage(content=content))
+                        current_messages.append(HumanMessage(content=error_response))
+                        continue
+                    
+                    # 执行工具调用（带超时）
+                    try:
+                        result = await asyncio.wait_for(
+                            mcp_manager.call_tool(
+                                self._akshare_config["command"],
+                                self._akshare_config["args"],
+                                tool_name,
+                                formatted_args
+                            ),
+                            timeout=10
+                        )
+                        
+                        # 格式化工具结果
+                        tool_output = self._format_tool_result(tool_name, result, formatted_args)
+                        print(f"[AKShareDataAgent] 工具执行成功，结果长度: {len(str(tool_output))}")
+                        
+                        # 对于单步查询，直接返回格式化结果
+                        if step == 0 and tool_name in ["stock_info", "stock_prices", "stock_news", "search", "get_current_time"]:
+                            return tool_output
+                        
+                        # 对于多步操作，将结果添加到消息历史
+                        current_messages.append(AIMessage(content=content))
+                        current_messages.append(HumanMessage(content=f"工具执行结果:\n{tool_output[:1000]}{'...(结果较长，已截断)' if len(str(tool_output)) > 1000 else ''}"))
+                        
+                    except asyncio.TimeoutError:
+                        print(f"[AKShareDataAgent] ⚠️ MCP 工具调用超时 (10秒)")
+                        return self._fallback_to_llm_knowledge(messages[-1].content, "MCP 工具调用超时，可能网络不稳定或远程服务响应慢。")
+                    except Exception as tool_error:
+                        print(f"[AKShareDataAgent] 工具调用失败: {tool_error}")
+                        import traceback
+                        traceback.print_exc()
+                        
+                        # 尝试搜索股票代码
+                        if tool_name in ["stock_info", "stock_prices", "stock_news"] and "Not Found" in str(tool_error):
+                            symbol_to_search = formatted_args.get('symbol')
+                            if symbol_to_search:
+                                search_result_text = await self._try_search_stock(symbol_to_search, mcp_manager)
+                                if search_result_text:
+                                    return search_result_text
+                        
+                        error_msg = f"❌ 工具调用失败: {str(tool_error)}\n\n**可能的原因**:\n1. 股票代码不存在或已退市\n2. 数据源暂时不可用\n3. 参数格式不正确\n\n**建议**:\n- 检查股票代码是否正确\n- 尝试使用 `@AKShare数据专家 搜索\"公司名称\"` 查找正确的股票代码\n- 稍后重试"
+                        current_messages.append(AIMessage(content=content))
+                        current_messages.append(HumanMessage(content=error_msg))
+                        continue
+                        
+                except json.JSONDecodeError as e:
+                    print(f"[AKShareDataAgent] JSON 解析失败: {e}")
+                    return content
+                except Exception as e:
+                    print(f"[AKShareDataAgent] 工具执行异常: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    return f"❌ 执行出错: {str(e)}"
+            else:
+                # 没有工具调用，返回最终响应
+                return content
+        
+        return "⚠️ 执行步骤过多，已停止。请尝试更简单明确的查询。"
+    
+    async def _try_search_stock(self, symbol: str, mcp_manager) -> Optional[str]:
+        """尝试搜索股票代码"""
+        try:
+            print(f"[AKShareDataAgent] 尝试搜索股票: {symbol}")
+            from tools.akshare_helper import format_tool_args
+            
+            search_args = format_tool_args("search", {"keyword": symbol})
+            search_result = await asyncio.wait_for(
+                mcp_manager.call_tool(
+                    self._akshare_config["command"],
+                    self._akshare_config["args"],
+                    "search",
+                    search_args
+                ),
+                timeout=10
+            )
+            
+            return self._format_tool_result("search", search_result, search_args)
+        except Exception as e:
+            print(f"[AKShareDataAgent] 搜索失败: {e}")
+            return None
+    
+    def _format_tools_description(self, tools: List[Dict]) -> str:
+        """格式化工具描述"""
+        descriptions = []
+        for tool in tools:
+            name = tool.get("name", "未知工具")
+            desc = tool.get("description", "无描述")
+            descriptions.append(f"- **{name}**: {desc}")
+        return "\n".join(descriptions)
+    
+    def _format_tool_result(self, tool_name: str, result: Any, tool_args: Dict) -> str:
+        """格式化工具结果"""
+        try:
+            if isinstance(result, dict):
+                if result.get("error"):
+                    return f"❌ 查询失败: {result['error']}"
+                
+                data = result.get("content", [])
+                if isinstance(data, list) and len(data) > 0:
+                    if tool_name == "stock_info":
+                        return self._format_stock_info(data[0], tool_args)
+                    elif tool_name == "stock_prices":
+                        return self._format_stock_prices(data, tool_args)
+                    elif tool_name == "stock_news":
+                        return self._format_stock_news(data, tool_args)
+                    elif tool_name == "search":
+                        return self._format_search_results(data, tool_args)
+                    elif tool_name == "get_current_time":
+                        return self._format_time_info(data[0])
+                
+                return f"✅ 查询成功\n\n```json\n{json.dumps(result, ensure_ascii=False, indent=2)}\n```"
+            else:
+                return f"✅ 查询结果:\n\n{str(result)}"
+        except Exception as e:
+            print(f"[AKShareDataAgent] 格式化结果失败: {e}")
+            return f"✅ 查询成功（原始结果）:\n\n{str(result)}"
+    
+    def _format_stock_info(self, info: Dict, args: Dict) -> str:
+        """格式化股票信息"""
+        symbol = args.get("symbol", "N/A")
+        return f"""📊 **股票信息 - {symbol}**
+
+{json.dumps(info, ensure_ascii=False, indent=2)}
+
+---
+💡 提示：您可以继续查询该股票的价格数据或相关新闻。"""
+    
+    def _format_stock_prices(self, prices: List[Dict], args: Dict) -> str:
+        """格式化股票价格"""
+        symbol = args.get("symbol", "N/A")
+        limit = len(prices)
+        return f"""📈 **股票价格 - {symbol}** (最近 {limit} 条)
+
+{json.dumps(prices[:10], ensure_ascii=False, indent=2)}
+
+---
+💡 提示：数据已按时间排序，显示最近的交易数据。"""
+    
+    def _format_stock_news(self, news: List[Dict], args: Dict) -> str:
+        """格式化股票新闻"""
+        symbol = args.get("symbol", "N/A")
+        return f"""📰 **股票新闻 - {symbol}**
+
+{json.dumps(news[:5], ensure_ascii=False, indent=2)}
+
+---
+💡 提示：新闻数据来自公开数据源。"""
+    
+    def _format_search_results(self, results: List[Dict], args: Dict) -> str:
+        """格式化搜索结果"""
+        keyword = args.get("keyword", "N/A")
+        return f"""🔍 **搜索结果 - "{keyword}"**
+
+{json.dumps(results, ensure_ascii=False, indent=2)}
+
+---
+💡 提示：找到股票代码后，可以使用代码进行详细查询。"""
+    
+    def _format_time_info(self, time_info: Dict) -> str:
+        """格式化时间信息"""
+        return f"""🕐 **交易日信息**
+
+{json.dumps(time_info, ensure_ascii=False, indent=2)}"""
+    
+    def _fallback_to_llm_knowledge(self, query: str, reason: str = "") -> str:
+        """降级到 LLM 知识"""
+        reason_text = f"\n\n**原因**: {reason}" if reason else ""
+        return f"""⚠️ **无法使用实时数据工具**{reason_text}
+
+我将基于训练知识为您提供参考信息：
+
+{query}
+
+---
+💡 **提示**：
+- 建议使用股票代码（如：600276）进行查询
+- 确保网络连接正常
+- 稍后重试可能会成功
+
+如需实时数据，请确保 AKShare MCP 服务正常运行。"""
+
 
 class PPTGeneratorAgent(Agent):
     """PPT 生成专家 - 智能生成演示文稿"""
@@ -1919,6 +2646,7 @@ class AgentRegistry:
             ImageGeneratorAgent(),
             DrawingAgent(),
             PPTGeneratorAgent(),
+            AKShareDataAgent(),
             MCPAgent()
         ]
         

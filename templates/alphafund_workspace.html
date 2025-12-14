@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlphaFund 投研工作区</title>
+    <link href="/static/css/fontawesome.min.css" rel="stylesheet">
+    <!-- 可视化：使用 ECharts（纯前端、无 React 依赖） -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0A0A0A;
+            color: #E0E0E0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #333;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #FF8800 0%, #FF6B00 50%, #FF5500 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 16px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .header-title .version {
+            color: #FF6B00;
+            font-size: 14px;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .left-panel {
+            width: 300px;
+            background: #121212;
+            border-right: 1px solid #333;
+            padding: 20px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            font-size: 12px;
+            color: #A0A0A0;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .topic-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(30, 30, 30, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .topic-input:focus {
+            border-color: rgba(255, 107, 0, 0.5);
+            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 15px 0;
+            font-size: 13px;
+            color: #A0A0A0;
+        }
+
+        .start-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #FF8800 0%, #FF6B00 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .start-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 0, 0.3);
+        }
+
+        .start-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .quick-examples {
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+        }
+
+        .quick-examples-title {
+            font-size: 11px;
+            color: #FFD700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .example-btn {
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #E0E0E0;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: left;
+            margin-bottom: 6px;
+            transition: all 0.2s;
+        }
+
+        .example-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #FF6B00;
+        }
+
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .agent-card {
+            background: rgba(30, 30, 30, 0.4);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .agent-card.active {
+            background: rgba(255, 107, 0, 0.1);
+            border-color: #FF6B00;
+            box-shadow: 0 0 20px rgba(255, 107, 0, 0.2);
+            transform: scale(1.05);
+        }
+
+        .agent-card.completed {
+            border-color: rgba(255, 107, 0, 0.3);
+            opacity: 0.8;
+        }
+
+        .agent-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 10px;
+            background: #1E1E1E;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #666;
+        }
+
+        .agent-card.active .agent-icon {
+            background: #FF6B00;
+            color: white;
+        }
+
+        .agent-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #E0E0E0;
+            margin-bottom: 4px;
+        }
+
+        .agent-role {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .agent-status {
+            font-size: 11px;
+            color: #FF6B00;
+            margin-top: 8px;
+            min-height: 16px;
+        }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .report-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            background: #0A0A0A;
+        }
+
+        .report-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .report-header {
+            border-bottom: 1px solid rgba(255, 107, 0, 0.3);
+            padding-bottom: 24px;
+            margin-bottom: 32px;
+        }
+
+        .report-badge {
+            font-size: 10px;
+            color: #FF6B00;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .report-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .report-meta {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: #333;
+            border: 1px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+
+        .meta-item {
+            background: #1E1E1E;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .meta-label {
+            font-size: 9px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .meta-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #E0E0E0;
+        }
+
+        .meta-value.score {
+            font-size: 24px;
+        }
+
+        .meta-value.score.low {
+            color: #ef4444;
+        }
+
+        .meta-value.score.high {
+            color: #10b981;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            color: #FF6B00;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-content {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #CCCCCC;
+        }
+
+        .section-content h3 {
+            font-size: 20px;
+            color: white;
+            margin: 24px 0 12px;
+            border-left: 4px solid #FF6B00;
+            padding-left: 12px;
+        }
+
+        .section-content h4 {
+            font-size: 16px;
+            color: #FF6B00;
+            margin: 20px 0 10px;
+        }
+
+        .section-content p {
+            margin-bottom: 12px;
+        }
+
+        .section-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #1E1E1E;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .section-content table th,
+        .section-content table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+
+        .section-content table th {
+            background: #0A0A0A;
+            color: #FF6B00;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .section-content table td {
+            color: #CCCCCC;
+            font-size: 13px;
+        }
+
+        .section-content table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+            text-align: center;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state-text {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .right-panel {
+            width: 350px;
+            background: #121212;
+            border-left: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .panel-tabs {
+            display: flex;
+            border-bottom: 1px solid #333;
+        }
+
+        .panel-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .panel-tab.active {
+            color: #FF6B00;
+            border-bottom-color: #FF6B00;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .log-entry {
+            font-size: 11px;
+            padding: 8px;
+            margin-bottom: 8px;
+            background: #1E1E1E;
+            border-left: 2px solid #333;
+            border-radius: 4px;
+        }
+
+        .log-entry.info {
+            border-left-color: #3b82f6;
+        }
+
+        .log-entry.success {
+            border-left-color: #10b981;
+        }
+
+        .log-entry.error {
+            border-left-color: #ef4444;
+        }
+
+        .log-entry.thinking {
+            border-left-color: #FF6B00;
+        }
+
+        .log-time {
+            color: #666;
+            font-size: 9px;
+            margin-right: 8px;
+        }
+
+        .log-agent {
+            color: #FF6B00;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255, 107, 0, 0.3);
+            border-top-color: #FF6B00;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .chart-container {
+            margin: 24px 0;
+            padding: 20px;
+            background: #1E1E1E;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+
+        .export-btn {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #FF8800 0%, #FF6B00 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 8px 24px rgba(255, 107, 0, 0.4);
+            z-index: 1000;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(255, 107, 0, 0.6);
+        }
+
+        .export-btn.show {
+            display: flex;
+        }
+
+        /* 打印样式 */
+        @media print {
+            @page {
+                margin: 2cm;
+                size: A4;
+            }
+            
+            body {
+                background: white;
+                color: black;
+            }
+            
+            .header, .left-panel, .right-panel, .export-btn {
+                display: none !important;
+            }
+            
+            .main-container {
+                display: block;
+            }
+            
+            .content-area {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .report-container {
+                padding: 0;
+                background: white;
+            }
+            
+            .report-content {
+                max-width: 100%;
+            }
+            
+            .report-badge {
+                color: #FF6B00;
+            }
+            
+            .report-title {
+                color: #000;
+                page-break-after: avoid;
+            }
+            
+            .report-meta {
+                page-break-after: avoid;
+                background: #f0f0f0;
+            }
+            
+            .meta-item {
+                background: #fff;
+            }
+            
+            .meta-label {
+                color: #666;
+            }
+            
+            .meta-value {
+                color: #000;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+                margin-bottom: 30px;
+            }
+            
+            .section-title {
+                color: #FF6B00;
+                page-break-after: avoid;
+            }
+            
+            .section-content {
+                color: #000;
+            }
+            
+            .section-content h1, .section-content h2, .section-content h3 {
+                color: #000;
+                page-break-after: avoid;
+            }
+            
+            .section-content table {
+                background: #f9f9f9;
+                page-break-inside: avoid;
+            }
+            
+            .section-content table th {
+                background: #e0e0e0;
+                color: #000;
+            }
+            
+            .section-content table td {
+                color: #000;
+            }
+            
+            /* 图表在打印时保持可见 */
+            #alphafundCharts {
+                page-break-inside: avoid;
+            }
+            
+            /* 插图优化 */
+            #alphafundIllustrationWrap {
+                page-break-inside: avoid;
+            }
+            
+            #alphafundIllustrationWrap img {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">AF</div>
+            <div>
+                <div class="header-title">AlphaFund <span class="version">专业版</span></div>
+                <div style="font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: 1px;">智能投研引擎</div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <div style="font-size: 10px; color: #666;">
+                <span style="display: inline-block; width: 6px; height: 6px; background: #10b981; border-radius: 50%; margin-right: 6px;"></span>
+                LLM 在线
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="left-panel">
+            <div class="input-section">
+                <label class="input-label">研究主题</label>
+                <input type="text" id="topicInput" class="topic-input" placeholder="例如：英伟达、新能源、半导体" />
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="deepResearchCheck" />
+                <label for="deepResearchCheck">启用深度研究（逻辑智能体）</label>
+            </div>
+
+            <button id="startBtn" class="start-btn" onclick="startWorkflow()">
+                <i class="fas fa-play"></i>
+                <span>启动投研工作流</span>
+            </button>
+
+            <div class="quick-examples">
+                <div class="quick-examples-title">
+                    <i class="fas fa-lightbulb"></i>
+                    快速示例
+                </div>
+                <button class="example-btn" onclick="setExample('英伟达')">
+                    <i class="fas fa-microchip" style="color: #4CAF50; margin-right: 6px;"></i>
+                    英伟达分析
+                </button>
+                <button class="example-btn" onclick="setExample('新能源')">
+                    <i class="fas fa-bolt" style="color: #2196F3; margin-right: 6px;"></i>
+                    新能源板块
+                </button>
+                <button class="example-btn" onclick="setExample('半导体')">
+                    <i class="fas fa-cog" style="color: #FF9800; margin-right: 6px;"></i>
+                    半导体行业
+                </button>
+            </div>
+
+            <div id="agentsGrid" class="agents-grid" style="margin-top: 30px;">
+                <!-- Agent cards will be dynamically generated -->
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div id="reportContainer" class="report-container">
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="empty-state-text">等待指令 // 终端就绪</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="panel-tabs">
+                <div class="panel-tab active" onclick="switchTab('stream')">协同流</div>
+                <div class="panel-tab" onclick="switchTab('logs')">日志</div>
+            </div>
+            <div class="panel-content" id="panelContent">
+                <div id="streamTab" class="tab-content">
+                    <div style="text-align: center; color: #666; padding: 40px 20px; font-size: 12px;">
+                        等待神经协同链路激活...
+                    </div>
+                </div>
+                <div id="logsTab" class="tab-content" style="display: none;">
+                    <div id="logsContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导出PDF按钮 -->
+    <button id="exportPdfBtn" class="export-btn" onclick="exportToPDF()">
+        <i class="fas fa-file-pdf"></i>
+        <span>导出 PDF</span>
+    </button>
+
+    <script>
+        const AGENTS = [
+            { id: 'deep', name: '逻辑', role: 'DEEP_RESEARCHER', icon: 'fa-brain', color: '#fbbf24', description: '使用 AI 大模型进行第一性原理推演与宏观战略研判。' },
+            { id: 'alpha', name: '天眼', role: 'MARKET_ANALYST', icon: 'fa-chart-line', color: '#f97316', description: '通过实时 Search 验证假设，提供数据驱动的市场情报。' },
+            { id: 'sigma', name: '西格玛', role: 'QUANT_ANALYST', icon: 'fa-calculator', color: '#ea580c', description: '混合数据引擎: 整合 yfinance, Tushare 与 AkShare 实时数据。' },
+            { id: 'prime', name: '阿尔法', role: 'PORTFOLIO_MANAGER', icon: 'fa-briefcase', color: '#d4d4d4', description: '综合多维信息，制定阿尔法策略与资产配置方案。' },
+            { id: 'critic', name: '天平', role: 'CRITICAL_REVIEWER', icon: 'fa-balance-scale', color: '#ef4444', description: '红队思维。进行极限压力测试与逻辑归因分析。' },
+            { id: 'canvas', name: '幻境', role: 'VISUALIZATION_EXPERT', icon: 'fa-palette', color: '#14b8a6', description: '利用多模态能力，生成专业的金融可视化图表与插画。' },
+            { id: 'shield', name: '坚盾', role: 'RISK_OFFICER', icon: 'fa-shield-alt', color: '#dc2626', description: '执行合规审查，对高风险策略拥有一票否决权。' }
+        ];
+
+        let currentWorkflow = null;
+        let activeAgentIndex = -1;
+        let reportData = null;
+
+        // Initialize agent cards
+        function initAgents() {
+            const grid = document.getElementById('agentsGrid');
+            grid.innerHTML = AGENTS.map(agent => `
+                <div class="agent-card" id="agent-${agent.id}">
+                    <div class="agent-icon">
+                        <i class="fas ${agent.icon}"></i>
+                    </div>
+                    <div class="agent-name">${agent.name}</div>
+                    <div class="agent-role">${getRoleName(agent.role)}</div>
+                    <div class="agent-status" id="status-${agent.id}"></div>
+                </div>
+            `).join('');
+        }
+
+        function getRoleName(role) {
+            const roles = {
+                'DEEP_RESEARCHER': '首席战略官',
+                'MARKET_ANALYST': '市场分析师',
+                'QUANT_ANALYST': '量化专家',
+                'PORTFOLIO_MANAGER': '基金经理',
+                'CRITICAL_REVIEWER': '独立评审',
+                'VISUALIZATION_EXPERT': '视觉总监',
+                'RISK_OFFICER': '首席风控官'
+            };
+            return roles[role] || role;
+        }
+
+        function setExample(topic) {
+            document.getElementById('topicInput').value = topic;
+            startWorkflow();
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('streamTab').style.display = tab === 'stream' ? 'block' : 'none';
+            document.getElementById('logsTab').style.display = tab === 'logs' ? 'block' : 'none';
+            event.target.classList.add('active');
+        }
+
+        async function startWorkflow() {
+            const topic = document.getElementById('topicInput').value.trim();
+            if (!topic) {
+                alert('请输入研究主题');
+                return;
+            }
+
+            const deepResearch = document.getElementById('deepResearchCheck').checked;
+            const startBtn = document.getElementById('startBtn');
+            
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<div class="loading-spinner"></div> <span>运行中...</span>';
+
+            // Reset UI
+            activeAgentIndex = -1;
+            reportData = null;
+            document.getElementById('reportContainer').innerHTML = '<div class="empty-state"><div class="loading-spinner" style="width: 32px; height: 32px; margin-bottom: 16px;"></div><div class="empty-state-text">正在生成 Alpha 策略...</div></div>';
+            document.getElementById('streamTab').innerHTML = '';
+            document.getElementById('logsContent').innerHTML = '';
+
+            // Reset agent cards
+            AGENTS.forEach(agent => {
+                const card = document.getElementById(`agent-${agent.id}`);
+                card.classList.remove('active', 'completed');
+                document.getElementById(`status-${agent.id}`).textContent = '';
+            });
+
+            // 隐藏导出按钮
+            hideExportButton();
+
+            addLog('系统', '正在初始化 AlphaFund 认知引擎...', 'info');
+
+            try {
+                // 使用 POST 发起流式请求
+                const formData = new FormData();
+                formData.append('topic', topic);
+                formData.append('deep_research', deepResearch.toString());
+
+                const response = await fetch('/api/alphafund/start', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('工作流启动失败');
+                }
+
+                // 读取流式响应
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const {done, value} = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, {stream: true});
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop(); // 保留不完整的行
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = JSON.parse(line.substring(6));
+                            handleStreamEvent(data, deepResearch);
+                        }
+                    }
+                }
+
+                startBtn.disabled = false;
+                startBtn.innerHTML = '<i class="fas fa-play"></i> <span>启动投研工作流</span>';
+
+            } catch (error) {
+                console.error('Workflow error:', error);
+                addLog('系统', `错误: ${error.message}`, 'error');
+                document.getElementById('reportContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon" style="color: #ef4444;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="empty-state-text" style="color: #ef4444;">${error.message}</div>
+                    </div>
+                `;
+                startBtn.disabled = false;
+                startBtn.innerHTML = '<i class="fas fa-play"></i> <span>启动投研工作流</span>';
+            }
+        }
+
+        function handleStreamEvent(event, deepResearchEnabled) {
+            if (event.type === 'start') {
+                addLog('系统', `开始分析：${event.topic}`, 'info');
+            } else if (event.type === 'agent_complete') {
+                // 实时显示智能体完成
+                const agent = event.agent;
+                const role = agent.role || 'AGENT';
+                const name = agent.name || role;
+                const content = (agent.content || '').toString();
+                const brief = content.length > 120 ? content.slice(0, 120) + '...' : content;
+                const timestamp = agent.timestamp || Date.now();
+                
+                // 添加到日志（实时追加）
+                addLog(role, `${name}：${brief}`, 'info', timestamp);
+                
+                // 添加到协同流（实时追加）
+                const streamTab = document.getElementById('streamTab');
+                const streamEntry = document.createElement('div');
+                streamEntry.className = 'log-entry info';
+                streamEntry.style.marginBottom = '12px';
+                streamEntry.innerHTML = `
+                    <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                        <span class="log-agent">${name}</span>
+                        <span class="log-time">${new Date(timestamp).toLocaleTimeString()}</span>
+                    </div>
+                    <div style="color: #CCCCCC; font-size: 11px; line-height: 1.5;">
+                        ${content.substring(0, 200)}${content.length > 200 ? '...' : ''}
+                    </div>
+                `;
+                streamTab.appendChild(streamEntry);
+                streamTab.scrollTop = streamTab.scrollHeight;
+                
+                // 更新智能体卡片状态
+                updateAgentCard(role, 'completed');
+                
+                // 保存报告数据，但不重新渲染（等所有智能体完成后再渲染）
+                reportData = event.report;
+                
+            } else if (event.type === 'complete') {
+                // 最终完成时才渲染完整报告
+                reportData = event.report;
+                renderReport(reportData);
+                addLog('系统', '工作流完成。', 'success');
+                
+                // 显示导出PDF按钮
+                showExportButton();
+            } else if (event.type === 'error') {
+                addLog('系统', `错误: ${event.error}`, 'error');
+                hideExportButton();
+            }
+        }
+
+        function updateAgentCard(role, status) {
+            const roleToCardId = {
+                'DEEP_RESEARCHER': 'deep',
+                'MARKET_ANALYST': 'alpha',
+                'QUANT_ANALYST': 'sigma',
+                'PORTFOLIO_MANAGER': 'prime',
+                'CRITICAL_REVIEWER': 'critic',
+                'VISUALIZATION_EXPERT': 'canvas',
+                'RISK_OFFICER': 'shield',
+            };
+            
+            const cardId = roleToCardId[role];
+            if (!cardId) return;
+            
+            const card = document.getElementById(`agent-${cardId}`);
+            const statusEl = document.getElementById(`status-${cardId}`);
+            
+            if (card && statusEl) {
+                if (status === 'completed') {
+                    card.classList.add('completed');
+                    card.classList.remove('active');
+                    statusEl.textContent = '已完成';
+                } else if (status === 'active') {
+                    card.classList.add('active');
+                    card.classList.remove('completed');
+                    statusEl.textContent = '进行中...';
+                }
+            }
+        }
+
+        function renderReport(data) {
+            const container = document.getElementById('reportContainer');
+            
+            let html = `
+                <div class="report-content">
+                    <div class="report-header">
+                        <div class="report-badge">
+                            <span style="width: 4px; height: 4px; background: #FF6B00; border-radius: 50%;"></span>
+                            AlphaFund 智能投研
+                        </div>
+                        <h1 class="report-title">${data.title || data.topic || '投资分析报告'}</h1>
+                    </div>
+
+                    <div class="report-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">市场状态</div>
+                            <div class="meta-value">${data.marketAnalysis ? '已分析' : '待处理'}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">风险评分</div>
+                            <div class="meta-value score ${data.riskAssessment && data.riskAssessment.score < 50 ? 'low' : 'high'}">
+                                ${data.riskAssessment ? data.riskAssessment.score : '--'}
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">最终结论</div>
+                            <div class="meta-value">${data.riskAssessment ? (data.riskAssessment.approved ? '通过' : '驳回') : '--'}</div>
+                        </div>
+                    </div>
+            `;
+
+            if (data.deepResearchAnalysis) {
+                html += `
+                    <div class="section">
+                        <div class="section-title">
+                            <i class="fas fa-brain"></i>
+                            战略底层逻辑
+                        </div>
+                        <div class="section-content">${formatMarkdown(data.deepResearchAnalysis)}</div>
+                    </div>
+                `;
+            }
+
+            if (data.marketAnalysis) {
+                html += `
+                    <div class="section">
+                        <div class="section-title">
+                            <i class="fas fa-chart-line"></i>
+                            市场情报综述
+                        </div>
+                        <div class="section-content">${formatMarkdown(data.marketAnalysis)}</div>
+                    </div>
+                `;
+            }
+
+            if (data.quantAnalysis) {
+                html += `
+                    <div class="section">
+                        <div class="section-title">
+                            <i class="fas fa-calculator"></i>
+                            量化数据透视
+                        </div>
+                        <div class="section-content">${formatMarkdown(data.quantAnalysis)}</div>
+                    </div>
+                `;
+            }
+
+            // 视觉总监：图表与插图
+            html += `
+                <div class="section">
+                    <div class="section-title">
+                        <i class="fas fa-palette"></i>
+                        视觉总监 · 图表与插图
+                    </div>
+                    <div class="section-content">
+                        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom: 10px;">
+                            <span style="color: #A1A1AA; font-size: 12px;">系统将默认自动生成图表（ECharts）与主题插图（nano-banana）。</span>
+                        </div>
+                        <div id="alphafundCharts" style="width:100%; display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px;">
+                            <div style="border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px; background: rgba(255,255,255,0.02);">
+                                <div style="font-weight:600; margin-bottom:8px;">Top 市值（亿元）</div>
+                                <div id="chartMarketCap" style="height: 260px;"></div>
+                            </div>
+                            <div style="border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px; background: rgba(255,255,255,0.02);">
+                                <div style="font-weight:600; margin-bottom:8px;">PE TTM 分布</div>
+                                <div id="chartPE" style="height: 260px;"></div>
+                            </div>
+                        </div>
+                        <div id="alphafundIllustrationWrap" style="margin-top: 12px; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px; background: rgba(255,255,255,0.02);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                                <div style="font-weight:600;">主题插图</div>
+                                <div id="alphafundIllustrationStatus" style="color:#A1A1AA; font-size:12px;"></div>
+                            </div>
+                            <div id="alphafundIllustration" style="margin-top: 10px; min-height: 120px; display:flex; justify-content:center; align-items:center; color:#A1A1AA;">
+                                正在准备生成插图...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (data.investmentThesis) {
+                html += `
+                    <div class="section">
+                        <div class="section-content" style="font-size: 16px; line-height: 1.8;">
+                            ${formatMarkdown(data.investmentThesis)}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (data.critiqueAnalysis) {
+                html += `
+                    <div class="section" style="background: rgba(239, 68, 68, 0.1); padding: 20px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3);">
+                        <div class="section-title" style="color: #ef4444;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            红队压力测试
+                        </div>
+                        <div class="section-content" style="font-style: italic;">${formatMarkdown(data.critiqueAnalysis)}</div>
+                    </div>
+                `;
+            }
+
+            if (data.riskAssessment) {
+                html += `
+                    <div class="section">
+                        <div class="section-title">
+                            <i class="fas fa-shield-alt"></i>
+                            CRO 合规审查
+                        </div>
+                        <div class="section-content">
+                            <p style="font-weight: 600; color: #E0E0E0;">"${data.riskAssessment.critique}"</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+
+            // 默认自动渲染图表（不阻塞，不弹窗）
+            try {
+                const rows = extractQuantRows(data.quantAnalysis || '');
+                renderChartsFromQuantRows(rows);
+                addLog('VISUALIZATION_EXPERT', '已自动尝试渲染图表（ECharts）。', 'info');
+            } catch (e) {
+                // 静默
+            }
+
+            // 默认自动生成插图（不阻塞）：失败会在插图区域显示原因
+            // 使用 setTimeout 让 DOM 先渲染完毕
+            setTimeout(() => {
+                generateIllustration(data);
+            }, 0);
+
+            // Render agent context in stream tab (按时间排序)
+            if (data.agentContext && data.agentContext.length > 0) {
+                const streamTab = document.getElementById('streamTab');
+                // 按时间戳排序
+                const sortedContext = [...data.agentContext].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+                
+                streamTab.innerHTML = sortedContext.map(msg => `
+                    <div class="log-entry info" style="margin-bottom: 12px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                            <span class="log-agent">${msg.name}</span>
+                            <span class="log-time">${new Date(msg.timestamp).toLocaleTimeString()}</span>
+                        </div>
+                        <div style="color: #CCCCCC; font-size: 11px; line-height: 1.5;">
+                            ${msg.content.substring(0, 200)}${msg.content.length > 200 ? '...' : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function formatMarkdown(text) {
+            if (!text) return '';
+            
+            // 先处理表格（在处理换行之前）
+            text = renderMarkdownTables(text);
+            
+            // Simple markdown to HTML conversion
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code style="background: rgba(255,107,0,0.1); padding: 2px 6px; border-radius: 3px; font-family: monospace;">$1</code>')
+                .replace(/### (.*?)$/gm, '<h3>$1</h3>')
+                .replace(/## (.*?)$/gm, '<h2>$1</h2>')
+                .replace(/# (.*?)$/gm, '<h1>$1</h1>')
+                .replace(/\n/g, '<br>');
+        }
+
+        function renderMarkdownTables(text) {
+            // 匹配 Markdown 表格
+            const tableRegex = /(\|[^\n]+\|\n)+/g;
+            
+            return text.replace(tableRegex, (match) => {
+                const lines = match.trim().split('\n').filter(l => l.trim());
+                if (lines.length < 2) return match; // 至少需要表头和分隔行
+                
+                // 第一行是表头
+                const headers = lines[0].split('|').map(h => h.trim()).filter(Boolean);
+                
+                // 第二行是分隔符（跳过）
+                const separatorLine = lines[1];
+                if (!separatorLine.includes('---')) return match;
+                
+                // 剩余行是数据
+                const dataRows = lines.slice(2);
+                
+                // 构建 HTML 表格
+                let html = '<table style="width:100%; border-collapse:collapse; margin:20px 0; background:#1E1E1E; border-radius:8px; overflow:hidden;">';
+                
+                // 表头
+                html += '<thead><tr>';
+                headers.forEach(h => {
+                    html += `<th style="padding:12px; text-align:left; border-bottom:1px solid #333; background:#0A0A0A; color:#FF6B00; font-weight:600; font-size:12px; text-transform:uppercase;">${h}</th>`;
+                });
+                html += '</tr></thead>';
+                
+                // 数据行
+                html += '<tbody>';
+                dataRows.forEach(row => {
+                    const cells = row.split('|').map(c => c.trim()).filter(Boolean);
+                    if (cells.length === 0) return;
+                    
+                    html += '<tr>';
+                    cells.forEach((cell, idx) => {
+                        const align = idx > 0 ? 'right' : 'left'; // 第一列左对齐，其他右对齐
+                        html += `<td style="padding:12px; text-align:${align}; border-bottom:1px solid #333; color:#CCCCCC; font-size:13px;">${cell}</td>`;
+                    });
+                    html += '</tr>';
+                });
+                html += '</tbody></table>';
+                
+                return html;
+            });
+        }
+
+        // ====== VISUALIZATION_EXPERT: 解析量化表格 + ECharts 渲染 ======
+        function extractQuantRows(markdownText) {
+            // 兼容全角竖线
+            markdownText = (markdownText || '').replace(/｜/g, '|');
+            // 从 markdown 中找第一段表格（|...|）
+            const lines = (markdownText || '').split('\n').map(l => l.trim()).filter(Boolean);
+            const tableStart = lines.findIndex(l => l.startsWith('|') && l.includes('|'));
+            if (tableStart === -1) return [];
+            // 找到连续的表格行
+            let tableLines = [];
+            for (let i = tableStart; i < lines.length; i++) {
+                const l = lines[i];
+                if (!l.startsWith('|')) break;
+                tableLines.push(l);
+            }
+            if (tableLines.length < 3) return [];
+
+            const header = tableLines[0].split('|').map(s => s.trim()).filter(Boolean);
+            // 第二行通常是分隔符，跳过
+            const rows = [];
+            for (let i = 2; i < tableLines.length; i++) {
+                const cols = tableLines[i].split('|').map(s => s.trim()).filter(Boolean);
+                if (cols.length !== header.length) continue;
+                const obj = {};
+                header.forEach((h, idx) => obj[h] = cols[idx]);
+                rows.push(obj);
+            }
+            return rows;
+        }
+
+        function parseNumberLike(v) {
+            if (v == null) return null;
+            let s = String(v).replace(/[,，]/g, '').trim();
+            if (!s || s === 'N/A' || s === '-') return null;
+            
+            // 移除货币符号
+            s = s.replace(/[$￥€]/g, '');
+            
+            // 支持百分比
+            const isPercent = s.endsWith('%');
+            let numStr = s.replace('%', '').trim();
+            
+            let mul = 1;
+            // 英文单位 (T=万亿, B=十亿, M=百万, K=千)
+            if (/T$/i.test(numStr)) { mul = 10000; numStr = numStr.replace(/T$/i, ''); }  // T = Trillion = 万亿 → 10000亿
+            else if (/B$/i.test(numStr)) { mul = 10; numStr = numStr.replace(/B$/i, ''); }  // B = Billion = 10亿
+            else if (/M$/i.test(numStr)) { mul = 0.01; numStr = numStr.replace(/M$/i, ''); }  // M = Million = 0.01亿
+            else if (/K$/i.test(numStr)) { mul = 0.00001; numStr = numStr.replace(/K$/i, ''); }  // K = Thousand
+            // 中文单位
+            else if (numStr.includes('万亿')) { mul = 10000; numStr = numStr.replace('万亿', ''); }
+            else if (numStr.includes('亿')) { mul = 1; numStr = numStr.replace('亿', ''); }
+            else if (numStr.includes('万')) { mul = 0.0001; numStr = numStr.replace('万', ''); }
+            
+            const n = Number(numStr.trim());
+            if (Number.isNaN(n)) return null;
+            return isPercent ? n : n * mul;
+        }
+
+        function showChartError(msg) {
+            const ids = ['chartMarketCap', 'chartPE'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerHTML = `<div style="color:#ef4444; font-size:12px; padding:8px;">${msg}</div>`;
+                }
+            });
+        }
+
+        function renderChartsFromQuantRows(rows) {
+            if (!window.echarts) {
+                showChartError('ECharts 未加载，无法渲染图表。');
+                return;
+            }
+            if (!rows || rows.length === 0) {
+                showChartError('未识别到量化表格数据（请确保量化专家输出包含 Markdown 表格）。');
+                return;
+            }
+
+            // 尝试兼容字段名
+            const nameKey = ['名称', '标的', '股票', '公司', 'Name'].find(k => rows[0][k] != null) || '名称';
+            const mcapKey = ['市值', '总市值', '市值(亿)', 'Market Cap'].find(k => rows[0][k] != null) || '市值';
+            const peKey = ['PE TTM', 'PE', 'PE(TTM)', '市盈率', '市盈率TTM'].find(k => rows[0][k] != null) || 'PE TTM';
+
+            const parsed = rows.map(r => ({
+                name: r[nameKey] || r['名称'] || r['Name'] || 'N/A',
+                mcap: parseNumberLike(r[mcapKey]),
+                pe: parseNumberLike(r[peKey]),
+                mcapRaw: r[mcapKey],
+                peRaw: r[peKey]
+            })).filter(x => x.name && x.name !== 'N/A');
+
+            // 市值 TopN（单位：亿）- 优先显示有数据的，若全是 N/A 则显示前 10 个标的名称
+            let mcapList = parsed.filter(x => x.mcap != null).sort((a,b)=>b.mcap-a.mcap).slice(0, 10);
+            if (mcapList.length === 0) {
+                // 全是 N/A，显示标的名称 + 占位
+                // 注意：占位值不能为 0，否则柱子不可见（长度为 0）
+                mcapList = parsed.slice(0, 10).map(x => ({ name: x.name, mcap: 1, isNA: true }));
+            }
+            const mcapDom = document.getElementById('chartMarketCap');
+            if (mcapDom && mcapList.length > 0) {
+                const existed = echarts.getInstanceByDom(mcapDom);
+                if (existed) existed.dispose();
+                const chart = echarts.init(mcapDom, null, { renderer: 'canvas' });
+                chart.setOption({
+                    backgroundColor: 'transparent',
+                    tooltip: { 
+                        trigger: 'axis', 
+                        axisPointer: { type: 'shadow' },
+                        formatter: params => {
+                            const p = params[0];
+                            if (mcapList[p.dataIndex]?.isNA) {
+                                return `${p.name}<br/>市值: N/A`;
+                            }
+                            return `${p.name}<br/>市值: ${p.value} 亿元`;
+                        }
+                    },
+                    grid: { left: 10, right: 10, top: 20, bottom: 10, containLabel: true },
+                    xAxis: { 
+                        type: 'value', 
+                        max: mcapList.some(x => x.isNA) ? 1 : null,
+                        axisLabel: { color: '#A1A1AA' }, 
+                        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.06)' } } 
+                    },
+                    yAxis: { type: 'category', data: mcapList.map(x => x.name), axisLabel: { color: '#E5E7EB' } },
+                    series: [{
+                        type: 'bar',
+                        data: mcapList.map(x => x.mcap),
+                        itemStyle: { 
+                            color: params => (mcapList[params.dataIndex]?.isNA ? '#555' : '#FF6B00')
+                        }
+                    }]
+                });
+                window.addEventListener('resize', () => chart.resize());
+            } else {
+                const el = document.getElementById('chartMarketCap');
+                if (el) el.innerHTML = '<div style="color:#A1A1AA; font-size:12px; padding:8px;">暂无市值数据</div>';
+            }
+
+            // PE 分布（柱状）- 优先显示有数据的，若全是 N/A 则显示前 10 个标的名称
+            let peList = parsed.filter(x => x.pe != null && x.pe > 0).sort((a,b)=>b.pe-a.pe).slice(0, 10);
+            if (peList.length === 0) {
+                // 全是 N/A，显示标的名称 + 占位
+                // 注意：占位值不能为 0，否则柱子不可见（高度为 0）
+                peList = parsed.slice(0, 10).map(x => ({ name: x.name, pe: 1, isNA: true }));
+            }
+            const peDom = document.getElementById('chartPE');
+            if (peDom && peList.length > 0) {
+                const existed = echarts.getInstanceByDom(peDom);
+                if (existed) existed.dispose();
+                const chart = echarts.init(peDom, null, { renderer: 'canvas' });
+                chart.setOption({
+                    backgroundColor: 'transparent',
+                    tooltip: { 
+                        trigger: 'axis',
+                        formatter: params => {
+                            const p = params[0];
+                            if (peList[p.dataIndex]?.isNA) {
+                                return `${p.name}<br/>PE TTM: N/A`;
+                            }
+                            return `${p.name}<br/>PE TTM: ${p.value}`;
+                        }
+                    },
+                    grid: { left: 10, right: 10, top: 20, bottom: 10, containLabel: true },
+                    xAxis: { type: 'category', data: peList.map(x => x.name), axisLabel: { color: '#E5E7EB', rotate: 25 } },
+                    yAxis: { 
+                        type: 'value', 
+                        max: peList.some(x => x.isNA) ? 1 : null,
+                        axisLabel: { color: '#A1A1AA' }, 
+                        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.06)' } } 
+                    },
+                    series: [{
+                        type: 'bar',
+                        data: peList.map(x => x.pe),
+                        itemStyle: { 
+                            color: params => (peList[params.dataIndex]?.isNA ? '#555' : '#14b8a6')
+                        }
+                    }]
+                });
+                window.addEventListener('resize', () => chart.resize());
+            } else {
+                const el = document.getElementById('chartPE');
+                if (el) el.innerHTML = '<div style="color:#A1A1AA; font-size:12px; padding:8px;">暂无 PE 数据</div>';
+            }
+        }
+
+        // ====== VISUALIZATION_EXPERT: nano-banana 插图生成（调用后端） ======
+        async function generateIllustration(reportData) {
+            const statusEl = document.getElementById('alphafundIllustrationStatus');
+            const wrapEl = document.getElementById('alphafundIllustration');
+            if (!wrapEl) return;
+            if (statusEl) statusEl.textContent = '生成中...';
+            wrapEl.innerHTML = '<div style="display:flex; align-items:center; gap:10px; color:#A1A1AA;"><div class="loading-spinner" style="width: 18px; height: 18px;"></div><div>正在调用 nano-banana 生成插图...</div></div>';
+
+            const topic = (reportData && (reportData.topic || reportData.title)) || '投资主题';
+            const prompt = `为金融投研报告生成一张专业插图海报：主题「${topic}」。风格：现代、深色背景、橙色强调色（#FF6B00），带有抽象金融图形元素（K线/曲线/网格/芯片纹理），无文字或极少文字，适合作为研报封面配图。`;
+
+            try {
+                const form = new FormData();
+                form.append('prompt', prompt);
+                form.append('model', 'nano-banana-pro');
+                form.append('size', '1024x1024');
+                // 防止后端图像生成卡住导致前端一直转圈：增加超时
+                const controller = new AbortController();
+                const timeoutMs = 90_000; // 90s
+                const t = setTimeout(() => controller.abort(), timeoutMs);
+                const res = await fetch('/api/image/generate', { method: 'POST', body: form, signal: controller.signal });
+                clearTimeout(t);
+                const data = await res.json();
+                if (!data || !data.success) {
+                    throw new Error((data && (data.error || data.hint)) || '生成失败');
+                }
+                if (data.image_base64) {
+                    wrapEl.innerHTML = `<img src="data:image/png;base64,${data.image_base64}" style="max-width:100%; height:auto; border-radius: 10px; background:#fff; padding: 8px;"/>`;
+                } else if (data.url) {
+                    wrapEl.innerHTML = `<img src="${data.url}" style="max-width:100%; height:auto; border-radius: 10px; background:#fff; padding: 8px;"/>`;
+                } else if (data.html) {
+                    wrapEl.innerHTML = data.html;
+                } else {
+                    wrapEl.innerHTML = '<div style="color:#A1A1AA;">生成成功但未返回图片数据。</div>';
+                }
+                if (statusEl) statusEl.textContent = '已生成';
+                addLog('VISUALIZATION_EXPERT', '已生成主题插图（nano-banana）。', 'success');
+            } catch (e) {
+                console.error(e);
+                if (statusEl) statusEl.textContent = '生成失败';
+                const msg = (e && e.name === 'AbortError') ? '请求超时（90秒）。请稍后重试，或检查模型网络/代理配置。' : (e.message || e);
+                wrapEl.innerHTML = `<div style="color:#ef4444; font-size:12px; line-height: 1.5;">
+                    插图生成失败：${msg}<br>
+                    <span style="color:#A1A1AA;">提示：如果你所在地区 Gemini API/图像生成不可用，会出现 400 FAILED_PRECONDITION；如果是 TLS EOF，多为网络/代理/证书链问题。</span>
+                </div>`;
+                addLog('VISUALIZATION_EXPERT', `插图生成失败：${msg}`, 'error');
+            }
+        }
+
+        function addLog(agentId, message, type = 'info', timestamp = null) {
+            const logsContent = document.getElementById('logsContent');
+            // 如果提供了 timestamp，使用它；否则使用当前时间
+            const time = timestamp ? new Date(timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.innerHTML = `
+                <span class="log-time">${time}</span>
+                <span class="log-agent">${agentId}</span>
+                <span>${message}</span>
+            `;
+            logsContent.appendChild(logEntry);
+            logsContent.scrollTop = logsContent.scrollHeight;
+        }
+
+        // ====== 工作流回放：把 agentContext 显示在“日志”，并更新左侧卡片 ======
+        function replayWorkflowToLogsAndCards(data, deepResearchEnabled) {
+            const roleToCardId = {
+                'DEEP_RESEARCHER': 'deep',
+                'MARKET_ANALYST': 'alpha',
+                'QUANT_ANALYST': 'sigma',
+                'PORTFOLIO_MANAGER': 'prime',
+                'CRITICAL_REVIEWER': 'critic',
+                'VISUALIZATION_EXPERT': 'canvas',
+                'RISK_OFFICER': 'shield',
+            };
+
+            // 1) 基于 agentContext 输出日志（使用后端返回的实际时间戳）
+            const ctx = (data && Array.isArray(data.agentContext)) ? data.agentContext : [];
+            if (ctx.length > 0) {
+                // **重要**：按时间戳排序，确保日志按实际执行顺序显示
+                const sortedCtx = [...ctx].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+                
+                // 按时间顺序回放每个智能体的输出摘要
+                sortedCtx.forEach(msg => {
+                    const role = msg.role || msg.name || 'AGENT';
+                    const name = msg.name || role;
+                    const content = (msg.content || '').toString();
+                    const brief = content.length > 120 ? content.slice(0, 120) + '...' : content;
+                    const timestamp = msg.timestamp || null; // 使用后端返回的时间戳
+                    addLog(role, `${name}：${brief || '(无输出)'}`, 'info', timestamp);
+                });
+            } else {
+                addLog('系统', '未收到 agentContext（可能是后端返回缺失或执行中断）。', 'error');
+            }
+
+            // 2) 更新左侧卡片：哪些角色实际产出了内容，就标记 completed
+            const producedRoles = new Set(ctx.map(m => m.role).filter(Boolean));
+            // 若未开启深度研究，不要把 deep 卡片当成缺失
+            if (!deepResearchEnabled) producedRoles.add('DEEP_RESEARCHER');
+
+            Object.keys(roleToCardId).forEach(role => {
+                const id = roleToCardId[role];
+                const card = document.getElementById(`agent-${id}`);
+                const statusEl = document.getElementById(`status-${id}`);
+                if (!card || !statusEl) return;
+                if (producedRoles.has(role)) {
+                    card.classList.add('completed');
+                    statusEl.textContent = '已完成';
+                } else {
+                    statusEl.textContent = '未执行/无输出';
+                }
+            });
+        }
+
+        // Listen for initialization message from parent
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'alphafund-init') {
+                document.getElementById('topicInput').value = event.data.topic || '';
+                document.getElementById('deepResearchCheck').checked = event.data.deepResearch || false;
+                // Optionally auto-start workflow
+                // startWorkflow();
+            }
+        });
+
+        // ====== 导出PDF功能 ======
+        function exportToPDF() {
+            // 使用浏览器原生打印功能
+            window.print();
+        }
+
+        function showExportButton() {
+            const exportBtn = document.getElementById('exportPdfBtn');
+            if (exportBtn) {
+                exportBtn.classList.add('show');
+            }
+        }
+
+        function hideExportButton() {
+            const exportBtn = document.getElementById('exportPdfBtn');
+            if (exportBtn) {
+                exportBtn.classList.remove('show');
+            }
+        }
+
+        // Initialize on load
+        initAgents();
+    </script>
+</body>
+</html>
+

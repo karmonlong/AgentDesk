@@ -2,8 +2,10 @@ import asyncio
 import os
 import json
 from typing import List, Dict, Any, Optional
+from urllib.parse import urlencode
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+from mcp.client.streamable_http import streamablehttp_client
 from langchain_core.tools import Tool
 
 class MCPClientManager:
@@ -55,6 +57,23 @@ class MCPClientManager:
         """
         连接 Server 并列出可用工具 (临时连接)
         """
+        # 优先尝试 HTTP (streamable) 方式 —— 适配 Smithery 提供的 HTTP MCP 服务
+        http_url = self._build_http_url(command, args)
+        if http_url:
+            tools = []
+            async with streamablehttp_client(http_url) as (read, write, _):
+                async with ClientSession(read, write) as session:
+                    await session.initialize()
+                    result = await session.list_tools()
+                    for tool in result.tools:
+                        tools.append({
+                            "name": tool.name,
+                            "description": tool.description,
+                            "input_schema": tool.inputSchema
+                        })
+            return tools
+
+        # 回退到 stdio 方式
         server_params = StdioServerParameters(
             command=command,
             args=args,
@@ -80,6 +99,16 @@ class MCPClientManager:
         """
         连接 Server 并调用工具 (临时连接)
         """
+        # 优先尝试 HTTP (streamable) 方式
+        http_url = self._build_http_url(command, args)
+        if http_url:
+            async with streamablehttp_client(http_url) as (read, write, _):
+                async with ClientSession(read, write) as session:
+                    await session.initialize()
+                    result = await session.call_tool(tool_name, arguments=tool_args)
+                    return result
+
+        # 回退到 stdio 方式
         server_params = StdioServerParameters(
             command=command,
             args=args,
@@ -93,6 +122,29 @@ class MCPClientManager:
                 # Call tool
                 result = await session.call_tool(tool_name, arguments=tool_args)
                 return result
+
+    def _build_http_url(self, command: str, args: List[str]) -> Optional[str]:
+        """
+        如果配置里包含 Smithery 的 aktools（通过 npx 调用），构造 HTTP URL。
+        """
+        # 只对 aktools 的 npx 方式做特殊处理
+        if command != "npx":
+            return None
+        if "@aahl/mcp-aktools" not in args:
+            return None
+
+        # 从参数中提取 key，例如: ["-y", "@smithery/cli@latest", "run", "@aahl/mcp-aktools", "--key", "<KEY>"]
+        api_key = None
+        if "--key" in args:
+            idx = args.index("--key")
+            if idx + 1 < len(args):
+                api_key = args[idx + 1]
+
+        if not api_key:
+            return None
+
+        base_url = "https://server.smithery.ai/@aahl/mcp-aktools/mcp"
+        return f"{base_url}?{urlencode({'api_key': api_key})}"
 
 # 全局实例
 mcp_manager = MCPClientManager()

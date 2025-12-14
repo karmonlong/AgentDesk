@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "python",
+      "args": ["tools/mcp_server_fs.py"]
+    },
+    "mcp-aktools": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@aahl/mcp-aktools",
+        "--key",
+        "44c67169-65b8-4564-8c17-90bc6746c6e7"
+      ]
+    }
+  }
+}

@@ -168,3 +168,15 @@ const result = await mcpClient.callTool('list_directory', {path: '.'});
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+

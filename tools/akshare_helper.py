@@ -89,10 +89,17 @@ def format_tool_args(tool_name: str, tool_args: Dict[str, Any]) -> Dict[str, Any
         if 'limit' not in formatted_args:
             formatted_args['limit'] = 5
     
-    # search 工具
+    # search 工具使用不同的 market 格式：sh, sz, hk, us
     if tool_name == 'search':
         if 'market' not in formatted_args:
-            formatted_args['market'] = 'A'
+            formatted_args['market'] = 'sh'  # 默认使用上证
+        else:
+            # 如果用户提供了 'A'，需要转换为 'sh' 或 'sz'
+            # 但这里我们保持原值，因为 search 工具期望 sh/sz/hk/us
+            market = formatted_args.get('market', '').lower()
+            if market == 'a':
+                # A股默认使用上证
+                formatted_args['market'] = 'sh'
     
     return formatted_args
 

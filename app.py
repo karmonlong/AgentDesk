@@ -4,7 +4,7 @@ FastAPI + 前端界面
 """
 
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import json
@@ -32,6 +32,7 @@ from tools.file_tools import (
 from tools.document_tools import create_summary_card, markdown_to_docx
 from agents.multi_agents import multi_agent_system
 from agents.prompt_manager import prompt_manager
+from agents.alphafund_agent import AlphaFundAgent
 from langchain_core.messages import HumanMessage
 
 # 创建 FastAPI 应用
@@ -69,6 +70,11 @@ async def test_mention_page():
 async def home(request: Request):
     """返回控制台主页"""
     return templates.TemplateResponse("command_center_v2.html", {"request": request})
+
+@app.get("/alphafund", response_class=HTMLResponse)
+async def alphafund_workspace(request: Request):
+    """返回 AlphaFund 投研工作区"""
+    return templates.TemplateResponse("alphafund_workspace.html", {"request": request})
 
 @app.get("/old", response_class=HTMLResponse)
 async def old_home(request: Request):
@@ -2035,6 +2041,51 @@ if __name__ == "__main__":
 
     print("="*60)
     print("办公智能体助手 已启动")
+    print("="*60)
+@app.post("/api/alphafund/start")
+async def start_alphafund_workflow(
+    topic: str = Form(...),
+    deep_research: str = Form("false")
+):
+    """启动 AlphaFund 投研工作流（流式输出版本）"""
+    async def event_generator():
+        try:
+            agent = AlphaFundAgent()
+            deep_research_bool = deep_research.lower() == "true"
+            
+            # 发送开始事件
+            yield f"data: {json.dumps({'type': 'start', 'topic': topic}, ensure_ascii=False)}\n\n"
+            
+            # 执行工作流，逐个智能体流式返回
+            async for event in agent.run_workflow_stream(topic, deep_research_bool):
+                # 确保 JSON 序列化成功，使用 ensure_ascii=False 保留中文
+                event_json = json.dumps(event, ensure_ascii=False)
+                yield f"data: {event_json}\n\n"
+                
+                # 关键：显式刷新以确保实时传输
+                await asyncio.sleep(0.01)
+            
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            yield f"data: {json.dumps({'type': 'error', 'error': str(e)}, ensure_ascii=False)}\n\n"
+    
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+            "Content-Type": "text/event-stream; charset=utf-8"
+        }
+    )
+
+
+if __name__ == "__main__":
+    import uvicorn
+    print("="*60)
+    print("🚀 AgentDesk - 资管智能体工作台")
     print("="*60)
     print(f"访问地址: http://localhost:8000")
     print(f"API文档: http://localhost:8000/docs")
