@@ -95,12 +95,12 @@
             user-select: none;
             opacity: 1;
         }
-        
+
         .landing-logo:hover {
             transform: translateY(-2px);
             filter: brightness(1.2);
         }
-        
+
         .landing-logo-icon {
             width: 36px;
             height: 36px;
@@ -116,7 +116,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .landing-logo-icon::before {
             content: '';
             position: absolute;
@@ -128,12 +128,19 @@
             transform: rotate(45deg);
             animation: shine 3s infinite;
         }
-        
+
         @keyframes shine {
-            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+
+            0%,
+            100% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+
+            50% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
         }
-        
+
         .landing-logo-text {
             background: linear-gradient(135deg, #FFFFFF 0%, #CCCCCC 100%);
             -webkit-background-clip: text;
@@ -202,7 +209,7 @@
             font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -210,7 +217,7 @@
             opacity: 0.9;
             z-index: 10;
         }
-        
+
         .landing-agent-mode-btn:hover {
             opacity: 1;
             transform: translateY(-52%) scale(1.05);
@@ -324,12 +331,13 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
+
         /* 确保 landing-input-wrapper 正确定位 */
         .landing-input-wrapper {
             position: relative !important;
@@ -474,6 +482,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -548,7 +557,8 @@
 
         .landing-qa-messages {
             flex: 1;
-            min-height: 0; /* 关键：允许 flex 子项收缩 */
+            min-height: 0;
+            /* 关键：允许 flex 子项收缩 */
             overflow-y: auto;
             padding: 20px 24px;
             display: flex;
@@ -563,8 +573,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .landing-qa-message.user {
@@ -659,7 +676,8 @@
 
         /* 预测问题区域 */
         .landing-qa-suggestions {
-            flex-shrink: 0; /* 固定不收缩 */
+            flex-shrink: 0;
+            /* 固定不收缩 */
             padding: 12px 20px;
             background: rgba(255, 255, 255, 0.02);
             border-top: 1px solid rgba(255, 255, 255, 0.06);
@@ -722,7 +740,8 @@
 
         /* 问答区域输入框 */
         .landing-qa-input-area {
-            flex-shrink: 0; /* 固定不收缩 */
+            flex-shrink: 0;
+            /* 固定不收缩 */
             padding: 16px 20px;
             background: rgba(30, 30, 30, 0.95);
             border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -801,13 +820,29 @@
             animation: bounce 1.4s infinite ease-in-out both;
         }
 
-        .landing-qa-loading span:nth-child(1) { animation-delay: -0.32s; }
-        .landing-qa-loading span:nth-child(2) { animation-delay: -0.16s; }
-        .landing-qa-loading span:nth-child(3) { animation-delay: 0; }
+        .landing-qa-loading span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .landing-qa-loading span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        .landing-qa-loading span:nth-child(3) {
+            animation-delay: 0;
+        }
 
         @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
         }
 
         /* 问答区域滚动条样式 */
@@ -877,6 +912,7 @@
             .landing-qa-history {
                 display: none;
             }
+
             .landing-qa-wrapper {
                 max-width: 100%;
             }
@@ -940,19 +976,20 @@
             transition: opacity 0.2s, left 0.2s;
             z-index: 1000;
             margin-left: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border);
         }
 
         .activity-item:hover::after {
             opacity: 1;
-            left: 110%; /* Slight movement effect */
+            left: 110%;
+            /* Slight movement effect */
         }
 
         .activity-item:hover {
             transform: scale(1.1);
         }
-        
+
         .activity-item:hover::before {
             content: '';
             position: absolute;
@@ -964,7 +1001,7 @@
         .activity-item.active {
             border-left-color: var(--primary);
         }
-        
+
         .activity-item.active::before {
             content: '';
             position: absolute;
@@ -972,23 +1009,27 @@
             background: rgba(255, 107, 0, 0.15);
             border-radius: 8px;
         }
-        
+
         /* Unified Activity Bar Styles - Ceramic White Theme */
         .activity-item i {
-            color: rgba(255, 255, 255, 0.5); /* Ceramic White (Unlit) */
+            color: rgba(255, 255, 255, 0.5);
+            /* Ceramic White (Unlit) */
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             filter: drop-shadow(0 0 0 transparent);
         }
-        
+
         .activity-item:hover i {
-            color: rgba(255, 255, 255, 0.9); /* Ceramic White (Lit) */
+            color: rgba(255, 255, 255, 0.9);
+            /* Ceramic White (Lit) */
             transform: scale(1.15);
             filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
         }
 
         .activity-item.active i {
-            color: #FFFFFF; /* Pure White */
-            filter: drop-shadow(0 0 8px var(--primary)); /* Brand Glow */
+            color: #FFFFFF;
+            /* Pure White */
+            filter: drop-shadow(0 0 8px var(--primary));
+            /* Brand Glow */
         }
 
         /* Special Active Colors - Enhanced for Dark Background */
@@ -997,7 +1038,7 @@
             color: #00E5FF !important;
             filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.8));
         }
-        
+
         /* NotebookLM - Deep Purple */
         #activity-notebooklm.active i {
             color: #E040FB !important;
@@ -1009,12 +1050,12 @@
             color: #FFD700 !important;
             filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8));
         }
-        
+
         /* Remove old specific ID colors to enforce uniformity */
         /* #activity-explorer i { color: ... } - REMOVED */
         /* #activity-scenarios i { color: ... } - REMOVED */
         /* #activity-market i { color: ... } - REMOVED */
-        
+
         .activity-item .fa-search {
             /* Keep search icon generic if used elsewhere, or override here */
         }
@@ -1041,7 +1082,7 @@
             left: var(--activity-bar-width);
             height: 100vh;
             z-index: 100;
-            box-shadow: 10px 0 50px rgba(0,0,0,0.6);
+            box-shadow: 10px 0 50px rgba(0, 0, 0, 0.6);
         }
 
         .sidebar.collapsed {
@@ -1055,7 +1096,7 @@
         .left-resizer {
             flex: 0 0 6px;
             cursor: col-resize;
-            background: rgba(255,255,255,0.06);
+            background: rgba(255, 255, 255, 0.06);
             border-right: 1px solid var(--border);
             transition: background 0.2s;
             z-index: 20;
@@ -1063,10 +1104,10 @@
         }
 
         .left-resizer:hover {
-            background: rgba(255,255,255,0.12);
+            background: rgba(255, 255, 255, 0.12);
         }
 
-        .sidebar.collapsed + .left-resizer {
+        .sidebar.collapsed+.left-resizer {
             display: none;
         }
 
@@ -1128,15 +1169,18 @@
             font-size: 0.8rem;
             transition: all 0.2s;
         }
+
         .prompt-tab.active {
             background: var(--primary);
             color: white;
             font-weight: bold;
         }
+
         .prompt-tab:hover:not(.active) {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text-primary);
         }
+
         .prompt-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
@@ -1145,17 +1189,20 @@
             position: relative;
             transition: all 0.2s;
         }
+
         .prompt-card:hover {
             border-color: var(--primary);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
+
         .prompt-card-title {
             font-weight: bold;
             color: var(--text-primary);
             margin-bottom: 8px;
             font-size: 1rem;
         }
+
         .prompt-card-content {
             color: var(--text-secondary);
             font-size: 0.85rem;
@@ -1167,6 +1214,7 @@
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
         }
+
         .prompt-tag {
             display: inline-block;
             background: rgba(255, 107, 0, 0.1);
@@ -1458,7 +1506,8 @@
             display: flex;
             align-items: center;
             border-bottom: 1px solid var(--border);
-            z-index: 20; /* Ensure tabs are above canvas */
+            z-index: 20;
+            /* Ensure tabs are above canvas */
         }
 
         .editor-area {
@@ -1474,7 +1523,7 @@
             z-index: 10;
             background-color: var(--bg-tertiary);
         }
-        
+
         /* Modal Styles */
         .settings-modal {
             display: none;
@@ -1500,8 +1549,15 @@
         }
 
         @keyframes modalSlideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .modal-header {
@@ -1633,35 +1689,42 @@
             transition: all 0.2s;
             border-left: 3px solid var(--primary);
         }
+
         .workflow-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             border-color: var(--primary);
         }
+
         .workflow-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
         }
+
         .workflow-title {
             font-weight: bold;
             color: var(--text-primary);
             font-size: 0.9rem;
         }
+
         .workflow-status {
             font-size: 0.7rem;
             padding: 2px 6px;
             border-radius: 4px;
         }
+
         .workflow-status.active {
             background: rgba(76, 175, 80, 0.2);
             color: #4CAF50;
         }
+
         .workflow-status.paused {
             background: rgba(158, 158, 158, 0.2);
             color: #9E9E9E;
         }
+
         .workflow-schedule {
             font-size: 0.75rem;
             color: var(--text-secondary);
@@ -1670,15 +1733,17 @@
             align-items: center;
             gap: 5px;
         }
+
         .workflow-visual {
             display: flex;
             align-items: center;
             gap: 5px;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0, 0, 0, 0.2);
             padding: 8px;
             border-radius: 6px;
             margin-bottom: 10px;
         }
+
         .wf-step {
             width: 24px;
             height: 24px;
@@ -1691,14 +1756,17 @@
             font-size: 0.7rem;
             color: var(--text-secondary);
         }
+
         .wf-arrow {
             font-size: 0.7rem;
             color: #666;
         }
+
         .workflow-actions {
             display: flex;
             gap: 8px;
         }
+
         .wf-btn-run {
             flex: 1;
             background: rgba(255, 107, 0, 0.1);
@@ -1710,10 +1778,12 @@
             cursor: pointer;
             transition: all 0.2s;
         }
+
         .wf-btn-run:hover {
             background: var(--primary);
             color: white;
         }
+
         .wf-btn-edit {
             width: 28px;
             background: transparent;
@@ -1722,6 +1792,7 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
         .wf-btn-edit:hover {
             color: var(--text-primary);
             border-color: var(--text-primary);
@@ -1730,12 +1801,14 @@
         /* 新的 Canvas 全屏样式 */
         .canvas-area {
             position: absolute;
-            top: 35px; /* Below tabs */
+            top: 35px;
+            /* Below tabs */
             left: 0;
             width: 100%;
             height: calc(100% - 35px);
             background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%);
-            z-index: 5; /* Below editor by default */
+            z-index: 5;
+            /* Below editor by default */
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
@@ -1745,7 +1818,8 @@
         }
 
         .canvas-area.active {
-            z-index: 15; /* Above editor */
+            z-index: 15;
+            /* Above editor */
             opacity: 1;
             pointer-events: all;
         }
@@ -1763,11 +1837,13 @@
             align-items: center;
             z-index: 20;
             color: #666;
-            pointer-events: none; /* Let clicks pass through to canvas */
+            pointer-events: none;
+            /* Let clicks pass through to canvas */
         }
-        
-        .canvas-header > * {
-            pointer-events: all; /* Enable buttons */
+
+        .canvas-header>* {
+            pointer-events: all;
+            /* Enable buttons */
         }
 
         .canvas-header.sticky {
@@ -1790,7 +1866,7 @@
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             backdrop-filter: blur(12px);
-            box-shadow: 
+            box-shadow:
                 0 10px 30px -10px rgba(0, 0, 0, 0.8),
                 inset 0 0 20px rgba(255, 255, 255, 0.05);
             position: relative;
@@ -1815,12 +1891,12 @@
         .workflow-node:hover {
             transform: translate(-50%, -50%) scale(1.15) !important;
             border-color: rgba(255, 107, 0, 0.5);
-            box-shadow: 
+            box-shadow:
                 0 15px 40px -10px rgba(0, 0, 0, 0.9),
                 0 0 20px rgba(255, 107, 0, 0.2),
                 inset 0 0 20px rgba(255, 107, 0, 0.1);
         }
-        
+
         .workflow-node:hover::before {
             opacity: 1;
         }
@@ -1828,7 +1904,7 @@
         .workflow-node.working {
             background: radial-gradient(circle at 30% 30%, rgba(255, 107, 0, 0.2), rgba(30, 30, 30, 0.95));
             border-color: var(--primary);
-            box-shadow: 
+            box-shadow:
                 0 0 30px rgba(255, 107, 0, 0.4),
                 inset 0 0 20px rgba(255, 107, 0, 0.2);
             animation: pulse 2s ease-in-out infinite;
@@ -1843,7 +1919,7 @@
         .workflow-node i {
             font-size: 26px !important;
             transition: all 0.3s;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
         }
 
         .workflow-node.working i {
@@ -1864,12 +1940,12 @@
             transition: all 0.3s;
             backdrop-filter: blur(4px);
             white-space: nowrap;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             z-index: 10;
         }
 
-        .workflow-node:hover ~ .agent-label,
-        .workflow-node.working ~ .agent-label {
+        .workflow-node:hover~.agent-label,
+        .workflow-node.working~.agent-label {
             color: var(--text-primary);
             border-color: var(--primary);
             background: rgba(255, 107, 0, 0.15);
@@ -1908,7 +1984,7 @@
             border-radius: 12px;
             overflow: hidden;
             background: #fff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .html-preview-header {
@@ -1935,7 +2011,7 @@
         }
 
         .html-fullscreen-btn:hover {
-            background: rgba(0,0,0,0.1);
+            background: rgba(0, 0, 0, 0.1);
             color: #333;
         }
 
@@ -1961,7 +2037,7 @@
         .right-resizer {
             flex: 0 0 6px;
             cursor: col-resize;
-            background: rgba(255,255,255,0.06);
+            background: rgba(255, 255, 255, 0.06);
             border-left: 1px solid var(--border);
             transition: background 0.2s;
             z-index: 20;
@@ -1969,7 +2045,7 @@
         }
 
         .right-resizer:hover {
-            background: rgba(255,255,255,0.12);
+            background: rgba(255, 255, 255, 0.12);
         }
 
         .sidebar-header-actions {
@@ -1986,7 +2062,7 @@
             border-left: none;
         }
 
-        .right-panel.collapsed + .right-resizer {
+        .right-panel.collapsed+.right-resizer {
             display: none;
         }
 
@@ -2013,7 +2089,7 @@
             margin-bottom: 0;
             margin-right: 20px;
         }
-        
+
         body.mode-workspace .landing-logo-icon {
             width: 32px;
             height: 32px;
@@ -2070,7 +2146,8 @@
         }
 
         body.mode-workspace .landing-input-wrapper {
-            display: none; /* 在 workspace 模式下隐藏搜索框 */
+            display: none;
+            /* 在 workspace 模式下隐藏搜索框 */
         }
 
         body.mode-workspace .landing-input {
@@ -2273,25 +2350,27 @@
                 <span>AD</span>
             </div>
             <div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">
-                <div style="font-size: 0.8rem; font-weight: 600; background: linear-gradient(135deg, #FF8800 0%, #FF6B00 50%, #FF5500 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: 2px;">招商基金</div>
+                <div
+                    style="font-size: 0.8rem; font-weight: 600; background: linear-gradient(135deg, #FF8800 0%, #FF6B00 50%, #FF5500 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: 2px;">
+                    招商基金</div>
                 <span class="landing-logo-text">AgentDesk</span>
             </div>
         </div>
-        
+
         <!-- 全局折叠控制按钮 -->
         <div class="global-controls" id="globalControls" style="display: none;">
-                <button class="global-control-btn" onclick="toggleSidebar('left')" title="切换左侧栏 (Ctrl+B)">
-                    <i class="fas fa-folder-open"></i>
-                </button>
-                <button class="global-control-btn" onclick="toggleCanvas()" title="切换智能体画布">
-                    <i class="fas fa-project-diagram"></i>
-                </button>
-                <button class="global-control-btn" onclick="toggleSidebar('right')" title="切换右侧面板">
-                    <i class="fas fa-comments"></i>
-                </button>
-                <button class="global-control-btn" onclick="toggleAllPanels()" title="展开/折叠所有">
-                    <i class="fas fa-expand-arrows-alt" id="expandAllIcon"></i>
-                </button>
+            <button class="global-control-btn" onclick="toggleSidebar('left')" title="切换左侧栏 (Ctrl+B)">
+                <i class="fas fa-folder-open"></i>
+            </button>
+            <button class="global-control-btn" onclick="toggleCanvas()" title="切换智能体画布">
+                <i class="fas fa-project-diagram"></i>
+            </button>
+            <button class="global-control-btn" onclick="toggleSidebar('right')" title="切换右侧面板">
+                <i class="fas fa-comments"></i>
+            </button>
+            <button class="global-control-btn" onclick="toggleAllPanels()" title="展开/折叠所有">
+                <i class="fas fa-expand-arrows-alt" id="expandAllIcon"></i>
+            </button>
         </div>
 
         <!-- Agent Avatars -->
@@ -2306,13 +2385,14 @@
                 <div class="landing-qa-history-header">
                     <h3>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         历史对话
                     </h3>
                     <button class="landing-qa-new-chat" onclick="startNewQaSession()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
-                            <path d="M12 4v16m-8-8h16"/>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"
+                            height="14">
+                            <path d="M12 4v16m-8-8h16" />
                         </svg>
                         新对话
                     </button>
@@ -2328,7 +2408,8 @@
                     <div class="landing-qa-header-left">
                         <div class="landing-qa-header-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                                <path
+                                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                             </svg>
                         </div>
                         <span class="landing-qa-header-title">AgentDesk 智能助手</span>
@@ -2336,17 +2417,18 @@
                     <div class="landing-qa-header-actions">
                         <button class="landing-qa-action-btn" onclick="toggleQaHistory()" title="切换历史">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M4 6h16M4 12h16M4 18h7"/>
+                                <path d="M4 6h16M4 12h16M4 18h7" />
                             </svg>
                         </button>
                         <button class="landing-qa-action-btn" onclick="clearLandingQa()" title="清空对话">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                <path
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                         </button>
                         <button class="landing-qa-action-btn" onclick="hideQaPanel()" title="关闭">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M6 18L18 6M6 6l12 12"/>
+                                <path d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
@@ -2358,7 +2440,8 @@
                 <div class="landing-qa-suggestions" id="landingQaSuggestions" style="display: none;">
                     <div class="landing-qa-suggestions-title">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            <path
+                                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                         </svg>
                         您可能想问
                     </div>
@@ -2369,14 +2452,11 @@
                 <!-- 问答区域输入框 -->
                 <div class="landing-qa-input-area">
                     <div class="landing-qa-input-wrapper">
-                        <input type="text" 
-                               class="landing-qa-input" 
-                               id="landingQaInput" 
-                               placeholder="继续提问..."
-                               onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); submitQaQuestion(); }">
+                        <input type="text" class="landing-qa-input" id="landingQaInput" placeholder="继续提问..."
+                            onkeydown="if(event.key === 'Enter' && !event.shiftKey && !event.isComposing) { event.preventDefault(); submitQaQuestion(); }">
                         <button class="landing-qa-send-btn" onclick="submitQaQuestion()">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
                             </svg>
                         </button>
                     </div>
@@ -2421,24 +2501,27 @@
             <div id="activity-akshare" class="activity-item" onclick="switchSidebar('akshare')" title="AKShare 数据专家">
                 <i class="fas fa-chart-line"></i>
             </div>
-            <div id="activity-alphafund" class="activity-item" onclick="switchSidebar('alphafund')" title="AlphaFund 投研智能体">
+            <div id="activity-alphafund" class="activity-item" onclick="switchSidebar('alphafund')"
+                title="AlphaFund 投研智能体">
                 <i class="fas fa-chart-pie"></i>
             </div>
-            <div id="activity-notebooklm" class="activity-item" onclick="switchSidebar('notebooklm')" title="NotebookLM Pro">
+            <div id="activity-notebooklm" class="activity-item" onclick="switchSidebar('notebooklm')"
+                title="NotebookLM Pro">
                 <i class="fas fa-brain"></i>
             </div>
             <div id="activity-aigist" class="activity-item" onclick="switchSidebar('aigist')" title="AI-Gist 提示词智能体">
                 <i class="fas fa-lightbulb"></i>
             </div>
-            <div id="activity-mcp" class="activity-item" onclick="switchSidebar('mcp')" title="MCP 生态连接 (Model Context Protocol)">
+            <div id="activity-mcp" class="activity-item" onclick="switchSidebar('mcp')"
+                title="MCP 生态连接 (Model Context Protocol)">
                 <i class="fas fa-network-wired"></i>
             </div>
-            
+
             <!-- 动态插入的订阅智能体图标将出现在这里 -->
             <div id="subscribed-agents-bar">
                 <!-- 订阅的智能体图标会动态添加到这里 -->
             </div>
-            
+
             <div style="flex: 1"></div>
             <div class="activity-item" title="设置" onclick="openSettingsModal()">
                 <i class="fas fa-cog"></i>
@@ -2455,18 +2538,18 @@
                     <i class="fas fa-angle-left collapse-btn" onclick="toggleSidebar('left')" title="折叠"></i>
                 </div>
                 <div class="sidebar-content" style="padding: 0; height: 100%;">
-                    <iframe 
-                        id="notebooklm-iframe"
-                        src="about:blank" 
+                    <iframe id="notebooklm-iframe" src="about:blank"
                         style="width: 100%; height: 100%; border: none; background: var(--bg-primary); display: none;"
                         frameborder="0">
                     </iframe>
-                    <div id="notebooklm-placeholder" style="padding: 20px; text-align: center; color: var(--text-secondary);">
+                    <div id="notebooklm-placeholder"
+                        style="padding: 20px; text-align: center; color: var(--text-secondary);">
                         <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px;"></i>
                         <p>正在启动 Open NotebookLM...</p>
                         <p style="font-size: 0.85rem; margin-top: 10px;">
                             如果长时间未加载，请确保服务已启动：<br>
-                            <code style="background: var(--bg-secondary); padding: 5px 10px; border-radius: 4px; margin-top: 5px; display: inline-block;">
+                            <code
+                                style="background: var(--bg-secondary); padding: 5px 10px; border-radius: 4px; margin-top: 5px; display: inline-block;">
                                 cd open-notebooklm && ./start.sh
                             </code>
                         </p>
@@ -2480,7 +2563,8 @@
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <span><i class="fas fa-magic" style="color: #FFD700; margin-right: 5px;"></i> 提示词工坊</span>
                         <!-- Tabs -->
-                        <div style="display: flex; background: var(--bg-secondary); padding: 2px; border-radius: 6px; margin-left: 20px;">
+                        <div
+                            style="display: flex; background: var(--bg-secondary); padding: 2px; border-radius: 6px; margin-left: 20px;">
                             <button class="prompt-tab active" onclick="switchPromptTab('optimize')">优化</button>
                             <button class="prompt-tab" onclick="switchPromptTab('library')">库</button>
                             <button class="prompt-tab" onclick="switchPromptTab('best-practices')">最佳实践</button>
@@ -2488,22 +2572,25 @@
                     </div>
                     <i class="fas fa-angle-left collapse-btn" onclick="toggleSidebar('left')" title="折叠"></i>
                 </div>
-                
+
                 <div class="sidebar-content" style="padding: 20px; overflow-y: auto;">
-                    
+
                     <!-- Tab 1: Optimize -->
                     <div id="prompt-tab-optimize" class="prompt-tab-content" style="display: block;">
                         <div style="margin-bottom: 15px;">
-                            <label style="display: block; color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 5px;">原始提示词 / 需求</label>
-                            <textarea id="prompt-input" placeholder="输入你想要优化的提示词或简单指令..." 
+                            <label
+                                style="display: block; color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 5px;">原始提示词
+                                / 需求</label>
+                            <textarea id="prompt-input" placeholder="输入你想要优化的提示词或简单指令..."
                                 style="width: 100%; height: 120px; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; padding: 10px; font-family: monospace; resize: vertical; transition: border-color 0.3s;"></textarea>
                         </div>
-                        
+
                         <!-- Optimization Options -->
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
                             <div>
                                 <label style="font-size: 0.75rem; color: var(--text-secondary);">目标模型</label>
-                                <select id="prompt-model-select" style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); padding: 6px; border-radius: 4px; margin-top: 4px;">
+                                <select id="prompt-model-select"
+                                    style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); padding: 6px; border-radius: 4px; margin-top: 4px;">
                                     <option value="general">通用模型</option>
                                     <option value="gpt-4">GPT-4</option>
                                     <option value="claude-3">Claude 3</option>
@@ -2512,7 +2599,8 @@
                             </div>
                             <div>
                                 <label style="font-size: 0.75rem; color: var(--text-secondary);">优化框架</label>
-                                <select id="prompt-framework-select" style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); padding: 6px; border-radius: 4px; margin-top: 4px;">
+                                <select id="prompt-framework-select"
+                                    style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); padding: 6px; border-radius: 4px; margin-top: 4px;">
                                     <option value="auto">自动选择</option>
                                     <option value="costar">CO-STAR (结构化)</option>
                                     <option value="crispe">CRISPE (角色扮演)</option>
@@ -2522,7 +2610,8 @@
                             </div>
                             <div>
                                 <label style="font-size: 0.75rem; color: var(--text-secondary);">语气风格</label>
-                                <select id="prompt-tone-select" style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); padding: 6px; border-radius: 4px; margin-top: 4px;">
+                                <select id="prompt-tone-select"
+                                    style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); padding: 6px; border-radius: 4px; margin-top: 4px;">
                                     <option value="professional">专业严谨</option>
                                     <option value="creative">创意活泼</option>
                                     <option value="concise">简洁明了</option>
@@ -2532,41 +2621,48 @@
                         </div>
 
                         <div style="text-align: right; margin-bottom: 15px;">
-                            <button id="btn-optimize-prompt" onclick="optimizePrompt()" style="background: var(--primary); color: white; border: none; padding: 8px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3); transition: transform 0.2s;">
+                            <button id="btn-optimize-prompt" onclick="optimizePrompt()"
+                                style="background: var(--primary); color: white; border: none; padding: 8px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3); transition: transform 0.2s;">
                                 <i class="fas fa-magic"></i> 立即优化
                             </button>
                         </div>
-                        
+
                         <div id="prompt-output-container" style="display: none; animation: fadeIn 0.5s ease;">
                             <div style="display: flex; gap: 15px; margin-bottom: 10px;">
                                 <div style="flex: 1;">
-                                    <label style="display: block; color: var(--primary); font-size: 0.8rem; margin-bottom: 5px;">优化结果</label>
+                                    <label
+                                        style="display: block; color: var(--primary); font-size: 0.8rem; margin-bottom: 5px;">优化结果</label>
                                 </div>
                                 <div style="flex: 1; text-align: right;">
-                                    <button onclick="copyToClipboard(document.getElementById('prompt-output').value)" 
+                                    <button onclick="copyToClipboard(document.getElementById('prompt-output').value)"
                                         style="background: rgba(255,255,255,0.1); border: none; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; margin-left: 5px;">
                                         <i class="fas fa-copy"></i> 复制
                                     </button>
-                                    <button onclick="saveToLibrary()" 
+                                    <button onclick="saveToLibrary()"
                                         style="background: rgba(255,255,255,0.1); border: none; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; margin-left: 5px;">
                                         <i class="fas fa-save"></i> 保存
                                     </button>
                                 </div>
                             </div>
-                            
+
                             <!-- Optimized Prompt -->
                             <textarea id="prompt-output" readonly
                                 style="width: 100%; height: 250px; background: rgba(255, 107, 0, 0.05); border: 1px solid var(--primary); color: var(--text-primary); border-radius: 8px; padding: 15px; font-family: monospace; resize: vertical; line-height: 1.5; margin-bottom: 15px;"></textarea>
-                            
+
                             <!-- Comparison & Explanation -->
-                            <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 15px;">
+                            <div
+                                style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 15px;">
                                 <div style="margin-bottom: 10px;">
                                     <strong style="color: #4CAF50;"><i class="fas fa-check-circle"></i> 优化说明</strong>
-                                    <div id="prompt-explanation" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 5px; line-height: 1.6;"></div>
+                                    <div id="prompt-explanation"
+                                        style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 5px; line-height: 1.6;">
+                                    </div>
                                 </div>
                                 <div style="border-top: 1px solid var(--border); padding-top: 10px; margin-top: 10px;">
                                     <strong style="color: #2196F3;"><i class="fas fa-exchange-alt"></i> 优化对比</strong>
-                                    <div id="prompt-comparison" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 5px; line-height: 1.6;"></div>
+                                    <div id="prompt-comparison"
+                                        style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 5px; line-height: 1.6;">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2577,7 +2673,8 @@
                         <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
                             <input type="text" id="prompt-search" placeholder="搜索提示词..." oninput="filterPrompts()"
                                 style="flex: 1; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); padding: 8px; border-radius: 6px; margin-right: 10px;">
-                            <button onclick="switchPromptTab('optimize')" style="background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); padding: 8px 12px; border-radius: 6px; cursor: pointer;">
+                            <button onclick="switchPromptTab('optimize')"
+                                style="background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); padding: 8px 12px; border-radius: 6px; cursor: pointer;">
                                 <i class="fas fa-plus"></i> 新建
                             </button>
                         </div>
@@ -2589,7 +2686,8 @@
 
                     <!-- Tab 3: Best Practices -->
                     <div id="prompt-tab-best-practices" class="prompt-tab-content" style="display: none;">
-                        <div id="best-practices-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
+                        <div id="best-practices-list"
+                            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
                             <!-- Dynamic content -->
                         </div>
                     </div>
@@ -2634,11 +2732,13 @@
                     <span><i class="fas fa-cogs" style="color: #FFD700; margin-right: 8px;"></i> 自动化工作流</span>
                     <i class="fas fa-angle-left collapse-btn" onclick="toggleSidebar('left')" title="折叠"></i>
                 </div>
-                
+
                 <div class="sidebar-content" style="padding: 15px;">
-                    <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <div
+                        style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
                         <span style="color: #888; font-size: 0.8rem;">已配置 3 个任务</span>
-                        <button style="background: var(--primary); border: none; border-radius: 4px; color: white; padding: 4px 8px; font-size: 0.75rem; cursor: pointer;">
+                        <button
+                            style="background: var(--primary); border: none; border-radius: 4px; color: white; padding: 4px 8px; font-size: 0.75rem; cursor: pointer;">
                             <i class="fas fa-plus"></i> 新建
                         </button>
                     </div>
@@ -2660,8 +2760,10 @@
                             <div class="wf-step" title="生成报告"><i class="fas fa-pen-fancy"></i></div>
                         </div>
                         <div class="workflow-actions">
-                            <button class="wf-btn-run" onclick="event.stopPropagation(); runWorkflow('舆情早报')"><i class="fas fa-play"></i> 立即运行</button>
-                            <button class="wf-btn-edit" onclick="event.stopPropagation()"><i class="fas fa-cog"></i></button>
+                            <button class="wf-btn-run" onclick="event.stopPropagation(); runWorkflow('舆情早报')"><i
+                                    class="fas fa-play"></i> 立即运行</button>
+                            <button class="wf-btn-edit" onclick="event.stopPropagation()"><i
+                                    class="fas fa-cog"></i></button>
                         </div>
                     </div>
 
@@ -2682,8 +2784,10 @@
                             <div class="wf-step" title="发送预警"><i class="fas fa-bell"></i></div>
                         </div>
                         <div class="workflow-actions">
-                            <button class="wf-btn-run" onclick="event.stopPropagation(); runWorkflow('竞品监控')"><i class="fas fa-play"></i> 立即运行</button>
-                            <button class="wf-btn-edit" onclick="event.stopPropagation()"><i class="fas fa-cog"></i></button>
+                            <button class="wf-btn-run" onclick="event.stopPropagation(); runWorkflow('竞品监控')"><i
+                                    class="fas fa-play"></i> 立即运行</button>
+                            <button class="wf-btn-edit" onclick="event.stopPropagation()"><i
+                                    class="fas fa-cog"></i></button>
                         </div>
                     </div>
 
@@ -2691,19 +2795,25 @@
                     <div class="workflow-card" onclick="previewWorkflow('doc-review')">
                         <div class="workflow-header">
                             <div class="workflow-title">智能文档多维审查</div>
-                            <div class="workflow-status active" style="color: var(--primary); background: rgba(255, 107, 0, 0.1);">推荐</div>
+                            <div class="workflow-status active"
+                                style="color: var(--primary); background: rgba(255, 107, 0, 0.1);">推荐</div>
                         </div>
                         <div class="workflow-schedule">
                             <i class="fas fa-bolt"></i> 即时执行
                         </div>
                         <div class="workflow-visual">
-                            <div class="wf-step" title="文档分析师"><i class="fas fa-file-alt" style="color: #FF9800;"></i></div>
-                            <div class="wf-step" title="合规官" style="margin-left: -8px;"><i class="fas fa-balance-scale" style="color: #F44336;"></i></div>
+                            <div class="wf-step" title="文档分析师"><i class="fas fa-file-alt" style="color: #FF9800;"></i>
+                            </div>
+                            <div class="wf-step" title="合规官" style="margin-left: -8px;"><i class="fas fa-balance-scale"
+                                    style="color: #F44336;"></i></div>
                             <div class="wf-arrow">→</div>
-                            <div class="wf-step" title="内容创作者"><i class="fas fa-pen-fancy" style="color: #9C27B0;"></i></div>
+                            <div class="wf-step" title="内容创作者"><i class="fas fa-pen-fancy" style="color: #9C27B0;"></i>
+                            </div>
                         </div>
                         <div class="workflow-actions">
-                            <button class="wf-btn-run" onclick="event.stopPropagation(); previewWorkflow('doc-review')"><i class="fas fa-play"></i> 开始使用</button>
+                            <button class="wf-btn-run"
+                                onclick="event.stopPropagation(); previewWorkflow('doc-review')"><i
+                                    class="fas fa-play"></i> 开始使用</button>
                         </div>
                     </div>
 
@@ -2711,20 +2821,26 @@
                     <div class="workflow-card" onclick="previewWorkflow('daily-tech')">
                         <div class="workflow-header">
                             <div class="workflow-title">每日科技动态</div>
-                            <div class="workflow-status active" style="color: #64B5F6; background: rgba(100, 181, 246, 0.15);">新</div>
+                            <div class="workflow-status active"
+                                style="color: #64B5F6; background: rgba(100, 181, 246, 0.15);">新</div>
                         </div>
                         <div class="workflow-schedule">
                             <i class="far fa-clock"></i> 每天 09:30
                         </div>
                         <div class="workflow-visual">
-                            <div class="wf-step" title="数据专家"><i class="fas fa-chart-bar" style="color: #2196F3;"></i></div>
+                            <div class="wf-step" title="数据专家"><i class="fas fa-chart-bar" style="color: #2196F3;"></i>
+                            </div>
                             <div class="wf-arrow">→</div>
-                            <div class="wf-step" title="文档分析师"><i class="fas fa-file-alt" style="color: #FF9800;"></i></div>
+                            <div class="wf-step" title="文档分析师"><i class="fas fa-file-alt" style="color: #FF9800;"></i>
+                            </div>
                             <div class="wf-arrow">→</div>
-                            <div class="wf-step" title="内容创作者"><i class="fas fa-pen-fancy" style="color: #9C27B0;"></i></div>
+                            <div class="wf-step" title="内容创作者"><i class="fas fa-pen-fancy" style="color: #9C27B0;"></i>
+                            </div>
                         </div>
                         <div class="workflow-actions">
-                            <button class="wf-btn-run" onclick="event.stopPropagation(); previewWorkflow('daily-tech')"><i class="fas fa-play"></i> 开始使用</button>
+                            <button class="wf-btn-run"
+                                onclick="event.stopPropagation(); previewWorkflow('daily-tech')"><i
+                                    class="fas fa-play"></i> 开始使用</button>
                         </div>
                     </div>
 
@@ -2757,14 +2873,20 @@
                 </div>
                 <div class="sidebar-content" style="padding: 15px;">
                     <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px;">快速生成</div>
-                    <textarea id="draw-prompt-sidebar" rows="3" style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 8px; padding: 10px;">画一个团队组织架构图，包含研发、产品、运营</textarea>
+                    <textarea id="draw-prompt-sidebar" rows="3"
+                        style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 8px; padding: 10px;">画一个团队组织架构图，包含研发、产品、运营</textarea>
                     <div style="margin-top: 8px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
-                        <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" id="tool-mermaid-sidebar"> Mermaid</label>
-                        <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" id="tool-plantuml-sidebar"> PlantUML</label>
-                        <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" id="tool-nanobanana-sidebar"> Nano Banana</label>
-                        <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" id="tool-excalidraw-sidebar"> Excalidraw</label>
+                        <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox"
+                                id="tool-mermaid-sidebar"> Mermaid</label>
+                        <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox"
+                                id="tool-plantuml-sidebar"> PlantUML</label>
+                        <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox"
+                                id="tool-nanobanana-sidebar"> Nano Banana</label>
+                        <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox"
+                                id="tool-excalidraw-sidebar"> Excalidraw</label>
                     </div>
-                    <button onclick="runDrawingGeneratorFromSidebar()" style="margin-top: 10px; width: 100%; padding: 10px 12px; background: var(--primary); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">
+                    <button onclick="runDrawingGeneratorFromSidebar()"
+                        style="margin-top: 10px; width: 100%; padding: 10px 12px; background: var(--primary); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">
                         生成并在工作区显示
                     </button>
                 </div>
@@ -2773,11 +2895,13 @@
             <!-- Panel: AKShare 数据专家 -->
             <div id="panel-akshare" class="sidebar-panel" style="display: none;">
                 <div class="sidebar-header">
-                    <span><i class="fas fa-chart-line" style="color: #FF5722; margin-right:6px;"></i> AKShare 数据专家</span>
+                    <span><i class="fas fa-chart-line" style="color: #FF5722; margin-right:6px;"></i> AKShare
+                        数据专家</span>
                     <i class="fas fa-angle-left collapse-btn" onclick="toggleSidebar('left')" title="折叠"></i>
                 </div>
                 <div class="sidebar-content" style="padding: 15px;">
-                    <div style="background: rgba(255,87,34,0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,87,34,0.3); margin-bottom: 15px;">
+                    <div
+                        style="background: rgba(255,87,34,0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,87,34,0.3); margin-bottom: 15px;">
                         <div style="font-size: 0.85rem; color: #FF5722; font-weight: 600; margin-bottom: 6px;">
                             <i class="fas fa-info-circle"></i> 查询说明
                         </div>
@@ -2789,7 +2913,8 @@
                     </div>
 
                     <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">查询类型</div>
-                    <select id="akshare-query-type" style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-size: 0.85rem; margin-bottom: 12px;">
+                    <select id="akshare-query-type"
+                        style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-size: 0.85rem; margin-bottom: 12px;">
                         <option value="stock_info">股票基本信息</option>
                         <option value="stock_prices">股票价格数据</option>
                         <option value="stock_news">股票相关新闻</option>
@@ -2798,17 +2923,22 @@
                     </select>
 
                     <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">股票代码或关键词</div>
-                    <input type="text" id="akshare-symbol" placeholder="例如：600276 或 平安银行" style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-size: 0.9rem; margin-bottom: 12px;">
+                    <input type="text" id="akshare-symbol" placeholder="例如：600276 或 平安银行"
+                        style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-size: 0.9rem; margin-bottom: 12px;">
 
                     <div id="akshare-advanced-options" style="margin-bottom: 12px;">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                             <div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">数据条数</div>
-                                <input type="number" id="akshare-limit" value="10" min="1" max="100" style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 0.85rem;">
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">数据条数
+                                </div>
+                                <input type="number" id="akshare-limit" value="10" min="1" max="100"
+                                    style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 0.85rem;">
                             </div>
                             <div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">周期</div>
-                                <select id="akshare-period" style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 0.85rem;">
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">周期
+                                </div>
+                                <select id="akshare-period"
+                                    style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 0.85rem;">
                                     <option value="1d" selected>日线</option>
                                     <option value="1w">周线</option>
                                     <option value="1m">月线</option>
@@ -2817,7 +2947,8 @@
                         </div>
                     </div>
 
-                    <button onclick="queryAKShareFromSidebar()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #FF5722 0%, #F44336 100%); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s;">
+                    <button onclick="queryAKShareFromSidebar()"
+                        style="width: 100%; padding: 12px; background: linear-gradient(135deg, #FF5722 0%, #F44336 100%); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s;">
                         <i class="fas fa-search" style="margin-right: 6px;"></i> 查询数据
                     </button>
 
@@ -2826,43 +2957,54 @@
                             <i class="fas fa-lightbulb" style="color: #FFD700;"></i> 快速示例
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 6px;">
-                            <button onclick="document.getElementById('akshare-query-type').value='stock_info'; document.getElementById('akshare-symbol').value='000001'; queryAKShareFromSidebar();" 
+                            <button
+                                onclick="document.getElementById('akshare-query-type').value='stock_info'; document.getElementById('akshare-symbol').value='000001'; queryAKShareFromSidebar();"
                                 style="padding: 6px 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 4px; color: var(--text-primary); cursor: pointer; font-size: 0.75rem; text-align: left; transition: all 0.2s;">
                                 <i class="fas fa-building" style="color: #4CAF50;"></i> 平安银行信息
                             </button>
-                            <button onclick="document.getElementById('akshare-query-type').value='stock_news'; document.getElementById('akshare-symbol').value='600036'; queryAKShareFromSidebar();" 
+                            <button
+                                onclick="document.getElementById('akshare-query-type').value='stock_news'; document.getElementById('akshare-symbol').value='600036'; queryAKShareFromSidebar();"
                                 style="padding: 6px 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 4px; color: var(--text-primary); cursor: pointer; font-size: 0.75rem; text-align: left; transition: all 0.2s;">
                                 <i class="fas fa-newspaper" style="color: #2196F3;"></i> 招商银行新闻
                             </button>
-                            <button onclick="document.getElementById('akshare-query-type').value='get_current_time'; queryAKShareFromSidebar();" 
+                            <button
+                                onclick="document.getElementById('akshare-query-type').value='get_current_time'; queryAKShareFromSidebar();"
                                 style="padding: 6px 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 4px; color: var(--text-primary); cursor: pointer; font-size: 0.75rem; text-align: left; transition: all 0.2s;">
                                 <i class="fas fa-clock" style="color: #FF9800;"></i> 交易日查询
                             </button>
                         </div>
                     </div>
 
-                    <div id="akshare-status" style="margin-top: 10px; font-size: 0.75rem; color: var(--text-secondary); display: none;"></div>
+                    <div id="akshare-status"
+                        style="margin-top: 10px; font-size: 0.75rem; color: var(--text-secondary); display: none;">
+                    </div>
                 </div>
             </div>
 
             <!-- Panel: PPT生成专家 -->
             <div id="panel-ppt" class="sidebar-panel" style="display: none;">
                 <div class="sidebar-header">
-                    <span><i class="fas fa-file-powerpoint" style="color: #FF6B00; margin-right:6px;"></i> PPT生成专家</span>
+                    <span><i class="fas fa-file-powerpoint" style="color: #FF6B00; margin-right:6px;"></i>
+                        PPT生成专家</span>
                     <i class="fas fa-angle-left collapse-btn" onclick="toggleSidebar('left')" title="折叠"></i>
                 </div>
                 <div class="sidebar-content" style="padding: 15px;">
                     <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">主题或内容</div>
-                    <textarea id="ppt-topic-sidebar" rows="3" style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 0.9rem;" placeholder="例如：人工智能在金融行业的应用"></textarea>
-                    
+                    <textarea id="ppt-topic-sidebar" rows="3"
+                        style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 0.9rem;"
+                        placeholder="例如：人工智能在金融行业的应用"></textarea>
+
                     <div style="margin-top: 12px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">幻灯片数量</div>
-                            <input type="number" id="ppt-slide-count" value="5" min="3" max="20" style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 0.85rem;">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">幻灯片数量
+                            </div>
+                            <input type="number" id="ppt-slide-count" value="5" min="3" max="20"
+                                style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 0.85rem;">
                         </div>
                         <div>
                             <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">复杂度</div>
-                            <select id="ppt-complexity" style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 0.85rem;">
+                            <select id="ppt-complexity"
+                                style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 0.85rem;">
                                 <option value="通用">通用</option>
                                 <option value="专业" selected>专业</option>
                                 <option value="学术">学术</option>
@@ -2873,7 +3015,8 @@
 
                     <div style="margin-top: 10px;">
                         <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">视觉风格</div>
-                        <select id="ppt-style" style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 0.85rem;">
+                        <select id="ppt-style"
+                            style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 0.85rem;">
                             <option value="现代简约" selected>现代简约</option>
                             <option value="商务科技">商务科技</option>
                             <option value="创意艺术">创意艺术</option>
@@ -2884,7 +3027,8 @@
 
                     <div style="margin-top: 10px;">
                         <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">语言</div>
-                        <select id="ppt-language" style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 0.85rem;">
+                        <select id="ppt-language"
+                            style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 0.85rem;">
                             <option value="简体中文" selected>简体中文</option>
                             <option value="English">English</option>
                             <option value="Spanish">Spanish</option>
@@ -2894,22 +3038,27 @@
                         </select>
                     </div>
 
-                    <button onclick="generatePPTFromSidebar()" style="margin-top: 15px; width: 100%; padding: 12px; background: linear-gradient(135deg, #FF8800 0%, #FF6B00 100%); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s;">
+                    <button onclick="generatePPTFromSidebar()"
+                        style="margin-top: 15px; width: 100%; padding: 12px; background: linear-gradient(135deg, #FF8800 0%, #FF6B00 100%); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s;">
                         <i class="fas fa-magic" style="margin-right: 6px;"></i> 生成PPT
                     </button>
 
-                    <div id="ppt-status" style="margin-top: 10px; font-size: 0.75rem; color: var(--text-secondary); display: none;"></div>
+                    <div id="ppt-status"
+                        style="margin-top: 10px; font-size: 0.75rem; color: var(--text-secondary); display: none;">
+                    </div>
                 </div>
             </div>
 
             <!-- Panel: AlphaFund 投研智能体 -->
             <div id="panel-alphafund" class="sidebar-panel" style="display: none;">
                 <div class="sidebar-header">
-                    <span><i class="fas fa-chart-pie" style="color: #FF6B00; margin-right:6px;"></i> AlphaFund 投研智能体</span>
+                    <span><i class="fas fa-chart-pie" style="color: #FF6B00; margin-right:6px;"></i> AlphaFund
+                        投研智能体</span>
                     <i class="fas fa-angle-left collapse-btn" onclick="toggleSidebar('left')" title="折叠"></i>
                 </div>
                 <div class="sidebar-content" style="padding: 15px;">
-                    <div style="background: rgba(255,107,0,0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,107,0,0.3); margin-bottom: 15px;">
+                    <div
+                        style="background: rgba(255,107,0,0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,107,0,0.3); margin-bottom: 15px;">
                         <div style="font-size: 0.85rem; color: #FF6B00; font-weight: 600; margin-bottom: 6px;">
                             <i class="fas fa-info-circle"></i> 多智能体投研系统
                         </div>
@@ -2921,16 +3070,19 @@
                     </div>
 
                     <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">研究主题</div>
-                    <input type="text" id="alphafund-topic" placeholder="例如：英伟达、新能源、半导体" style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-size: 0.9rem; margin-bottom: 12px;">
+                    <input type="text" id="alphafund-topic" placeholder="例如：英伟达、新能源、半导体"
+                        style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-size: 0.9rem; margin-bottom: 12px;">
 
                     <div style="margin-bottom: 12px;">
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer;">
+                        <label
+                            style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer;">
                             <input type="checkbox" id="alphafund-deep-research" style="cursor: pointer;">
                             <span>启用深度研究（逻辑智能体）</span>
                         </label>
                     </div>
 
-                    <button onclick="startAlphaFundWorkflow()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #FF8800 0%, #FF6B00 100%); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s;">
+                    <button onclick="startAlphaFundWorkflow()"
+                        style="width: 100%; padding: 12px; background: linear-gradient(135deg, #FF8800 0%, #FF6B00 100%); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s;">
                         <i class="fas fa-play" style="margin-right: 6px;"></i> 启动投研工作流
                     </button>
 
@@ -2939,22 +3091,27 @@
                             <i class="fas fa-lightbulb" style="color: #FFD700;"></i> 快速示例
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 6px;">
-                            <button onclick="document.getElementById('alphafund-topic').value='英伟达'; startAlphaFundWorkflow();" 
+                            <button
+                                onclick="document.getElementById('alphafund-topic').value='英伟达'; startAlphaFundWorkflow();"
                                 style="padding: 6px 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 4px; color: var(--text-primary); cursor: pointer; font-size: 0.75rem; text-align: left; transition: all 0.2s;">
                                 <i class="fas fa-microchip" style="color: #4CAF50;"></i> 英伟达分析
                             </button>
-                            <button onclick="document.getElementById('alphafund-topic').value='新能源'; startAlphaFundWorkflow();" 
+                            <button
+                                onclick="document.getElementById('alphafund-topic').value='新能源'; startAlphaFundWorkflow();"
                                 style="padding: 6px 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 4px; color: var(--text-primary); cursor: pointer; font-size: 0.75rem; text-align: left; transition: all 0.2s;">
                                 <i class="fas fa-bolt" style="color: #2196F3;"></i> 新能源板块
                             </button>
-                            <button onclick="document.getElementById('alphafund-topic').value='半导体'; startAlphaFundWorkflow();" 
+                            <button
+                                onclick="document.getElementById('alphafund-topic').value='半导体'; startAlphaFundWorkflow();"
                                 style="padding: 6px 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 4px; color: var(--text-primary); cursor: pointer; font-size: 0.75rem; text-align: left; transition: all 0.2s;">
                                 <i class="fas fa-cog" style="color: #FF9800;"></i> 半导体行业
                             </button>
                         </div>
                     </div>
 
-                    <div id="alphafund-status" style="margin-top: 10px; font-size: 0.75rem; color: var(--text-secondary); display: none;"></div>
+                    <div id="alphafund-status"
+                        style="margin-top: 10px; font-size: 0.75rem; color: var(--text-secondary); display: none;">
+                    </div>
                 </div>
             </div>
 
@@ -2964,127 +3121,182 @@
                     <span><i class="fas fa-network-wired" style="color: #00E5FF; margin-right: 8px;"></i> MCP 生态</span>
                     <i class="fas fa-angle-left collapse-btn" onclick="toggleSidebar('left')" title="折叠"></i>
                 </div>
-                
+
                 <!-- MCP Status / Toggle -->
-                <div style="padding: 15px; border-bottom: 1px solid var(--border); background: rgba(0, 229, 255, 0.05);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div
+                    style="padding: 15px; border-bottom: 1px solid var(--border); background: rgba(0, 229, 255, 0.05);">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <span style="font-size: 0.85rem; font-weight: 600; color: #00E5FF;">AgentDesk Server</span>
-                        <label class="switch" style="position: relative; display: inline-block; width: 34px; height: 20px;">
+                        <label class="switch"
+                            style="position: relative; display: inline-block; width: 34px; height: 20px;">
                             <input type="checkbox" id="mcp-server-toggle" onchange="toggleMcpServer(this)">
-                            <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px;"></span>
+                            <span class="slider round"
+                                style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px;"></span>
                             <style>
-                                .switch input { opacity: 0; width: 0; height: 0; }
-                                .switch input:checked + .slider { background-color: #00E5FF; }
-                                .switch input:focus + .slider { box-shadow: 0 0 1px #00E5FF; }
-                                .switch input:checked + .slider:before { transform: translateX(14px); }
-                                .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+                                .switch input {
+                                    opacity: 0;
+                                    width: 0;
+                                    height: 0;
+                                }
+
+                                .switch input:checked+.slider {
+                                    background-color: #00E5FF;
+                                }
+
+                                .switch input:focus+.slider {
+                                    box-shadow: 0 0 1px #00E5FF;
+                                }
+
+                                .switch input:checked+.slider:before {
+                                    transform: translateX(14px);
+                                }
+
+                                .slider:before {
+                                    position: absolute;
+                                    content: "";
+                                    height: 12px;
+                                    width: 12px;
+                                    left: 4px;
+                                    bottom: 4px;
+                                    background-color: white;
+                                    transition: .4s;
+                                    border-radius: 50%;
+                                }
                             </style>
                         </label>
                     </div>
                     <div id="mcp-server-status" style="font-size: 0.75rem; color: var(--text-secondary);">
                         <i class="fas fa-circle" style="font-size: 6px; margin-right: 4px; color: #666;"></i> 未启动
                     </div>
-                    <div id="mcp-connect-info" style="display: none; margin-top: 10px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; font-family: monospace; font-size: 0.7rem; color: #aaa; word-break: break-all;">
+                    <div id="mcp-connect-info"
+                        style="display: none; margin-top: 10px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; font-family: monospace; font-size: 0.7rem; color: #aaa; word-break: break-all;">
                         npx -y @agentdesk/mcp-server connect
                     </div>
                 </div>
 
                 <!-- MCP Tabs -->
                 <div style="display: flex; border-bottom: 1px solid var(--border);">
-                    <div class="mcp-tab active" onclick="switchMcpTab('installed')" style="flex: 1; text-align: center; padding: 10px; font-size: 0.8rem; cursor: pointer; border-bottom: 2px solid #00E5FF; color: var(--text-primary);">已连接</div>
-                    <div class="mcp-tab" onclick="switchMcpTab('market')" style="flex: 1; text-align: center; padding: 10px; font-size: 0.8rem; cursor: pointer; border-bottom: 2px solid transparent; color: var(--text-secondary);">发现市场</div>
+                    <div class="mcp-tab active" onclick="switchMcpTab('installed')"
+                        style="flex: 1; text-align: center; padding: 10px; font-size: 0.8rem; cursor: pointer; border-bottom: 2px solid #00E5FF; color: var(--text-primary);">
+                        已连接</div>
+                    <div class="mcp-tab" onclick="switchMcpTab('market')"
+                        style="flex: 1; text-align: center; padding: 10px; font-size: 0.8rem; cursor: pointer; border-bottom: 2px solid transparent; color: var(--text-secondary);">
+                        发现市场</div>
                 </div>
 
                 <div class="sidebar-content" style="padding: 0;">
-                    
+
                     <!-- Tab: Installed -->
                     <div id="mcp-tab-installed" style="padding: 15px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                             <span style="font-size: 0.8rem; color: var(--text-secondary);">自定义连接</span>
-                            <button onclick="showAddMcpModal()" style="background: transparent; border: 1px solid var(--border); color: var(--primary); border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; cursor: pointer;">
+                            <button onclick="showAddMcpModal()"
+                                style="background: transparent; border: 1px solid var(--border); color: var(--primary); border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; cursor: pointer;">
                                 <i class="fas fa-plus"></i> 添加
                             </button>
                         </div>
 
                         <!-- Demo Connected Item -->
-                        <div class="mcp-item" style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center;">
-                            <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                        <div class="mcp-item"
+                            style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center;">
+                            <div
+                                style="width: 32px; height: 32px; border-radius: 6px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
                                 <i class="fas fa-folder" style="color: #FFCA28;"></i>
                             </div>
                             <div style="flex: 1;">
                                 <div style="font-size: 0.85rem; font-weight: 600;">Filesystem</div>
                                 <div style="font-size: 0.7rem; color: #4CAF50;"><i class="fas fa-link"></i> 已连接</div>
                             </div>
-                            <div style="font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Stdio</div>
+                            <div
+                                style="font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">
+                                Stdio</div>
                         </div>
-                        
-                        <div class="mcp-item" style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center;">
-                            <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+
+                        <div class="mcp-item"
+                            style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center;">
+                            <div
+                                style="width: 32px; height: 32px; border-radius: 6px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
                                 <i class="fas fa-search" style="color: #29B6F6;"></i>
                             </div>
                             <div style="flex: 1;">
                                 <div style="font-size: 0.85rem; font-weight: 600;">Brave Search</div>
                                 <div style="font-size: 0.7rem; color: #4CAF50;"><i class="fas fa-link"></i> 已连接</div>
                             </div>
-                            <div style="font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">SSE</div>
+                            <div
+                                style="font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">
+                                SSE</div>
                         </div>
                     </div>
 
                     <!-- Tab: Market -->
                     <div id="mcp-tab-market" style="display: none; padding: 15px;">
-                         <input type="text" placeholder="搜索 MCP 服务..." style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border); padding: 8px; border-radius: 6px; color: white; margin-bottom: 15px; font-size: 0.85rem;">
-                         
-                         <!-- Market Items -->
-                         <div class="market-list">
+                        <input type="text" placeholder="搜索 MCP 服务..."
+                            style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border); padding: 8px; border-radius: 6px; color: white; margin-bottom: 15px; font-size: 0.85rem;">
+
+                        <!-- Market Items -->
+                        <div class="market-list">
                             <!-- Item 1 -->
-                            <div class="mcp-market-item" style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px;">
+                            <div class="mcp-market-item"
+                                style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px;">
                                 <div style="display: flex; align-items: center; margin-bottom: 5px;">
                                     <i class="fab fa-github" style="font-size: 1.2rem; margin-right: 10px;"></i>
                                     <div style="font-weight: 600; font-size: 0.9rem;">GitHub</div>
-                                    <button style="margin-left: auto; background: var(--primary); border: none; color: white; border-radius: 12px; padding: 2px 10px; font-size: 0.7rem; cursor: pointer;">安装</button>
+                                    <button
+                                        style="margin-left: auto; background: var(--primary); border: none; color: white; border-radius: 12px; padding: 2px 10px; font-size: 0.7rem; cursor: pointer;">安装</button>
                                 </div>
                                 <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
                                     提供仓库搜索、文件读取、PR 管理等能力。
                                 </div>
                             </div>
-                            
+
                             <!-- Item 2 -->
-                            <div class="mcp-market-item" style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px;">
+                            <div class="mcp-market-item"
+                                style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px;">
                                 <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                                    <i class="fas fa-database" style="font-size: 1.2rem; margin-right: 10px; color: #336791;"></i>
+                                    <i class="fas fa-database"
+                                        style="font-size: 1.2rem; margin-right: 10px; color: #336791;"></i>
                                     <div style="font-weight: 600; font-size: 0.9rem;">PostgreSQL</div>
-                                    <button style="margin-left: auto; background: var(--primary); border: none; color: white; border-radius: 12px; padding: 2px 10px; font-size: 0.7rem; cursor: pointer;">安装</button>
+                                    <button
+                                        style="margin-left: auto; background: var(--primary); border: none; color: white; border-radius: 12px; padding: 2px 10px; font-size: 0.7rem; cursor: pointer;">安装</button>
                                 </div>
                                 <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
                                     只读访问数据库模式，执行安全查询。
                                 </div>
                             </div>
 
-                             <!-- Item 3 -->
-                            <div class="mcp-market-item" style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px;">
+                            <!-- Item 3 -->
+                            <div class="mcp-market-item"
+                                style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px;">
                                 <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                                    <i class="fab fa-google-drive" style="font-size: 1.2rem; margin-right: 10px; color: #1FA463;"></i>
+                                    <i class="fab fa-google-drive"
+                                        style="font-size: 1.2rem; margin-right: 10px; color: #1FA463;"></i>
                                     <div style="font-weight: 600; font-size: 0.9rem;">Google Drive</div>
-                                    <button style="margin-left: auto; background: var(--primary); border: none; color: white; border-radius: 12px; padding: 2px 10px; font-size: 0.7rem; cursor: pointer;">安装</button>
+                                    <button
+                                        style="margin-left: auto; background: var(--primary); border: none; color: white; border-radius: 12px; padding: 2px 10px; font-size: 0.7rem; cursor: pointer;">安装</button>
                                 </div>
                                 <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
                                     访问文档、表格和幻灯片内容。
                                 </div>
                             </div>
-                            
+
                             <!-- Item 4 -->
-                            <div class="mcp-market-item" style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px;">
+                            <div class="mcp-market-item"
+                                style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px;">
                                 <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                                    <i class="fas fa-terminal" style="font-size: 1.2rem; margin-right: 10px; color: #ccc;"></i>
+                                    <i class="fas fa-terminal"
+                                        style="font-size: 1.2rem; margin-right: 10px; color: #ccc;"></i>
                                     <div style="font-weight: 600; font-size: 0.9rem;">Local Commander</div>
-                                    <button style="margin-left: auto; background: var(--primary); border: none; color: white; border-radius: 12px; padding: 2px 10px; font-size: 0.7rem; cursor: pointer;">安装</button>
+                                    <button
+                                        style="margin-left: auto; background: var(--primary); border: none; color: white; border-radius: 12px; padding: 2px 10px; font-size: 0.7rem; cursor: pointer;">安装</button>
                                 </div>
                                 <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
                                     在安全沙箱中执行本地 shell 命令。
                                 </div>
                             </div>
 
-                         </div>
+                        </div>
                     </div>
 
                 </div>
@@ -3099,41 +3311,47 @@
         <div class="main-content">
             <!-- Updated Tabs -->
             <div class="editor-tabs" style="padding: 0 10px; justify-content: flex-start; gap: 10px;">
-                <button onclick="switchMainView('editor')" id="view-btn-editor" 
+                <button onclick="switchMainView('editor')" id="view-btn-editor"
                     style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--primary); border: none; border-radius: 6px 6px 0 0; color: white; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: all 0.2s; border-bottom: 2px solid var(--primary);">
                     <i class="fas fa-layer-group"></i> 内容视图
                 </button>
-                
-                <button onclick="switchMainView('canvas')" id="view-btn-canvas" 
+
+                <button onclick="switchMainView('canvas')" id="view-btn-canvas"
                     style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: transparent; border: none; border-radius: 6px 6px 0 0; color: var(--text-secondary); cursor: pointer; font-size: 0.9rem; font-weight: normal; transition: all 0.2s; border-bottom: 2px solid transparent;">
                     <i class="fas fa-project-diagram"></i> 智能体调度驾驶舱
                 </button>
 
                 <div style="flex: 1;"></div>
-                
-                <div id="content-status-indicator" style="margin-right: 15px; font-size: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: 5px;">
+
+                <div id="content-status-indicator"
+                    style="margin-right: 15px; font-size: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: 5px;">
                     <!-- Dynamic content label -->
                     <i class="fas fa-info-circle"></i> <span id="content-title-text">欢迎页</span>
                 </div>
 
                 <!-- Clear Buttons -->
-                <button onclick="clearEditorContent()" title="清空内容画布" 
+                <button onclick="clearEditorContent()" title="清空内容画布"
                     style="padding: 8px 12px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.85rem;">
                     <i class="fas fa-eraser"></i>
                 </button>
             </div>
-            
+
             <!-- Editor Area -->
             <div class="editor-area" id="editorArea">
                 <div class="welcome-message" style="max-width: 800px; margin: 50px auto; text-align: center;">
-                    <div style="width: 120px; height: 120px; margin: 0 auto 30px; background: linear-gradient(135deg, #FF8800 0%, #FF6B00 50%, #FF5500 100%); border-radius: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 40px rgba(255, 107, 0, 0.4); position: relative; overflow: hidden;">
+                    <div
+                        style="width: 120px; height: 120px; margin: 0 auto 30px; background: linear-gradient(135deg, #FF8800 0%, #FF6B00 50%, #FF5500 100%); border-radius: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 40px rgba(255, 107, 0, 0.4); position: relative; overflow: hidden;">
                         <span style="font-size: 48px; font-weight: 900; color: white;">AD</span>
-                            <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.15), transparent); transform: rotate(45deg); animation: shine 3s infinite;"></div>
+                        <div
+                            style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.15), transparent); transform: rotate(45deg); animation: shine 3s infinite;">
                         </div>
+                    </div>
                     <h1 style="color: var(--text-primary); margin-bottom: 15px;">欢迎使用 AgentDesk</h1>
                     <p style="color: var(--text-secondary); line-height: 1.8; font-size: 16px;">
                         在左侧选择文件或智能体开始工作<br>
-                        使用 <code style="background: var(--bg-secondary); padding: 2px 8px; border-radius: 4px; color: #FF6B00;">@智能体名称</code> 提问，或点击下方的智能体卡片快速开始
+                        使用 <code
+                            style="background: var(--bg-secondary); padding: 2px 8px; border-radius: 4px; color: #FF6B00;">@智能体名称</code>
+                        提问，或点击下方的智能体卡片快速开始
                     </p>
                 </div>
             </div>
@@ -3143,7 +3361,8 @@
                 <div class="canvas-header sticky">
                     <span>智能体工作流</span>
                     <div style="display: flex; gap: 10px;">
-                         <span style="font-size: 0.8rem; color: #888;"><i class="fas fa-mouse-pointer"></i> 拖拽节点调整位置</span>
+                        <span style="font-size: 0.8rem; color: #888;"><i class="fas fa-mouse-pointer"></i>
+                            拖拽节点调整位置</span>
                     </div>
                 </div>
                 <canvas id="workflowCanvas"></canvas>
@@ -3151,7 +3370,8 @@
             </div>
 
             <!-- Workflow Detail View (Prototype) -->
-            <div class="workflow-detail-area" id="workflowDetailArea" style="display: none; position: absolute; top: 35px; left: 0; width: 100%; height: calc(100% - 35px); background: var(--bg-primary); z-index: 20; padding: 20px; overflow-y: auto;">
+            <div class="workflow-detail-area" id="workflowDetailArea"
+                style="display: none; position: absolute; top: 35px; left: 0; width: 100%; height: calc(100% - 35px); background: var(--bg-primary); z-index: 20; padding: 20px; overflow-y: auto;">
                 <!-- Dynamic Content -->
             </div>
         </div>
@@ -3173,30 +3393,33 @@
                     <div class="message-content">你好！欢迎使用 AgentDesk，您的智能团队随时待命。有什么可以帮你？</div>
                 </div>
             </div>
-            
+
             <!-- 可拖动的分隔线 -->
-            <div id="chatInputResizer" style="height: 4px; background: var(--border); cursor: ns-resize; position: relative; transition: background 0.2s; flex-shrink: 0;" 
-                 onmouseenter="this.style.background='var(--primary)'" 
-                 onmouseleave="this.style.background='var(--border)'"
-                 title="拖动调整输入区域高度">
-                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 2px; background: var(--text-secondary); border-radius: 2px;"></div>
+            <div id="chatInputResizer"
+                style="height: 4px; background: var(--border); cursor: ns-resize; position: relative; transition: background 0.2s; flex-shrink: 0;"
+                onmouseenter="this.style.background='var(--primary)'"
+                onmouseleave="this.style.background='var(--border)'" title="拖动调整输入区域高度">
+                <div
+                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 2px; background: var(--text-secondary); border-radius: 2px;">
+                </div>
             </div>
-            
-            <div id="chatInputArea" style="padding: 15px; background: var(--bg-secondary); position: relative; flex-shrink: 0;">
+
+            <div id="chatInputArea"
+                style="padding: 15px; background: var(--bg-secondary); position: relative; flex-shrink: 0;">
                 <div id="mentionDropdown" class="mention-dropdown"></div>
-                
+
                 <!-- 工具栏：功能按钮 -->
                 <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap;">
                     <!-- 左侧功能按钮组 -->
                     <div style="display: flex; gap: 6px;">
-                    <button id="optimizeBtn" onclick="optimizePrompt()" type="button" title="优化提示词"
+                        <button id="optimizeBtn" onclick="optimizePrompt()" type="button" title="优化提示词"
                             style="width: 32px; height: 32px; background: rgba(156, 39, 176, 0.2); border: 1px solid rgba(156, 39, 176, 0.4); border-radius: 6px; color: #E040FB; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
-                        <i class="fas fa-magic"></i>
-                    </button>
-                    <button id="undoOptimizeBtn" onclick="undoOptimize()" type="button" title="撤回优化"
+                            <i class="fas fa-magic"></i>
+                        </button>
+                        <button id="undoOptimizeBtn" onclick="undoOptimize()" type="button" title="撤回优化"
                             style="display: none; width: 32px; height: 32px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; color: #bbb; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
-                        <i class="fas fa-undo"></i>
-                    </button>
+                            <i class="fas fa-undo"></i>
+                        </button>
                         <button onclick="copyChatHistory()" type="button" title="复制对话内容"
                             style="width: 32px; height: 32px; background: rgba(33, 150, 243, 0.2); border: 1px solid rgba(33, 150, 243, 0.4); border-radius: 6px; color: #64B5F6; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
                             <i class="fas fa-copy"></i>
@@ -3206,20 +3429,21 @@
                             <i class="fas fa-download"></i>
                         </button>
                     </div>
-                    
+
                     <!-- 右侧操作按钮组 -->
                     <div style="display: flex; gap: 6px; margin-left: auto;">
-                        <button id="sendBtn" onclick="executeTask(document.getElementById('chatInput').value)" title="发送消息 (Enter)"
+                        <button id="sendBtn" onclick="executeTask(document.getElementById('chatInput').value)"
+                            title="发送消息 (Enter)"
                             style="width: 32px; height: 32px; background: var(--primary); border: none; border-radius: 6px; color: white; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(255, 107, 0, 0.3);">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                    <button id="cancelBtn" onclick="cancelTask()" title="停止生成"
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                        <button id="cancelBtn" onclick="cancelTask()" title="停止生成"
                             style="display: none; width: 32px; height: 32px; background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%); border: none; border-radius: 6px; color: white; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">
-                        <i class="fas fa-times"></i>
-                    </button>
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                 </div>
-                
+
                 <!-- 输入框 -->
                 <div style="display: flex; align-items: flex-end; gap: 8px;">
                     <textarea id="chatInput" placeholder="输入消息... (Enter 发送，Shift+Enter 换行，输入 @ 呼叫智能体)" rows="1"
@@ -3269,11 +3493,13 @@
                 </div>
                 <div class="form-group">
                     <label>模型名称</label>
-                    <input type="text" id="setting-model-name" class="form-control" placeholder="例如: gemini-2.5-flash, deepseek-chat">
+                    <input type="text" id="setting-model-name" class="form-control"
+                        placeholder="例如: gemini-2.5-flash, deepseek-chat">
                 </div>
                 <div class="form-group" id="base-url-group" style="display: none;">
                     <label>Base URL (API 代理地址)</label>
-                    <input type="text" id="setting-base-url" class="form-control" placeholder="例如: https://api.deepseek.com">
+                    <input type="text" id="setting-base-url" class="form-control"
+                        placeholder="例如: https://api.deepseek.com">
                 </div>
             </div>
             <div class="modal-footer">
@@ -3325,6 +3551,7 @@
         let taskCounter = 0;
         let animationId = null;
         let currentAbortController = null; // 用于取消请求
+        let isDropdownActive = false; // 全局标记 @ 提及下拉框是否激活
 
         // ==================== Initialization ====================
         document.addEventListener('DOMContentLoaded', function () {
@@ -3335,7 +3562,7 @@
                 chatInput: !!document.getElementById('chatInput'),
                 mentionDropdown: !!document.getElementById('mentionDropdown')
             });
-            
+
             initCanvas();
             loadAgents();
             loadFiles(); // Load files on startup
@@ -3357,11 +3584,11 @@
 
             canvas = document.getElementById('workflowCanvas');
             ctx = canvas.getContext('2d');
-            
+
             // Initial resize (even if invisible)
             resizeCanvas();
-            initParticles(); 
-            
+            initParticles();
+
             window.addEventListener('resize', () => {
                 resizeCanvas();
                 initParticles();
@@ -3392,7 +3619,7 @@
                     buildMarketAgents();
                     renderMarket();
                     renderLandingAgents();
-                    
+
                     // 初始化 mention 逻辑（需要在 marketAgents 构建完成后）
                     setupMentionLogic(document.getElementById('chatInput'), document.getElementById('mentionDropdown'));
                     setupMentionLogic(document.getElementById('globalInput'), document.getElementById('landingMentionDropdown'));
@@ -3613,13 +3840,22 @@
 
         // 当前问答会话 ID
         let currentQaSessionId = null;
-        
+
         // 问答模式状态
         let isQaMode = false;
 
         // Landing Page Input - 处理 Enter 键
         input.addEventListener('keydown', async (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
+                // 如果输入法正在组合中（如中文输入法确认文字），不触发提交
+                if (e.isComposing) {
+                    return;
+                }
+                // 如果 @ 提及下拉框激活，不在这里处理 Enter 键
+                // 让 setupMentionLogic 中的监听器处理选择逻辑
+                if (isDropdownActive) {
+                    return;
+                }
                 e.preventDefault();
                 await handleLandingInput();
             }
@@ -3631,7 +3867,7 @@
         async function handleLandingInput() {
             const val = input.value.trim();
             if (!val) return;
-            
+
             try {
                 // 1. 调用意图识别 API
                 const intentRes = await fetch('/api/parse-intent', {
@@ -3640,9 +3876,9 @@
                     body: JSON.stringify({ message: val })
                 });
                 const intentData = await intentRes.json();
-                
+
                 console.log('[意图识别]', intentData);
-                
+
                 // 2. 根据意图决定行为
                 if (intentData.intent === 'qa') {
                     // 问答模式：在首页直接回答
@@ -3664,26 +3900,26 @@
         async function handleLandingQa(question) {
             const qaWrapper = document.getElementById('landingQaWrapper');
             const qaMessages = document.getElementById('landingQaMessages');
-            
+
             // 显示问答区域，并进入问答模式（隐藏智能体图标）
             qaWrapper.style.display = 'flex';
             document.body.classList.add('qa-active');
             isQaMode = true;
-            
+
             // 首次显示时加载历史记录
             if (!currentQaSessionId) {
                 loadQaHistory();
             }
-            
+
             // 添加用户消息
             addLandingQaMessage('user', question);
-            
+
             // 清空输入框
             input.value = '';
-            
+
             // 隐藏预测问题
             document.getElementById('landingQaSuggestions').style.display = 'none';
-            
+
             // 添加加载动画
             const loadingId = 'loading-' + Date.now();
             qaMessages.innerHTML += `
@@ -3702,7 +3938,7 @@
                 </div>
             `;
             scrollQaToBottom();
-            
+
             try {
                 // 调用问答 API
                 const res = await fetch('/api/landing-qa', {
@@ -3713,20 +3949,20 @@
                         session_id: currentQaSessionId
                     })
                 });
-                
+
                 const data = await res.json();
-                
+
                 // 保存会话 ID
                 if (data.session_id) {
                     currentQaSessionId = data.session_id;
                     // 刷新历史列表
                     loadQaHistory();
                 }
-                
+
                 // 移除加载动画
                 const loadingEl = document.getElementById(loadingId);
                 if (loadingEl) loadingEl.remove();
-                
+
                 // 添加 AI 回答
                 if (data.success) {
                     addLandingQaMessage('assistant', data.answer, data.agent);
@@ -3735,7 +3971,7 @@
                 } else {
                     addLandingQaMessage('assistant', '抱歉，暂时无法回答您的问题。');
                 }
-                
+
             } catch (error) {
                 console.error('[问答失败]', error);
                 const loadingEl = document.getElementById(loadingId);
@@ -3749,12 +3985,12 @@
          */
         function addLandingQaMessage(role, content, agent = null) {
             const qaMessages = document.getElementById('landingQaMessages');
-            
+
             const agentName = agent?.name || '';
-            
+
             // 格式化内容（支持 Markdown 和 HTML 渲染）
             const formattedContent = formatQaContent(content);
-            
+
             // 用户图标 SVG
             const userAvatar = `
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -3762,7 +3998,7 @@
                     <circle cx="12" cy="7" r="4"/>
                 </svg>
             `;
-            
+
             // AI 助手图标 SVG
             const assistantAvatar = `
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -3771,7 +4007,7 @@
                     <circle cx="15" cy="13" r="1.5" fill="currentColor"/>
                 </svg>
             `;
-            
+
             const messageHtml = `
                 <div class="landing-qa-message ${role}">
                     <div class="landing-qa-avatar">
@@ -3790,10 +4026,10 @@
                     </div>
                 </div>
             `;
-            
+
             qaMessages.innerHTML += messageHtml;
             scrollQaToBottom();
-            
+
             // 处理 HTML 渲染
             processHtmlBlocks();
         }
@@ -3803,7 +4039,7 @@
          */
         function formatQaContent(text) {
             if (!text) return '';
-            
+
             // 检测并处理 HTML 代码块
             text = text.replace(/```html\n([\s\S]*?)```/g, (match, code) => {
                 const escapedCode = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -3816,13 +4052,13 @@
                     </details>
                 </div>`;
             });
-            
+
             // 普通代码块
             text = text.replace(/```(\w*)\n([\s\S]*?)```/g, (match, lang, code) => {
                 const escapedCode = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 return `<pre><code class="language-${lang}">${escapedCode}</code></pre>`;
             });
-            
+
             // Markdown 格式化
             return text
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -3857,10 +4093,10 @@
         function generateSuggestions(question, answer) {
             const suggestionsContainer = document.getElementById('landingQaSuggestions');
             const suggestionsList = document.getElementById('landingQaSuggestionsList');
-            
+
             // 基于回答内容生成相关问题
             const suggestions = [];
-            
+
             // 简单的规则生成
             if (answer.includes('ETF') || answer.includes('基金')) {
                 suggestions.push('如何选择适合自己的基金？');
@@ -3878,21 +4114,21 @@
                 suggestions.push('量化策略有哪些类型？');
                 suggestions.push('个人投资者如何入门量化？');
             }
-            
+
             // 默认建议
             if (suggestions.length === 0) {
                 suggestions.push('帮我分析一下最近的市场行情');
                 suggestions.push('推荐一些入门投资书籍');
                 suggestions.push('什么是资产配置？');
             }
-            
+
             // 只显示前3个
             const displaySuggestions = suggestions.slice(0, 3);
-            
-            suggestionsList.innerHTML = displaySuggestions.map(s => 
+
+            suggestionsList.innerHTML = displaySuggestions.map(s =>
                 `<div class="landing-qa-suggestion" onclick="askSuggestion('${s.replace(/'/g, "\\'")}')">${s}</div>`
             ).join('');
-            
+
             suggestionsContainer.style.display = 'block';
         }
 
@@ -3908,11 +4144,11 @@
          */
         async function loadQaHistory() {
             const historyList = document.getElementById('landingQaHistoryList');
-            
+
             try {
                 const res = await fetch('/api/qa/sessions?limit=15');
                 const data = await res.json();
-                
+
                 if (data.sessions && data.sessions.length > 0) {
                     historyList.innerHTML = data.sessions.map(session => `
                         <div class="landing-qa-history-item ${session.session_id === currentQaSessionId ? 'active' : ''}" 
@@ -3943,15 +4179,15 @@
          */
         async function loadQaSession(sessionId) {
             const qaMessages = document.getElementById('landingQaMessages');
-            
+
             try {
                 const res = await fetch(`/api/qa/history/${sessionId}`);
                 const data = await res.json();
-                
+
                 // 清空当前消息
                 qaMessages.innerHTML = '';
                 currentQaSessionId = sessionId;
-                
+
                 // 渲染历史消息
                 if (data.history && data.history.length > 0) {
                     data.history.forEach(item => {
@@ -3959,13 +4195,13 @@
                         addLandingQaMessage('assistant', item.answer, { name: item.agent_name });
                     });
                 }
-                
+
                 // 刷新历史列表高亮
                 loadQaHistory();
-                
+
                 // 隐藏预测问题
                 document.getElementById('landingQaSuggestions').style.display = 'none';
-                
+
             } catch (error) {
                 console.error('加载会话失败:', error);
             }
@@ -3978,10 +4214,10 @@
             const qaMessages = document.getElementById('landingQaMessages');
             qaMessages.innerHTML = '';
             currentQaSessionId = null;
-            
+
             // 刷新历史列表
             loadQaHistory();
-            
+
             // 显示预测问题
             const suggestionsContainer = document.getElementById('landingQaSuggestions');
             const suggestionsList = document.getElementById('landingQaSuggestionsList');
@@ -3991,7 +4227,7 @@
                 <div class="landing-qa-suggestion" onclick="askSuggestion('量化投资入门')">量化投资入门</div>
             `;
             suggestionsContainer.style.display = 'block';
-            
+
             // 聚焦输入框
             input.focus();
         }
@@ -4010,12 +4246,12 @@
         function submitQaQuestion() {
             const qaInput = document.getElementById('landingQaInput');
             const question = qaInput.value.trim();
-            
+
             if (!question) return;
-            
+
             // 清空输入框
             qaInput.value = '';
-            
+
             // 调用问答处理函数
             handleLandingQa(question);
         }
@@ -4038,12 +4274,12 @@
             const date = new Date(timestamp);
             const now = new Date();
             const diff = now - date;
-            
+
             if (diff < 60000) return '刚刚';
             if (diff < 3600000) return Math.floor(diff / 60000) + ' 分钟前';
             if (diff < 86400000) return Math.floor(diff / 3600000) + ' 小时前';
             if (diff < 604800000) return Math.floor(diff / 86400000) + ' 天前';
-            
+
             return date.toLocaleDateString('zh-CN');
         }
 
@@ -4073,7 +4309,7 @@
             const qaMessages = document.getElementById('landingQaMessages');
             qaMessages.innerHTML = '';
             currentQaSessionId = null;
-            
+
             // 显示欢迎消息
             startNewQaSession();
         }
@@ -4083,12 +4319,12 @@
          */
         function enterWorkspaceWithTask(task) {
             document.body.classList.add('mode-workspace');
-            
+
             if (task) {
                 chatInput.value = task;
                 executeTask(task);
             }
-            
+
             // 清空输入框
             input.value = '';
         }
@@ -4098,7 +4334,7 @@
          */
         function enterWorkspace() {
             const val = input.value.trim();
-            
+
             // 如果有输入内容，走意图识别流程
             if (val) {
                 handleLandingInput();
@@ -4107,16 +4343,16 @@
                 document.body.classList.add('mode-workspace');
             }
         }
-        
+
         // 返回首页
         function goToHomePage() {
             // 移除工作区模式
             document.body.classList.remove('mode-workspace');
-            
+
             // 清空输入框
             const input = document.getElementById('landing-input');
             if (input) input.value = '';
-            
+
             // 重置内容区
             const editorArea = document.getElementById('editorArea');
             if (editorArea) {
@@ -4135,10 +4371,10 @@
                     </div>
                 `;
             }
-            
+
             // 更新标题
             updateContentTitle('AI智能体团队工作区', 'fas fa-comments');
-            
+
             // 清空聊天消息，只保留欢迎消息
             const chatMessages = document.getElementById('chat-messages');
             if (chatMessages) {
@@ -4149,7 +4385,7 @@
                     </div>
                 `;
             }
-            
+
             // 聚焦到搜索框
             setTimeout(() => {
                 if (input) input.focus();
@@ -4160,15 +4396,15 @@
         function adjustChatInputHeight() {
             const chatInput = document.getElementById('chatInput');
             if (!chatInput) return;
-            
+
             // 重置高度以获取正确的 scrollHeight
             chatInput.style.height = 'auto';
-            
+
             // 计算内容高度
             const scrollHeight = chatInput.scrollHeight;
             const minHeight = 40; // 最小高度（1行）
             const maxHeight = 200; // 最大高度（约10行）
-            
+
             // 设置高度，在最小和最大之间
             if (scrollHeight < minHeight) {
                 chatInput.style.height = minHeight + 'px';
@@ -4184,19 +4420,24 @@
                 }
             }
         }
-        
+
         // 监听输入变化，自动调整高度
         chatInput.addEventListener('input', adjustChatInputHeight);
-        
+
         // 初始化时调整一次高度
         setTimeout(adjustChatInputHeight, 100);
-        
+
         // Chat Panel Input - 键盘事件
         chatInput.addEventListener('keydown', (e) => {
+            // 如果输入法正在组合中（如中文输入法确认文字），不触发提交
+            if (e.isComposing) {
+                return;
+            }
+            
             // 检查下拉菜单是否显示
             const dropdown = document.getElementById('mentionDropdown');
             const isDropdownVisible = dropdown && dropdown.classList.contains('show');
-            
+
             if (!isDropdownVisible && e.key === 'Enter' && !e.shiftKey) {
                 const val = chatInput.value.trim();
                 if (val) {
@@ -4208,17 +4449,17 @@
                 e.preventDefault();
             }
         });
-        
+
         // 可拖动分隔线 - 调整输入区域高度
-        (function() {
+        (function () {
             const resizer = document.getElementById('chatInputResizer');
             const chatInputArea = document.getElementById('chatInputArea');
-            
+
             if (resizer && chatInputArea) {
                 let isResizing = false;
                 let startY = 0;
                 let startHeight = 0;
-                
+
                 resizer.addEventListener('mousedown', (e) => {
                     isResizing = true;
                     startY = e.clientY;
@@ -4227,16 +4468,16 @@
                     document.body.style.userSelect = 'none';
                     e.preventDefault();
                 });
-                
+
                 document.addEventListener('mousemove', (e) => {
                     if (!isResizing) return;
-                    
+
                     const deltaY = startY - e.clientY; // 向上拖动，输入区域变大
                     const newHeight = Math.max(80, Math.min(400, startHeight + deltaY));
                     chatInputArea.style.height = newHeight + 'px';
                     chatInputArea.style.maxHeight = newHeight + 'px';
                 });
-                
+
                 document.addEventListener('mouseup', () => {
                     if (isResizing) {
                         isResizing = false;
@@ -4246,29 +4487,29 @@
                 });
             }
         })();
-        
+
         // 复制对话内容
         function copyChatHistory() {
             const chatMessages = document.getElementById('chat-messages');
             if (!chatMessages) return;
-            
+
             const messages = chatMessages.querySelectorAll('.chat-message');
             let text = '';
-            
+
             messages.forEach(msg => {
-                const role = msg.classList.contains('user-message') ? '用户' : 
-                            msg.classList.contains('agent-message') ? '智能体' : '系统';
-                const content = msg.querySelector('.message-content')?.textContent || 
-                               msg.querySelector('.typing-content')?.textContent || '';
+                const role = msg.classList.contains('user-message') ? '用户' :
+                    msg.classList.contains('agent-message') ? '智能体' : '系统';
+                const content = msg.querySelector('.message-content')?.textContent ||
+                    msg.querySelector('.typing-content')?.textContent || '';
                 const agentName = msg.querySelector('.message-agent-name')?.textContent || '';
-                
+
                 if (agentName) {
                     text += `[${role}: ${agentName}]\n${content}\n\n`;
                 } else {
                     text += `[${role}]\n${content}\n\n`;
                 }
             });
-            
+
             if (text.trim()) {
                 navigator.clipboard.writeText(text.trim()).then(() => {
                     showToast('对话内容已复制到剪贴板', 'success');
@@ -4280,25 +4521,25 @@
                 showToast('没有可复制的内容', 'info');
             }
         }
-        
+
         // 下载对话到TXT
         function downloadChatHistory() {
             const chatMessages = document.getElementById('chat-messages');
             if (!chatMessages) return;
-            
+
             const messages = chatMessages.querySelectorAll('.chat-message');
             let text = 'AgentDesk 对话记录\n';
             text += '='.repeat(50) + '\n';
             text += `生成时间: ${new Date().toLocaleString('zh-CN')}\n`;
             text += '='.repeat(50) + '\n\n';
-            
+
             messages.forEach((msg, index) => {
-                const role = msg.classList.contains('user-message') ? '用户' : 
-                            msg.classList.contains('agent-message') ? '智能体' : '系统';
-                const content = msg.querySelector('.message-content')?.textContent || 
-                               msg.querySelector('.typing-content')?.textContent || '';
+                const role = msg.classList.contains('user-message') ? '用户' :
+                    msg.classList.contains('agent-message') ? '智能体' : '系统';
+                const content = msg.querySelector('.message-content')?.textContent ||
+                    msg.querySelector('.typing-content')?.textContent || '';
                 const agentName = msg.querySelector('.message-agent-name')?.textContent || '';
-                
+
                 if (agentName) {
                     text += `[${index + 1}] ${role}: ${agentName}\n`;
                 } else {
@@ -4307,7 +4548,7 @@
                 text += '-'.repeat(30) + '\n';
                 text += content + '\n\n';
             });
-            
+
             // 创建下载链接
             const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
@@ -4319,10 +4560,10 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            
+
             showToast('对话记录已下载', 'success');
         }
-        
+
         // 显示提示消息
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
@@ -4345,13 +4586,13 @@
             `;
             toast.textContent = message;
             document.body.appendChild(toast);
-            
+
             setTimeout(() => {
                 toast.style.animation = 'slideOut 0.3s ease';
                 setTimeout(() => toast.remove(), 300);
             }, 2000);
         }
-        
+
         // 添加动画样式
         if (!document.getElementById('toast-styles')) {
             const style = document.createElement('style');
@@ -4417,7 +4658,7 @@
 
         async function executeTask(message, agentId = null) {
             if (!message || !message.trim()) return;
-            
+
             console.log("Executing:", message);
 
             // 切换按钮显示
@@ -4463,7 +4704,7 @@
                 if (agentId) {
                     formData.append('agent_id', agentId);
                 }
-                
+
                 // Add current file context if available
                 if (currentActiveFile) {
                     formData.append('filename', currentActiveFile);
@@ -4478,7 +4719,7 @@
 
                 if (result.success) {
                     const agentName = result.agent && result.agent.name ? result.agent.name : '助手';
-                    
+
                     // 解析用户消息中的所有@mention
                     const mentions = [];
                     try {
@@ -4508,7 +4749,7 @@
                     } catch (e) {
                         console.error('Error parsing mentions:', e);
                     }
-                    
+
                     // 如果API返回了mentions信息，也添加进去
                     try {
                         if (result.routing_info && Array.isArray(result.routing_info.mentions)) {
@@ -4525,18 +4766,18 @@
                     } catch (e) {
                         console.error('Error processing routing_info mentions:', e);
                     }
-                    
+
                     // 如果没有找到任何mention，至少连接返回的agent
                     if (mentions.length === 0 && agentName) {
                         mentions.push(agentName);
                     }
-                    
+
                     // 连接所有被提到的智能体
                     mentions.forEach(mentionedName => {
                         const agentIndex = agents.findIndex(a => a.name === mentionedName);
                         if (coordinatorIndex !== -1 && agentIndex !== -1 && coordinatorIndex !== agentIndex) {
                             addWorkflowConnection(coordinatorIndex, agentIndex);
-                            
+
                             // Delay highlight
                             setTimeout(() => {
                                 agents[agentIndex].status = 'working';
@@ -4574,7 +4815,7 @@
                 if (e.name === 'AbortError') {
                     addChatMessage('system', '任务已取消');
                 } else {
-                addChatMessage('system', 'Error: ' + e.message);
+                    addChatMessage('system', 'Error: ' + e.message);
                 }
             } finally {
                 // 恢复按钮状态
@@ -4592,7 +4833,7 @@
         function cancelTask() {
             if (currentAbortController) {
                 currentAbortController.abort();
-                
+
                 // 立即恢复按钮状态
                 const sendBtn = document.getElementById('sendBtn');
                 const cancelBtn = document.getElementById('cancelBtn');
@@ -4600,10 +4841,10 @@
                     sendBtn.style.display = 'block';
                     cancelBtn.style.display = 'none';
                 }
-                
+
                 // 隐藏加载状态
                 hideLoading();
-                
+
                 // 恢复智能体状态
                 agents.forEach(a => a.status = 'idle');
                 renderAgents();
@@ -4654,7 +4895,7 @@
             if (text.includes('<img') || text.includes('<div') || text.includes('<iframe')) {
                 // 使用 parseMarkdown 处理 markdown，然后直接设置 HTML
                 let processedText = text;
-                
+
                 // 处理 Markdown 格式
                 if (typeof parseMarkdown === 'function') {
                     try {
@@ -4671,9 +4912,9 @@
                         .replace(/# (.*?)\n/g, '<h1>$1</h1>')
                         .replace(/\n/g, '<br>');
                 }
-                
+
                 element.innerHTML = processedText;
-                
+
                 // 滚动到底部
                 const container = element.closest('.chat-messages') || element.closest('#chat-messages');
                 if (container) {
@@ -4681,7 +4922,7 @@
                 }
                 return;
             }
-            
+
             let i = 0;
             element.innerHTML = '';
 
@@ -4762,17 +5003,17 @@
             const htmlRegex = /```html\s*([\s\S]*?)```/g;
             let processedContent = content.replace(htmlRegex, (match, code) => {
                 let cleanCode = code.trim();
-                
+
                 // 自动修复常见的 CDN 问题 - 使用本地资源
                 cleanCode = cleanCode.replace(
-                    /https:\/\/cdn\.jsdelivr\.net\/npm\/mermaid.*\/mermaid(\.esm)?\.min\.js/g, 
+                    /https:\/\/cdn\.jsdelivr\.net\/npm\/mermaid.*\/mermaid(\.esm)?\.min\.js/g,
                     '/static/js/mermaid.min.js'
                 );
                 cleanCode = cleanCode.replace(
                     /https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/mermaid\/[^"']+/g,
                     '/static/js/mermaid.min.js'
                 );
-                
+
                 htmlBlocks.push(`<div class="html-preview-container">
                     <div class="html-preview-header">
                         <i class="fas fa-chart-line" style="color: #FF6B00;"></i>
@@ -4805,14 +5046,14 @@
                 htmlTags.push(match[0]);
                 tempContent = tempContent.replace(match[0], `__HTML_TAG_${htmlTags.length - 1}__`);
             }
-            
+
             let htmlContent = tempContent
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/### (.*?)\n/g, '<h3>$1</h3>')
                 .replace(/## (.*?)\n/g, '<h2>$1</h2>')
                 .replace(/# (.*?)\n/g, '<h1>$1</h1>')
                 .replace(/\n/g, '<br>');
-            
+
             // 恢复 HTML 标签
             htmlTags.forEach((tag, index) => {
                 htmlContent = htmlContent.replace(`__HTML_TAG_${index}__`, tag);
@@ -4848,18 +5089,18 @@
                     console.error('Mermaid rendering failed:', e);
                 }
             }
-            
+
             // 7. Store HTML blocks for fullscreen function
             window.htmlPreviewBlocks = htmlBlocks.map((_, index) => {
                 const iframe = editorArea.querySelectorAll('.html-preview')[index];
                 return iframe ? iframe.getAttribute('srcdoc') : '';
             });
         }
-        
+
         // 全屏查看 HTML 预览
         function openHTMLFullscreen(index) {
             if (!window.htmlPreviewBlocks || !window.htmlPreviewBlocks[index]) return;
-            
+
             const htmlContent = window.htmlPreviewBlocks[index];
             const newWindow = window.open('', '_blank', 'width=1200,height=800');
             newWindow.document.write(htmlContent);
@@ -4916,7 +5157,7 @@
             } else {
                 sidebar.classList.remove('expanded');
             }
-            
+
             // 显示目标面板 - 确保移除内联样式并使用CSS类
             const targetPanel = document.getElementById(`panel-${panelName}`);
             if (targetPanel) {
@@ -4931,7 +5172,7 @@
             } else {
                 console.warn(`Panel not found: panel-${panelName}`);
             }
-            
+
             // NotebookLM Special Handling: auto-load external iframe
             if (panelName === 'notebooklm') {
                 const placeholder = document.getElementById('notebooklm-placeholder');
@@ -4951,8 +5192,8 @@
                     const placeholder = document.getElementById('aigist-placeholder');
                     const iframe = document.getElementById('aigist-iframe');
                     if (placeholder && iframe) {
-                         placeholder.style.display = 'none';
-                         iframe.style.display = 'block';
+                        placeholder.style.display = 'none';
+                        iframe.style.display = 'block';
                     }
                 }, 500);
             }
@@ -5036,7 +5277,7 @@
         function renderMcpMarket() {
             const container = document.querySelector('.market-list');
             if (!container) return; // Guard if tab content not ready
-            
+
             container.innerHTML = mcpTools.map((tool, index) => `
                 <div class="mcp-market-item" style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px; cursor: pointer;" onclick="showMcpToolDetails(${index})">
                     <div style="display: flex; align-items: center; margin-bottom: 5px;">
@@ -5054,15 +5295,15 @@
         function showMcpToolDetails(index) {
             const tool = mcpTools[index];
             const editorArea = document.querySelector('.editor-area');
-            
+
             // Update Title
             updateContentTitle('MCP 工具详情', 'fas fa-network-wired');
 
-            const capabilitiesHtml = tool.capabilities.map(cap => 
+            const capabilitiesHtml = tool.capabilities.map(cap =>
                 `<span style="display: inline-block; padding: 4px 10px; background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 15px; font-size: 0.8rem; margin-right: 8px; margin-bottom: 8px; color: #00E5FF;">${cap}</span>`
             ).join('');
 
-            const envVarsHtml = tool.envVars.length > 0 
+            const envVarsHtml = tool.envVars.length > 0
                 ? tool.envVars.map(v => `<div style="background: rgba(0,0,0,0.3); padding: 6px 10px; border-radius: 4px; font-family: monospace; font-size: 0.8rem; color: #FFAB40; margin-bottom: 5px;">${v}</div>`).join('')
                 : '<div style="color: var(--text-secondary); font-size: 0.8rem;">无特殊环境变量要求</div>';
 
@@ -5134,14 +5375,14 @@
                 t.style.borderBottom = '2px solid transparent';
                 t.style.color = 'var(--text-secondary)';
             });
-            
+
             // Highlight active tab
             const activeTab = Array.from(tabs).find(t => t.getAttribute('onclick').includes(tabName));
             if (activeTab) {
                 activeTab.style.borderBottom = '2px solid #00E5FF';
                 activeTab.style.color = 'var(--text-primary)';
             }
-            
+
             const installedTab = document.getElementById('mcp-tab-installed');
             const marketTab = document.getElementById('mcp-tab-market');
             if (installedTab) installedTab.style.display = tabName === 'installed' ? 'block' : 'none';
@@ -5154,7 +5395,7 @@
         function toggleMcpServer(checkbox) {
             const statusText = document.getElementById('mcp-server-status');
             const connectInfo = document.getElementById('mcp-connect-info');
-            
+
             if (checkbox.checked) {
                 if (statusText) {
                     statusText.innerHTML = '<i class="fas fa-circle" style="font-size: 6px; margin-right: 4px; color: #00E5FF; box-shadow: 0 0 5px #00E5FF;"></i> 运行中 (Port: 8080)';
@@ -5170,7 +5411,7 @@
                 if (connectInfo) connectInfo.style.display = 'none';
             }
         }
-        
+
         function showAddMcpModal() {
             const url = prompt("请输入 MCP Server 连接地址或命令:", "npx -y @modelcontextprotocol/server-filesystem");
             if (url) {
@@ -5183,13 +5424,13 @@
             // 高亮活动栏图标
             document.querySelectorAll('.activity-item').forEach(item => item.classList.remove('active'));
             document.getElementById('activity-notebooklm').classList.add('active');
-            
+
             // 隐藏所有侧边栏面板
             document.querySelectorAll('.sidebar-panel').forEach(p => {
                 p.classList.remove('active');
                 p.style.display = 'none';
             });
-            
+
             // 在主窗口显示 NotebookLM iframe
             const centerPanel = document.getElementById('centerPanel');
             centerPanel.innerHTML = `
@@ -5230,7 +5471,7 @@
                 </div>
             `;
         }
-        
+
         // 刷新 NotebookLM iframe
         function connectNotebookLM(url) {
             const iframe = document.getElementById('notebooklm-iframe');
@@ -5241,12 +5482,12 @@
                 iframe.src = url;
             }
         }
-        
+
         // 在新标签页打开 NotebookLM
         function openNotebookLMNewTab() {
             window.open('http://localhost:8502/Notebooks', '_blank');
         }
-        
+
         // 隐藏加载动画
         function hideNotebookLMLoading() {
             const loading = document.getElementById('notebooklm-loading');
@@ -5263,7 +5504,7 @@
                 const sidebar = document.getElementById('leftSidebar');
                 const resizer = document.getElementById('leftResizer');
                 sidebar.classList.toggle('collapsed');
-                
+
                 // 隐藏/显示resizer
                 if (resizer) {
                     if (sidebar.classList.contains('collapsed')) {
@@ -5272,7 +5513,7 @@
                         resizer.style.display = 'block';
                     }
                 }
-                
+
                 // 更新所有左侧面板的折叠按钮图标
                 const buttons = sidebar.querySelectorAll('.collapse-btn');
                 buttons.forEach(btn => {
@@ -5290,7 +5531,7 @@
                 const panel = document.getElementById('rightPanel');
                 const resizer = document.getElementById('rightResizer');
                 panel.classList.toggle('collapsed');
-                
+
                 // 隐藏/显示resizer
                 if (resizer) {
                     if (panel.classList.contains('collapsed')) {
@@ -5299,32 +5540,32 @@
                         resizer.style.display = 'block';
                     }
                 }
-                
+
                 // 更新右侧面板的折叠按钮图标
                 const btn = panel.querySelector('.collapse-btn');
                 if (btn) {
-                if (panel.classList.contains('collapsed')) {
-                    btn.classList.remove('fa-angle-right');
-                    btn.classList.add('fa-angle-left');
-                    btn.setAttribute('title', '展开');
-                } else {
-                    btn.classList.remove('fa-angle-left');
-                    btn.classList.add('fa-angle-right');
-                    btn.setAttribute('title', '折叠');
+                    if (panel.classList.contains('collapsed')) {
+                        btn.classList.remove('fa-angle-right');
+                        btn.classList.add('fa-angle-left');
+                        btn.setAttribute('title', '展开');
+                    } else {
+                        btn.classList.remove('fa-angle-left');
+                        btn.classList.add('fa-angle-right');
+                        btn.setAttribute('title', '折叠');
                     }
                 }
             }
-            
+
             updateGlobalControlButtons();
         }
-        
+
         // 折叠/展开内容区
         function toggleContentArea() {
             const editorArea = document.getElementById('editorArea');
             const icon = document.getElementById('contentAreaToggleIcon');
-            
+
             editorArea.classList.toggle('collapsed');
-            
+
             if (editorArea.classList.contains('collapsed')) {
                 icon.classList.remove('fa-angle-down');
                 icon.classList.add('fa-angle-up');
@@ -5333,15 +5574,15 @@
                 icon.classList.add('fa-angle-down');
             }
         }
-        
+
         // 更新内容区标题
         function updateContentTitle(title, icon = 'fas fa-comments') {
             const titleText = document.getElementById('content-title-text');
             // Use content-status-indicator as the tab container
             const titleTab = document.getElementById('content-status-indicator') || document.getElementById('content-title-tab');
-            
+
             if (titleText) titleText.textContent = title;
-            
+
             if (titleTab) {
                 const iconElement = titleTab.querySelector('i');
                 if (iconElement) iconElement.className = icon;
@@ -5354,14 +5595,14 @@
             const editorArea = document.getElementById('editorArea');
             const btnEditor = document.getElementById('view-btn-editor');
             const btnCanvas = document.getElementById('view-btn-canvas');
-            
+
             if (view === 'canvas') {
                 // 显示画布，隐藏编辑器
                 canvasArea.classList.add('active');
                 if (editorArea) {
                     editorArea.style.display = 'none';
                 }
-                
+
                 // Update buttons
                 btnEditor.style.background = 'transparent';
                 btnEditor.style.color = 'var(--text-secondary)';
@@ -5372,7 +5613,7 @@
                 btnCanvas.style.color = 'var(--primary)';
                 btnCanvas.style.fontWeight = 'bold';
                 btnCanvas.style.borderBottom = '2px solid var(--primary)';
-                
+
                 // Resize canvas
                 setTimeout(() => {
                     resizeCanvas();
@@ -5384,7 +5625,7 @@
                 if (editorArea) {
                     editorArea.style.display = 'block';
                 }
-                
+
                 // Update buttons
                 btnEditor.style.background = 'var(--bg-tertiary)';
                 btnEditor.style.color = 'var(--primary)';
@@ -5400,12 +5641,12 @@
 
         // 兼容旧的 toggleCanvas 函数 (现在映射到 switchMainView)
         function toggleCanvas() {
-             const canvasArea = document.getElementById('canvasArea');
-             if (canvasArea.classList.contains('active')) {
-                 switchMainView('editor');
-             } else {
-                 switchMainView('canvas');
-             }
+            const canvasArea = document.getElementById('canvasArea');
+            if (canvasArea.classList.contains('active')) {
+                switchMainView('editor');
+            } else {
+                switchMainView('canvas');
+            }
         }
 
         // 折叠/展开所有面板 (Updated Logic)
@@ -5414,21 +5655,21 @@
             const leftSidebar = document.getElementById('leftSidebar');
             const rightPanel = document.getElementById('rightPanel');
             const icon = document.getElementById('expandAllIcon');
-            
+
             allPanelsCollapsed = !allPanelsCollapsed;
-            
+
             if (allPanelsCollapsed) {
                 // 全部折叠
                 if (!leftSidebar.classList.contains('collapsed')) toggleSidebar('left');
                 if (!rightPanel.classList.contains('collapsed')) toggleSidebar('right');
-                
+
                 icon.classList.remove('fa-expand-arrows-alt');
                 icon.classList.add('fa-compress-arrows-alt');
             } else {
                 // 全部展开
                 if (leftSidebar.classList.contains('collapsed')) toggleSidebar('left');
                 if (rightPanel.classList.contains('collapsed')) toggleSidebar('right');
-                
+
                 icon.classList.remove('fa-compress-arrows-alt');
                 icon.classList.add('fa-expand-arrows-alt');
             }
@@ -5438,11 +5679,11 @@
         function updateGlobalControlButtons() {
             const leftSidebar = document.getElementById('leftSidebar');
             const rightPanel = document.getElementById('rightPanel');
-            
+
             // 检查是否所有面板都折叠了
-            const allCollapsed = leftSidebar.classList.contains('collapsed') && 
-                                 rightPanel.classList.contains('collapsed');
-            
+            const allCollapsed = leftSidebar.classList.contains('collapsed') &&
+                rightPanel.classList.contains('collapsed');
+
             allPanelsCollapsed = allCollapsed;
             const icon = document.getElementById('expandAllIcon');
             if (allCollapsed) {
@@ -5466,7 +5707,7 @@
                 e.preventDefault();
                 toggleCanvas();
             }
-            
+
             // Ctrl/Cmd + E: 切换内容区
             if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
                 e.preventDefault();
@@ -5519,10 +5760,10 @@
 
             const toolbar = `
                 <div style="display: flex; gap: 8px; padding: 10px; border-bottom: 1px solid var(--border);">
-                    ${['all','investment','compliance','operations'].map(s => `
+                    ${['all', 'investment', 'compliance', 'operations'].map(s => `
                         <button onclick="WorkflowManager.setScenario('${s}'); renderMarket();" 
-                                style="padding: 6px 12px; border-radius: 16px; border: 1px solid var(--border); background: ${scenario===s?'var(--primary)':'var(--bg-secondary)'}; color: ${scenario===s?'white':'var(--text-primary)'};">
-                            ${s==='all'?'全部':WorkflowManager.scenarios[s].name}
+                                style="padding: 6px 12px; border-radius: 16px; border: 1px solid var(--border); background: ${scenario === s ? 'var(--primary)' : 'var(--bg-secondary)'}; color: ${scenario === s ? 'white' : 'var(--text-primary)'};">
+                            ${s === 'all' ? '全部' : WorkflowManager.scenarios[s].name}
                         </button>
                     `).join('')}
                 </div>
@@ -5552,7 +5793,7 @@
         function showAgentDetails(index) {
             const agent = marketAgents[index];
             const editorArea = document.querySelector('.editor-area');
-            
+
             // 如果是外部工具，显示特殊界面
             if (agent.isExternal) {
                 editorArea.innerHTML = `
@@ -5570,9 +5811,9 @@
                         <div style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 25px; margin-bottom: 30px; border: 1px solid var(--border);">
                             <h3 style="margin-bottom: 15px; color: var(--primary); font-size: 1.1rem;"><i class="fas fa-bolt" style="margin-right: 8px;"></i>核心能力</h3>
                             <div style="display: flex; flex-wrap: wrap;">
-                                ${agent.capabilities.map(cap => 
-                                    `<span style="display: inline-block; padding: 4px 10px; background: rgba(255,255,255,0.1); border-radius: 15px; font-size: 0.8rem; margin-right: 8px; margin-bottom: 8px; color: var(--text-primary);">${cap}</span>`
-                                ).join('')}
+                                ${agent.capabilities.map(cap =>
+                    `<span style="display: inline-block; padding: 4px 10px; background: rgba(255,255,255,0.1); border-radius: 15px; font-size: 0.8rem; margin-right: 8px; margin-bottom: 8px; color: var(--text-primary);">${cap}</span>`
+                ).join('')}
                             </div>
                         </div>
 
@@ -5763,14 +6004,14 @@
             // Visual feedback
             if (agent.subscribed) {
                 addChatMessage('system', `已订阅智能体: ${agent.name}`);
-                
+
                 // 如果是外部工具，添加到活动栏
                 if (agent.isExternal && agent.activityBarId) {
                     addToActivityBar(agent);
                 }
             } else {
                 addChatMessage('system', `已退订智能体: ${agent.name}`);
-                
+
                 // 如果是外部工具，从活动栏移除
                 if (agent.isExternal && agent.activityBarId) {
                     removeFromActivityBar(agent.activityBarId);
@@ -5779,17 +6020,17 @@
 
             renderMarket();
         }
-        
+
         // 添加智能体到活动栏
         function addToActivityBar(agent) {
             const container = document.getElementById('subscribed-agents-bar');
             if (!container) return;
-            
+
             // 检查是否已存在
             if (document.getElementById(agent.activityBarId)) {
                 return;
             }
-            
+
             // 创建活动栏图标
             const activityItem = document.createElement('div');
             activityItem.id = agent.activityBarId;
@@ -5797,15 +6038,15 @@
             activityItem.title = agent.name;
             activityItem.onclick = () => switchSidebar(agent.panelId);
             activityItem.innerHTML = `<i class="${agent.icon}" style="color: ${agent.color};"></i>`;
-            
+
             container.appendChild(activityItem);
-            
+
             // 显示提示
             setTimeout(() => {
                 activityItem.style.animation = 'bounce 0.5s ease';
             }, 100);
         }
-        
+
         // 从活动栏移除智能体
         function removeFromActivityBar(activityBarId) {
             const element = document.getElementById(activityBarId);
@@ -5834,10 +6075,10 @@
         function selectLandingAgent(index) {
             const agent = marketAgents[index];
             const input = document.getElementById('globalInput');
-                const mention = `@${agent.name} `;
+            const mention = `@${agent.name} `;
             input.value += mention;
             input.focus();
-            
+
             // Animation feedback
             const items = document.querySelectorAll('.landing-agent-item');
             if (items[index]) {
@@ -5990,10 +6231,10 @@
                     const response = await fetch(`/download/${encodedFilename}`);
                     if (response.ok) {
                         const text = await response.text();
-                        
+
                         let contentHtml = '';
                         if (ext === 'md') {
-                             contentHtml = text
+                            contentHtml = text
                                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                                 .replace(/### (.*?)\n/g, '<h3>$1</h3>')
                                 .replace(/## (.*?)\n/g, '<h2>$1</h2>')
@@ -6002,7 +6243,7 @@
                         } else {
                             contentHtml = `<pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; overflow: auto; font-family: monospace; color: #ccc; white-space: pre-wrap;">${escapeHtml(text)}</pre>`;
                         }
-                        
+
                         renderPreviewContainer(editorArea, filename, contentHtml);
                     } else {
                         renderError(editorArea, filename, "无法读取文件内容");
@@ -6010,11 +6251,11 @@
                 } catch (e) {
                     renderError(editorArea, filename, "读取出错");
                 }
-            } 
+            }
             // 2. PDF files
             else if (ext === 'pdf') {
-                 const pdfUrl = `/download/${encodedFilename}?preview=true`;
-                 const contentHtml = `
+                const pdfUrl = `/download/${encodedFilename}?preview=true`;
+                const contentHtml = `
                     <div style="position: relative; width: 100%; height: calc(100vh - 200px);">
                         <iframe src="${pdfUrl}" style="width: 100%; height: 100%; border: none; border-radius: 8px; background: #333;"></iframe>
                         <div style="position: absolute; bottom: 20px; right: 20px; display: flex; gap: 10px;">
@@ -6027,25 +6268,25 @@
                         </div>
                     </div>
                  `;
-                 renderPreviewContainer(editorArea, filename, contentHtml);
+                renderPreviewContainer(editorArea, filename, contentHtml);
             }
             // 3. Word files (docx)
             else if (ext === 'docx') {
                 try {
                     const response = await fetch(`/download/${encodedFilename}`);
                     if (!response.ok) throw new Error('Fetch failed');
-                    
+
                     const arrayBuffer = await response.arrayBuffer();
-                    
+
                     if (typeof mammoth === 'undefined') {
-                         throw new Error('Mammoth library not loaded');
+                        throw new Error('Mammoth library not loaded');
                     }
 
-                    mammoth.convertToHtml({arrayBuffer: arrayBuffer})
-                        .then(function(result){
+                    mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
+                        .then(function (result) {
                             const html = result.value; // The generated HTML
                             const messages = result.messages; // Any messages, such as warnings during conversion
-                            
+
                             const contentHtml = `
                                 <div class="docx-preview" style="background: white; color: black; padding: 40px; border-radius: 8px; overflow-y: auto; height: calc(100vh - 200px);">
                                     ${html}
@@ -6053,11 +6294,11 @@
                             `;
                             renderPreviewContainer(editorArea, filename, contentHtml);
                         })
-                        .catch(function(error) {
+                        .catch(function (error) {
                             console.error(error);
                             renderError(editorArea, filename, "Word 文档解析失败: " + error.message);
                         });
-                } catch(e) {
+                } catch (e) {
                     console.error(e);
                     renderError(editorArea, filename, "加载 Word 文档失败: " + e.message);
                 }
@@ -6069,18 +6310,18 @@
                     if (!response.ok) throw new Error('Fetch failed');
 
                     const arrayBuffer = await response.arrayBuffer();
-                    
+
                     if (typeof XLSX === 'undefined') {
                         throw new Error('XLSX library not loaded');
                     }
 
                     const data = new Uint8Array(arrayBuffer);
-                    const workbook = XLSX.read(data, {type: 'array'});
-                    
+                    const workbook = XLSX.read(data, { type: 'array' });
+
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     const html = XLSX.utils.sheet_to_html(worksheet);
-                    
+
                     const contentHtml = `
                         <div class="excel-preview" style="background: white; color: black; padding: 20px; border-radius: 8px; overflow: auto; height: calc(100vh - 200px);">
                             <style>
@@ -6091,7 +6332,7 @@
                         </div>
                     `;
                     renderPreviewContainer(editorArea, filename, contentHtml);
-                } catch(e) {
+                } catch (e) {
                     console.error(e);
                     renderError(editorArea, filename, "Excel 文档解析失败: " + e.message);
                 }
@@ -6101,9 +6342,9 @@
                 renderUnsupported(editorArea, filename);
             }
         }
-        
+
         function renderPreviewContainer(container, filename, content) {
-             container.innerHTML = `
+            container.innerHTML = `
                 <div style="margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <span style="font-size: 0.8rem; color: var(--primary); text-transform: uppercase;">FILE PREVIEW</span>
@@ -6118,9 +6359,9 @@
                 </div>
              `;
         }
-        
+
         function renderError(container, filename, msg) {
-             container.innerHTML = `
+            container.innerHTML = `
                 <div style="padding: 20px; color: #ff4444; display: flex; justify-content: space-between; align-items: center;">
                     <span>${msg}</span>
                     <button onclick="resetWelcomeScreen()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer;">
@@ -6128,7 +6369,7 @@
                     </button>
                 </div>`;
         }
-        
+
         function renderUnsupported(container, filename) {
             container.innerHTML = `
                 <div style="height: 100%; display: flex; flex-direction: column;">
@@ -6163,7 +6404,7 @@
         const mentionDropdown = document.getElementById('mentionDropdown');
         const landingMentionDropdown = document.getElementById('landingMentionDropdown');
         let mentionIndex = -1;
-        let isDropdownActive = false; // 全局标记下拉框是否激活
+        // isDropdownActive 已在顶部全局状态变量区声明
 
         function setupMentionLogic(inputElement, dropdownElement) {
             if (!inputElement || !dropdownElement) {
@@ -6193,8 +6434,8 @@
 
                 // Auto resize logic only for textarea
                 if (this.tagName.toLowerCase() === 'textarea') {
-                this.style.height = 'auto';
-                this.style.height = (this.scrollHeight) + 'px';
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
                     if (this.value === '') {
                         this.style.height = 'auto';
                     }
@@ -6203,7 +6444,7 @@
                 if (lastAtPos !== -1) {
                     const query = value.substring(lastAtPos + 1, cursorPos);
                     console.log('[Mention] Found @, query:', query);
-                    
+
                     // Check if there's a space after @, if so, close dropdown
                     if (query.includes(' ')) {
                         console.log('[Mention] Space found, hiding dropdown');
@@ -6231,7 +6472,7 @@
             inputElement.addEventListener('keydown', function (e) {
                 // 使用全局标记判断，更可靠
                 const isDropdownVisible = isDropdownActive;
-                
+
                 console.log('[Mention] Keydown:', {
                     key: e.key,
                     isDropdownVisible,
@@ -6240,7 +6481,7 @@
                     hasShowClass: dropdownElement.classList.contains('show'),
                     displayStyle: dropdownElement.style.display
                 });
-                
+
                 if (isDropdownVisible) {
                     const items = dropdownElement.querySelectorAll('.mention-item');
                     if (e.key === 'ArrowDown') {
@@ -6298,7 +6539,7 @@
                 inputId: inputElement.id,
                 dropdownElement: dropdownElement
             });
-            
+
             dropdownElement.innerHTML = agents.map((agent, index) => `
                 <div class="mention-item" onclick="selectMention('${agent.name}', ${atPos}, document.getElementById('${inputElement.id}'), document.getElementById('${dropdownElement.id}'))">
                     <div class="mention-item-icon" style="color: ${agent.color}; background: ${agent.color}15;">
@@ -6321,13 +6562,13 @@
                 z-index: 999999 !important;
                 pointer-events: auto !important;
             `;
-            
+
             // 设置全局标记
             isDropdownActive = true;
-            
+
             mentionIndex = 0;
             updateMentionSelection(dropdownElement.querySelectorAll('.mention-item'));
-            
+
             // 验证显示状态
             setTimeout(() => {
                 const computed = window.getComputedStyle(dropdownElement);
@@ -6340,7 +6581,7 @@
                     isDropdownActive: isDropdownActive
                 });
             }, 100);
-            
+
             console.log('[Mention] Dropdown should be visible now, isDropdownActive:', isDropdownActive);
         }
 
@@ -6375,9 +6616,9 @@
             hideMentionDropdown(dropdownElement);
             inputElement.focus();
 
-            const newCursorPos = atPos + name.length + 2; 
+            const newCursorPos = atPos + name.length + 2;
             inputElement.setSelectionRange(newCursorPos, newCursorPos);
-            
+
             console.log('[Mention] Mention selected, dropdown hidden, isDropdownActive:', isDropdownActive);
         }
 
@@ -6444,17 +6685,17 @@
 
                 if (data.success) {
                     document.getElementById('prompt-output-container').style.display = 'block';
-                    
+
                     const resultData = data.data || {};
                     document.getElementById('prompt-output').value = resultData.optimized_prompt || '';
-                    
+
                     // Render Markdown for explanation and comparison
                     const explanation = resultData.explanation || '无详细说明';
                     const comparison = resultData.comparison || '无对比说明';
-                    
+
                     document.getElementById('prompt-explanation').innerHTML = parseMarkdown(explanation);
                     document.getElementById('prompt-comparison').innerHTML = parseMarkdown(comparison);
-                    
+
                 } else {
                     alert('优化失败: ' + data.error);
                 }
@@ -6473,7 +6714,7 @@
             try {
                 const res = await fetch('/api/prompt/best-practices');
                 const data = await res.json();
-                
+
                 if (data.success) {
                     // Group by category
                     const grouped = {};
@@ -6482,7 +6723,7 @@
                         if (!grouped[cat]) grouped[cat] = [];
                         grouped[cat].push(bp);
                     });
-                    
+
                     let html = '';
                     for (const [category, practices] of Object.entries(grouped)) {
                         html += `<h3 style="grid-column: 1 / -1; color: var(--text-secondary); font-size: 0.9rem; margin-top: 20px; border-bottom: 1px solid var(--border); padding-bottom: 5px;">${category}</h3>`;
@@ -6493,7 +6734,7 @@
                             </div>
                         `).join('');
                     }
-                    
+
                     container.innerHTML = html;
                 }
             } catch (e) {
@@ -6544,7 +6785,7 @@
             if (!title) return;
 
             const tags = prompt('添加标签（用逗号分隔）：', '优化版, 通用');
-            
+
             try {
                 const formData = new FormData();
                 formData.append('title', title);
@@ -6556,7 +6797,7 @@
                     body: formData
                 });
                 const data = await res.json();
-                
+
                 if (data.success) {
                     alert('保存成功！');
                     switchPromptTab('library');
@@ -6623,11 +6864,11 @@
 
         function escapeHtml(unsafe) {
             return unsafe
-                 .replace(/&/g, "&amp;")
-                 .replace(/</g, "&lt;")
-                 .replace(/>/g, "&gt;")
-                 .replace(/"/g, "&quot;")
-                 .replace(/'/g, "&#039;");
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
 
         function copyToClipboard(text) {
@@ -6652,10 +6893,10 @@
         }
 
         // ==================== 清空功能 ====================
-        
+
         async function clearChat() {
             if (!confirm('确定要清空对话记录吗？')) return;
-            
+
             try {
                 await fetch('/api/chat/clear', { method: 'POST' });
                 const container = document.getElementById('chat-messages');
@@ -6698,21 +6939,21 @@
         // ==================== Workflow Logic ====================
         function previewWorkflow(type) {
             console.log(`Previewing workflow: ${type}`);
-            
+
             const detailArea = document.getElementById('workflowDetailArea');
             const editorArea = document.getElementById('editorArea');
             const canvasArea = document.getElementById('canvasArea');
-            
+
             // Hide main areas
             editorArea.style.display = 'none';
             canvasArea.classList.remove('active');
-            
+
             // Show detail area
             detailArea.style.display = 'block';
-            
+
             // Update content based on type
             let content = '';
-            
+
             if (type === 'doc-review') {
                 content = `
                     <div style="max-width: 800px; margin: 0 auto;">
@@ -6925,14 +7166,14 @@
             } else {
                 content = `<div style="text-align: center; padding: 50px; color: #666;">${type} 的详情页正在开发中... <button onclick="closeWorkflowDetail()" style="margin-left: 10px; cursor: pointer; background: none; border: 1px solid #666; color: #aaa; padding: 2px 8px; border-radius: 4px;">返回</button></div>`;
             }
-            
+
             detailArea.innerHTML = content;
         }
 
         function closeWorkflowDetail() {
             const detailArea = document.getElementById('workflowDetailArea');
             const editorArea = document.getElementById('editorArea');
-            
+
             detailArea.style.display = 'none';
             editorArea.style.display = 'block';
         }
@@ -6944,7 +7185,7 @@
                 const originalText = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 启动中...';
                 btn.disabled = true;
-                
+
                 setTimeout(() => {
                     btn.innerHTML = '<i class="fas fa-check"></i> 已启动';
                     setTimeout(() => {
@@ -6979,7 +7220,7 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 审查中...';
             progress.style.display = 'block';
             resultArea.style.display = 'none';
-            
+
             logs.innerHTML = `[${new Date().toLocaleTimeString()}] 任务启动：智能文档多维审查<br>`;
 
             const formData = new FormData();
@@ -6987,28 +7228,28 @@
 
             try {
                 logs.innerHTML += `[${new Date().toLocaleTimeString()}] 正在上传文档...<br>`;
-                
+
                 const response = await fetch('/api/workflow/review', {
                     method: 'POST',
                     body: formData
                 });
-                
+
                 logs.innerHTML += `[${new Date().toLocaleTimeString()}] 文档分析师：正在提取摘要...<br>`;
                 logs.innerHTML += `[${new Date().toLocaleTimeString()}] 合规官：正在扫描风险点...<br>`;
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     logs.innerHTML += `[${new Date().toLocaleTimeString()}] 内容创作者：正在汇总报告...<br>`;
                     logs.innerHTML += `[${new Date().toLocaleTimeString()}] <span style="color: #4CAF50;">任务完成！</span><br>`;
-                    
+
                     const visualHtml = renderVisualReviewReport(data);
                     resultContent.innerHTML = visualHtml;
                     resultArea.style.display = 'block';
                     if (window.mermaid) {
                         try {
                             mermaid.run({ nodes: resultContent.querySelectorAll('.mermaid') });
-                        } catch (e) {}
+                        } catch (e) { }
                     }
                     btn.innerHTML = '<i class="fas fa-check"></i> 完成';
                 } else {
@@ -7059,7 +7300,7 @@
                     try {
                         const errData = await response.json();
                         errMsg = errData.error || errData.detail || errMsg;
-                    } catch (e) {}
+                    } catch (e) { }
                     logs.innerHTML += `[${new Date().toLocaleTimeString()}] <span style="color: #F44336;">错误：${escapeHtml(String(errMsg))}</span><br>`;
                     btn.innerHTML = '重试';
                     btn.disabled = false;
@@ -7077,7 +7318,7 @@
                     if (window.mermaid) {
                         try {
                             mermaid.run({ nodes: resultContent.querySelectorAll('.mermaid') });
-                        } catch (e) {}
+                        } catch (e) { }
                     }
                     btn.innerHTML = '<i class="fas fa-check"></i> 完成';
                 } else {
@@ -7275,8 +7516,8 @@
                     else if (/低风险|低|一般/.test(t)) severity = '低';
                     // 如果没有明确级别，根据上下文判断
                     if (!severity) {
-                        if (i > 0 && /高|严重/.test(lines[i-1])) severity = '高';
-                        else if (i > 0 && /中/.test(lines[i-1])) severity = '中';
+                        if (i > 0 && /高|严重/.test(lines[i - 1])) severity = '高';
+                        else if (i > 0 && /中/.test(lines[i - 1])) severity = '中';
                         else severity = '中'; // 默认中等风险
                     }
                     const cleanText = t.replace(/^[-\*\s\d\.]+/, '').replace(/^[（(].*?[）)]/, '');
@@ -7302,18 +7543,18 @@
             return `pie title ${title}\n"高" : ${counts['高']}\n"中" : ${counts['中']}\n"低" : ${counts['低']}`;
         }
         let settingsModalInstance = null;
-        
-        document.addEventListener('DOMContentLoaded', function() {
+
+        document.addEventListener('DOMContentLoaded', function () {
             settingsModalInstance = document.getElementById('settingsModal');
         });
-        
+
         function openSettingsModal() {
             // Re-query if null (sometimes DOMContentLoaded fires before dynamic elements are ready in some frameworks, though unlikely here)
             if (!settingsModalInstance) settingsModalInstance = document.getElementById('settingsModal');
-            
+
             if (settingsModalInstance) {
                 settingsModalInstance.style.display = 'block';
-                
+
                 // Fetch settings from backend
                 fetch('/api/settings/model')
                     .then(res => res.json())
@@ -7322,20 +7563,20 @@
                             const s = data.settings;
                             // Use backend settings
                             selectProvider(s.provider || 'gemini');
-                            
+
                             const apiKeyInput = document.getElementById('setting-api-key');
                             const modelNameInput = document.getElementById('setting-model-name');
                             const baseUrlInput = document.getElementById('setting-base-url');
-                            
-                            if(apiKeyInput) apiKeyInput.value = s.api_key || '';
-                            if(modelNameInput) modelNameInput.value = s.model_name || '';
-                            if(baseUrlInput) baseUrlInput.value = s.base_url || '';
-                            
+
+                            if (apiKeyInput) apiKeyInput.value = s.api_key || '';
+                            if (modelNameInput) modelNameInput.value = s.model_name || '';
+                            if (baseUrlInput) baseUrlInput.value = s.base_url || '';
+
                             // Also update localStorage to keep them in sync
                             localStorage.setItem('llm_provider', s.provider);
-                            if(s.api_key) localStorage.setItem('llm_api_key', s.api_key);
-                            if(s.model_name) localStorage.setItem('llm_model_name', s.model_name);
-                            if(s.base_url) localStorage.setItem('llm_base_url', s.base_url);
+                            if (s.api_key) localStorage.setItem('llm_api_key', s.api_key);
+                            if (s.model_name) localStorage.setItem('llm_model_name', s.model_name);
+                            if (s.base_url) localStorage.setItem('llm_base_url', s.base_url);
                         } else {
                             // Fallback to localStorage if fetch failed or no settings returned
                             loadSettingsFromLocal();
@@ -7349,18 +7590,18 @@
                 console.error("Settings modal element not found!");
             }
         }
-        
+
         function loadSettingsFromLocal() {
             const provider = localStorage.getItem('llm_provider') || 'gemini';
             selectProvider(provider);
-            
+
             const apiKeyInput = document.getElementById('setting-api-key');
             const modelNameInput = document.getElementById('setting-model-name');
             const baseUrlInput = document.getElementById('setting-base-url');
-            
-            if(apiKeyInput) apiKeyInput.value = localStorage.getItem('llm_api_key') || '';
-            if(modelNameInput) modelNameInput.value = localStorage.getItem('llm_model_name') || '';
-            if(baseUrlInput) baseUrlInput.value = localStorage.getItem('llm_base_url') || '';
+
+            if (apiKeyInput) apiKeyInput.value = localStorage.getItem('llm_api_key') || '';
+            if (modelNameInput) modelNameInput.value = localStorage.getItem('llm_model_name') || '';
+            if (baseUrlInput) baseUrlInput.value = localStorage.getItem('llm_base_url') || '';
         }
 
         function closeSettingsModal() {
@@ -7382,7 +7623,7 @@
                     }
                 });
             }
-            
+
             // Toggle Base URL field
             const baseUrlGroup = document.getElementById('base-url-group');
             if (baseUrlGroup) {
@@ -7392,11 +7633,11 @@
                     baseUrlGroup.style.display = 'none';
                 }
             }
-            
+
             // Auto-fill defaults if empty
             const modelInput = document.getElementById('setting-model-name');
             const urlInput = document.getElementById('setting-base-url');
-            
+
             if (modelInput && urlInput) {
                 if (provider === 'deepseek') {
                     if (!modelInput.value) modelInput.value = 'deepseek-chat';
@@ -7414,17 +7655,17 @@
             const apiKey = document.getElementById('setting-api-key').value;
             const modelName = document.getElementById('setting-model-name').value;
             const baseUrl = document.getElementById('setting-base-url').value;
-            
+
             if (!apiKey && provider !== 'local') {
                 alert('请输入 API Key');
                 return;
             }
-            
+
             const btn = document.getElementById('saveSettingsBtn');
             const originalText = btn.textContent;
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
-            
+
             try {
                 // Save to backend
                 const response = await fetch('/api/settings/model', {
@@ -7437,16 +7678,16 @@
                         base_url: baseUrl
                     })
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (result.success) {
                     // Save to localStorage for persistence in UI
                     localStorage.setItem('llm_provider', provider);
                     localStorage.setItem('llm_api_key', apiKey);
                     localStorage.setItem('llm_model_name', modelName);
                     localStorage.setItem('llm_base_url', baseUrl);
-                    
+
                     addChatMessage('system', `系统配置已更新: ${result.message}`);
                     closeSettingsModal();
                 } else {
@@ -7460,9 +7701,9 @@
                 btn.textContent = originalText;
             }
         }
-        
+
         // Close modal when clicking outside
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const modal = document.getElementById('settingsModal');
             if (modal && event.target == modal) {
                 closeSettingsModal();
@@ -7520,66 +7761,66 @@
         }
     </script>
     <script>
-        (function(){
+        (function () {
             const root = document.documentElement;
             const el = document.getElementById('rightResizer');
             let startX = 0;
             let startW = 0;
-            function onMove(e){
+            function onMove(e) {
                 const dx = e.clientX - startX;
                 const w = Math.min(Math.max(startW - dx, 280), 720);
                 root.style.setProperty('--right-panel-width', w + 'px');
             }
-            function onUp(){
+            function onUp() {
                 window.removeEventListener('mousemove', onMove);
                 window.removeEventListener('mouseup', onUp);
                 try {
                     const v = getComputedStyle(root).getPropertyValue('--right-panel-width').trim();
                     localStorage.setItem('rightPanelWidth', v);
-                } catch(e) {}
+                } catch (e) { }
             }
-            if (el){
-                el.addEventListener('mousedown', (e)=>{
+            if (el) {
+                el.addEventListener('mousedown', (e) => {
                     startX = e.clientX;
                     const v = parseInt(getComputedStyle(root).getPropertyValue('--right-panel-width')) || 420;
                     startW = v;
                     window.addEventListener('mousemove', onMove);
                     window.addEventListener('mouseup', onUp);
                 });
-                el.addEventListener('dblclick', ()=>{
+                el.addEventListener('dblclick', () => {
                     const target = Math.round(Math.min(Math.max(window.innerWidth * 0.32, 420), 680));
                     root.style.setProperty('--right-panel-width', target + 'px');
-                    try { localStorage.setItem('rightPanelWidth', target + 'px'); } catch(e) {}
+                    try { localStorage.setItem('rightPanelWidth', target + 'px'); } catch (e) { }
                 });
             }
             try {
                 const saved = localStorage.getItem('rightPanelWidth');
                 if (saved) root.style.setProperty('--right-panel-width', saved);
-            } catch(e) {}
+            } catch (e) { }
         })();
     </script>
     <script>
         // Left Sidebar Resizer
-        (function(){
+        (function () {
             const root = document.documentElement;
             const el = document.getElementById('leftResizer');
             let startX = 0;
             let startW = 0;
-            function onMove(e){
+            function onMove(e) {
                 const dx = e.clientX - startX;
                 const w = Math.min(Math.max(startW + dx, 200), 600);
                 root.style.setProperty('--sidebar-width', w + 'px');
             }
-            function onUp(){
+            function onUp() {
                 window.removeEventListener('mousemove', onMove);
                 window.removeEventListener('mouseup', onUp);
                 try {
                     const v = getComputedStyle(root).getPropertyValue('--sidebar-width').trim();
                     localStorage.setItem('leftSidebarWidth', v);
-                } catch(e) {}
+                } catch (e) { }
             }
-            if (el){
-                el.addEventListener('mousedown', (e)=>{
+            if (el) {
+                el.addEventListener('mousedown', (e) => {
                     e.preventDefault();
                     startX = e.clientX;
                     const v = parseInt(getComputedStyle(root).getPropertyValue('--sidebar-width')) || 250;
@@ -7587,16 +7828,16 @@
                     window.addEventListener('mousemove', onMove);
                     window.addEventListener('mouseup', onUp);
                 });
-                el.addEventListener('dblclick', ()=>{
+                el.addEventListener('dblclick', () => {
                     const target = Math.round(Math.min(Math.max(window.innerWidth * 0.15, 200), 400));
                     root.style.setProperty('--sidebar-width', target + 'px');
-                    try { localStorage.setItem('leftSidebarWidth', target + 'px'); } catch(e) {}
+                    try { localStorage.setItem('leftSidebarWidth', target + 'px'); } catch (e) { }
                 });
             }
             try {
                 const saved = localStorage.getItem('leftSidebarWidth');
                 if (saved) root.style.setProperty('--sidebar-width', saved);
-            } catch(e) {}
+            } catch (e) { }
         })();
     </script>
     <script>
@@ -7604,14 +7845,14 @@
         function showPPTPDFPreview(filename) {
             const encodedFilename = encodeURIComponent(filename);
             const pdfUrl = `/download/${encodedFilename}?preview=true`;
-            
+
             // 切换到编辑器视图
             switchMainView('editor');
-            
+
             // 更新中间面板显示 PDF
             const editorArea = document.querySelector('.editor-area');
             updateContentTitle(filename, 'fas fa-file-pdf');
-            
+
             // 创建横向翻页的 PDF 预览界面
             const contentHtml = `
                 <div style="display: flex; flex-direction: column; height: calc(100vh - 150px);">
@@ -7644,46 +7885,46 @@
                     </div>
                 </div>
             `;
-            
+
             editorArea.innerHTML = contentHtml;
-            
+
             // 加载 PDF 并显示页面
             loadPDFPages(pdfUrl, filename);
         }
-        
+
         // 加载 PDF 页面（使用 PDF.js，支持横向翻页）
         async function loadPDFPages(pdfUrl, filename) {
             const pdfPages = document.getElementById('pdfPages');
             const container = document.getElementById('pdfContainer');
-            
+
             // 显示加载中
             pdfPages.innerHTML = '<div style="width: 100%; text-align: center; color: var(--text-secondary); padding: 50px;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem;"></i><p style="margin-top: 15px;">正在加载 PDF...</p></div>';
-            
+
             try {
                 // 设置 PDF.js worker
                 if (typeof pdfjsLib !== 'undefined') {
                     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-                    
+
                     // 加载 PDF 文档
                     const loadingTask = pdfjsLib.getDocument(pdfUrl);
                     const pdf = await loadingTask.promise;
-                    
+
                     window.currentPDF = pdf;
                     window.currentPDFPage = 1;
                     window.currentPDFTotalPages = pdf.numPages;
                     window.currentPDFUrl = pdfUrl;
                     window.currentPDFFilename = filename;
-                    
+
                     // 渲染所有页面（横向排列）
                     pdfPages.innerHTML = '';
-                    
+
                     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
                         await renderPDFPage(pdf, pageNum, pdfPages);
                     }
-                    
+
                     // 更新页面信息
                     updatePageInfo(1, pdf.numPages);
-                    
+
                     // 滚动到第一页
                     container.scrollTo({ left: 0, behavior: 'smooth' });
                 } else {
@@ -7696,12 +7937,12 @@
                 fallbackPDFViewer(pdfUrl);
             }
         }
-        
+
         // 渲染单个 PDF 页面
         async function renderPDFPage(pdf, pageNum, container) {
             const page = await pdf.getPage(pageNum);
             const viewport = page.getViewport({ scale: 1.5 });
-            
+
             // 创建 canvas
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
@@ -7711,15 +7952,15 @@
             canvas.style.height = 'auto';
             canvas.style.borderRadius = '8px';
             canvas.style.boxShadow = '0 4px 6px rgba(0,0,0,0.3)';
-            
+
             // 渲染页面
             const renderContext = {
                 canvasContext: context,
                 viewport: viewport
             };
-            
+
             await page.render(renderContext).promise;
-            
+
             // 创建页面容器
             const pageContainer = document.createElement('div');
             pageContainer.style.flex = '0 0 auto';
@@ -7729,11 +7970,11 @@
             pageContainer.style.alignItems = 'center';
             pageContainer.style.marginRight = '20px';
             pageContainer.id = `pdf-page-${pageNum}`;
-            
+
             pageContainer.appendChild(canvas);
             container.appendChild(pageContainer);
         }
-        
+
         // 后备方案：使用 iframe
         function fallbackPDFViewer(pdfUrl) {
             const pdfPages = document.getElementById('pdfPages');
@@ -7744,16 +7985,16 @@
             `;
             updatePageInfo(1, '?');
         }
-        
+
         // 更新页面信息
         function updatePageInfo(current, total) {
             document.getElementById('currentPage').textContent = current;
             document.getElementById('totalPages').textContent = total;
-            
+
             // 更新按钮状态
             const prevBtn = document.getElementById('prevPageBtn');
             const nextBtn = document.getElementById('nextPageBtn');
-            
+
             if (current <= 1) {
                 prevBtn.disabled = true;
                 prevBtn.style.opacity = '0.5';
@@ -7763,7 +8004,7 @@
                 prevBtn.style.opacity = '1';
                 prevBtn.style.cursor = 'pointer';
             }
-            
+
             if (total !== '?' && current >= parseInt(total)) {
                 nextBtn.disabled = true;
                 nextBtn.style.opacity = '0.5';
@@ -7774,7 +8015,7 @@
                 nextBtn.style.cursor = 'pointer';
             }
         }
-        
+
         // 上一页
         function prevPDFPage() {
             if (window.currentPDFPage > 1) {
@@ -7782,29 +8023,29 @@
                 navigatePDFPage(window.currentPDFPage);
             }
         }
-        
+
         // 下一页
         function nextPDFPage() {
             window.currentPDFPage++;
             navigatePDFPage(window.currentPDFPage);
         }
-        
+
         // 导航到指定页面（滚动到对应页面）
         function navigatePDFPage(pageNum) {
             const container = document.getElementById('pdfContainer');
             const pageElement = document.getElementById(`pdf-page-${pageNum}`);
-            
+
             if (pageElement && container) {
                 // 滚动到指定页面
                 const containerRect = container.getBoundingClientRect();
                 const pageRect = pageElement.getBoundingClientRect();
                 const scrollLeft = pageElement.offsetLeft - (containerRect.width / 2) + (pageRect.width / 2);
-                
+
                 container.scrollTo({
                     left: scrollLeft,
                     behavior: 'smooth'
                 });
-                
+
                 window.currentPDFPage = pageNum;
                 const totalPages = window.currentPDFTotalPages || document.getElementById('totalPages').textContent;
                 updatePageInfo(pageNum, totalPages);
@@ -7818,17 +8059,17 @@
                 }
             }
         }
-        
+
         // 兼容旧的 previewPPT 函数
         function previewPPT(filename) {
             showPPTPDFPreview(filename);
         }
-        
+
         function downloadPPT(filename) {
             const encodedFilename = encodeURIComponent(filename);
             window.location.href = `/download/${encodedFilename}`;
         }
-        
+
         async function generatePPTFromSidebar() {
             const topic = document.getElementById('ppt-topic-sidebar').value.trim();
             if (!topic) {
@@ -7862,14 +8103,14 @@
                 }
 
                 const data = await response.json();
-                
+
                 if (data.response) {
                     statusEl.innerHTML = '<i class="fas fa-check-circle" style="color: #4CAF50;"></i> PPT生成完成！';
                     statusEl.style.color = '#4CAF50';
-                    
+
                     // 将结果添加到聊天区
                     addChatMessage('agent', data.response, 'PPT生成专家');
-                    
+
                     // 如果有 PDF 文件名，优先显示 PDF 预览
                     if (data.pdf_filename) {
                         window.currentPPT_PDF = data.pdf_filename;
@@ -7879,10 +8120,10 @@
                         // 如果没有 PDF，显示文本结果
                         updateCenterPanel(data.response, 'PPT生成专家');
                     }
-                    
+
                     // 切换到主视图（确保中间面板可见）
                     switchMainView('editor');
-                    
+
                     // 切换到聊天面板查看结果
                     setTimeout(() => {
                         const chatPanel = document.getElementById('rightSidebar');
@@ -7965,17 +8206,17 @@
                 if (data.success) {
                     statusDiv.style.color = '#4CAF50';
                     statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> 查询完成！';
-                    
+
                     // 显示在聊天区域
                     addChatMessage('user', message, 'user');
                     addChatMessage('agent', data.response, 'AKShare数据专家');
-                    
+
                     // 更新中央面板
                     if (data.response) {
                         switchMainView('editor');
                         updateCenterPanel(data.response, 'AKShare数据专家');
                     }
-                    
+
                     setTimeout(() => {
                         statusDiv.style.display = 'none';
                     }, 3000);
@@ -8023,7 +8264,7 @@
 
                 statusDiv.style.color = '#4CAF50';
                 statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> 工作区已打开，请在主内容区操作';
-                
+
                 setTimeout(() => {
                     statusDiv.style.display = 'none';
                 }, 3000);
@@ -8037,7 +8278,7 @@
         function openAlphaFundWorkspace(topic, deepResearch) {
             // 切换到主内容视图
             switchMainView('editor');
-            
+
             // 创建或显示 AlphaFund 工作区 iframe
             let workspace = document.getElementById('alphafund-workspace');
             if (!workspace) {
@@ -8048,7 +8289,7 @@
                 workspace.style.height = '100%';
                 workspace.style.border = 'none';
                 workspace.style.background = 'var(--bg-primary)';
-                
+
                 const editorArea = document.getElementById('editorArea');
                 if (editorArea) {
                     editorArea.innerHTML = '';
@@ -8061,7 +8302,7 @@
                     workspace.src = '/alphafund';
                 }
             }
-            
+
             // 更新内容标题
             const titleText = document.getElementById('content-title-text');
             if (titleText) {
