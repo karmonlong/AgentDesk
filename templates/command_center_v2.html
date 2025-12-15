@@ -348,8 +348,12 @@
             animation: fadeInUp 0.4s ease-out;
         }
 
-        /* 问答模式下隐藏智能体图标区域，最大化内容空间 */
+        /* 问答模式下隐藏智能体图标区域和底部输入框，最大化内容空间 */
         body.qa-active .landing-agents {
+            display: none !important;
+        }
+
+        body.qa-active .landing-input-wrapper {
             display: none !important;
         }
 
