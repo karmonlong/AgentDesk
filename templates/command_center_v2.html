@@ -1855,8 +1855,8 @@
 
         /* 智能体节点样式 (Enhanced) */
         .workflow-node {
-            width: 65px;
-            height: 65px;
+            width: 50px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1917,7 +1917,7 @@
         }
 
         .workflow-node i {
-            font-size: 26px !important;
+            font-size: 20px !important;
             transition: all 0.3s;
             filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
         }
@@ -1929,11 +1929,11 @@
 
         .agent-label {
             position: absolute;
-            padding: 6px 12px;
-            background: rgba(10, 10, 10, 0.8);
+            padding: 4px 10px;
+            background: rgba(10, 10, 10, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            font-size: 11px;
+            border-radius: 16px;
+            font-size: 10px;
             font-weight: 500;
             color: var(--text-secondary);
             pointer-events: none;
@@ -1944,8 +1944,8 @@
             z-index: 10;
         }
 
-        .workflow-node:hover~.agent-label,
-        .workflow-node.working~.agent-label {
+        /* 高亮时的标签样式 - 使用 JavaScript 控制 */
+        .agent-label.highlighted {
             color: var(--text-primary);
             border-color: var(--primary);
             background: rgba(255, 107, 0, 0.15);
@@ -2017,9 +2017,12 @@
 
         .html-preview {
             width: 100%;
-            height: 600px;
+            min-width: 800px;
+            height: 500px;
+            min-height: 400px;
             border: none;
             display: block;
+            background: #fff;
         }
 
         /* 4. Right Panel (右侧) */
@@ -2222,16 +2225,20 @@
 
         /* Loading Spinner */
         .typing-indicator {
-            display: inline-block;
-            width: 40px;
-            height: 20px;
-            padding: 5px 10px;
-            background: rgba(30, 30, 30, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            width: 70px;
+            height: 35px;
+            padding: 8px 15px;
+            background: rgba(30, 30, 30, 0.95);
+            border: 1px solid rgba(255, 107, 0, 0.3);
             border-radius: 20px;
-            margin-bottom: 15px;
-            margin-left: 15px;
+            margin: 20px auto;
             opacity: 0;
             transition: opacity 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         .typing-indicator span {
@@ -2337,6 +2344,164 @@
             color: var(--primary);
             font-weight: 600;
             margin-bottom: 4px;
+        }
+
+        /* Markdown 表格样式 */
+        .message-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 0.85rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .message-content th,
+        .message-content td {
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            text-align: left;
+        }
+
+        .message-content th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .message-content tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .message-content tr:hover {
+            background: rgba(255, 107, 0, 0.05);
+        }
+
+        /* Markdown 标题样式 */
+        .message-content h1,
+        .message-content h2,
+        .message-content h3 {
+            margin: 16px 0 8px 0;
+            color: var(--text-primary);
+        }
+
+        .message-content h1 {
+            font-size: 1.4em;
+        }
+
+        .message-content h2 {
+            font-size: 1.2em;
+        }
+
+        .message-content h3 {
+            font-size: 1.1em;
+        }
+
+        /* Markdown 代码块样式 */
+        .message-content pre {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            padding: 12px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .message-content code {
+            background: rgba(255, 107, 0, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9em;
+        }
+
+        .message-content pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* Markdown 列表样式 */
+        .message-content ul,
+        .message-content ol {
+            margin: 10px 0;
+            padding-left: 24px;
+        }
+
+        .message-content li {
+            margin: 4px 0;
+        }
+
+        /* 摘要卡片样式（类似 Cursor 执行步骤） */
+        .summary-card .summary-content {
+            padding: 10px 14px;
+        }
+
+        .summary-card .summary-status {
+            font-size: 0.85rem;
+            color: #4CAF50;
+            margin: 4px 0;
+        }
+
+        .summary-card .summary-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        /* 执行日志样式（类似 Cursor 的步骤视图） */
+        .execution-log {
+            border-left: 2px solid var(--primary);
+        }
+
+        .execution-content {
+            padding: 10px 14px !important;
+        }
+
+        .execution-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .execution-agent {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.85rem;
+        }
+
+        .execution-time {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .execution-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .execution-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            color: var(--text-primary);
+            padding: 4px 0;
+        }
+
+        .execution-step i {
+            width: 16px;
+            text-align: center;
+        }
+
+        .execution-step .step-time {
+            margin-left: auto;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
         }
     </style>
 </head>
@@ -3070,7 +3235,7 @@
                     </div>
 
                     <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">研究主题</div>
-                    <input type="text" id="alphafund-topic" placeholder="例如：英伟达、新能源、半导体"
+                    <input type="text" id="alphafund-topic" placeholder="例如：招商银行、新能源、半导体"
                         style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-size: 0.9rem; margin-bottom: 12px;">
 
                     <div style="margin-bottom: 12px;">
@@ -3092,9 +3257,9 @@
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 6px;">
                             <button
-                                onclick="document.getElementById('alphafund-topic').value='英伟达'; startAlphaFundWorkflow();"
+                                onclick="document.getElementById('alphafund-topic').value='招商银行'; startAlphaFundWorkflow();"
                                 style="padding: 6px 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 4px; color: var(--text-primary); cursor: pointer; font-size: 0.75rem; text-align: left; transition: all 0.2s;">
-                                <i class="fas fa-microchip" style="color: #4CAF50;"></i> 英伟达分析
+                                <i class="fas fa-microchip" style="color: #4CAF50;"></i> 招商银行分析
                             </button>
                             <button
                                 onclick="document.getElementById('alphafund-topic').value='新能源'; startAlphaFundWorkflow();"
@@ -3446,8 +3611,8 @@
 
                 <!-- 输入框 -->
                 <div style="display: flex; align-items: flex-end; gap: 8px;">
-                    <textarea id="chatInput" placeholder="输入消息... (Enter 发送，Shift+Enter 换行，输入 @ 呼叫智能体)" rows="1"
-                        style="flex: 1; padding: 8px 15px; background: rgba(30, 30, 30, 0.8); border: 1px solid rgba(255, 107, 0, 0.3); color: #fff; border-radius: 8px; outline: none; transition: border-color 0.3s; resize: none; min-height: 40px; max-height: 200px; line-height: 1.5; font-family: inherit; overflow-y: auto; overflow-x: hidden; white-space: pre-wrap; word-wrap: break-word; scrollbar-width: thin; scrollbar-color: rgba(255, 107, 0, 0.3) transparent;"></textarea>
+                    <textarea id="chatInput" placeholder="输入消息... (Enter 发送，Shift+Enter 换行，输入 @ 呼叫智能体)" rows="2"
+                        style="flex: 1; padding: 10px 15px; background: rgba(30, 30, 30, 0.8); border: 1px solid rgba(255, 107, 0, 0.3); color: #fff; border-radius: 8px; outline: none; transition: border-color 0.3s; resize: none; min-height: 56px; max-height: 200px; line-height: 1.5; font-family: inherit; overflow-y: auto; overflow-x: hidden; white-space: pre-wrap; word-wrap: break-word; scrollbar-width: thin; scrollbar-color: rgba(255, 107, 0, 0.3) transparent;"></textarea>
                 </div>
             </div>
         </div>
@@ -3640,9 +3805,9 @@
             // Calculate positions (Circle Layout)
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            // Enforce minimum radius to avoid overlap (reduced for smaller display)
-            const minRadius = 100;
-            const calculatedRadius = Math.min(canvas.width, canvas.height) * 0.28;
+            // Enforce minimum radius to avoid overlap
+            const minRadius = 130;
+            const calculatedRadius = Math.min(canvas.width, canvas.height) * 0.38;
             const radius = Math.max(minRadius, calculatedRadius);
 
             const coordinator = visibleAgents.find(a => a.name === '协调者');
@@ -3664,6 +3829,34 @@
                     };
                 }
             });
+
+            // 创建从协调者到各智能体的默认连线
+            // 保留非默认连线（高亮连线），只重建默认连线
+            const activeConnections = workflowConnections.filter(c => !c.isDefault);
+            workflowConnections = [...activeConnections]; // 保留高亮连线
+
+            const coordinatorIndex = agents.findIndex(a => a.name === '协调者');
+            if (coordinatorIndex !== -1) {
+                others.forEach((agent, index) => {
+                    const agentIndex = agents.findIndex(a => a.name === agent.name);
+                    if (agentIndex !== -1) {
+                        // 检查是否已经有活跃连线到这个智能体
+                        const hasActiveConnection = activeConnections.some(
+                            c => c.from === coordinatorIndex && c.to === agentIndex
+                        );
+                        // 如果没有活跃连线，添加默认连线
+                        if (!hasActiveConnection) {
+                            workflowConnections.push({
+                                from: coordinatorIndex,
+                                to: agentIndex,
+                                progress: 1,
+                                id: `default-${index}`,
+                                isDefault: true
+                            });
+                        }
+                    }
+                });
+            }
 
             renderWorkflowNodes(visibleAgents, centerX, centerY);
             drawWorkflow();
@@ -3690,9 +3883,8 @@
 
                     if (distance > 0) {
                         // Normalize and scale
-                        // The node radius is approx 30px. We want the label to be outside that.
-                        // Let's push it 45px out from the node center (reduced for smaller display).
-                        const offset = 45;
+                        // The node radius is approx 25px. We want the label to be outside that.
+                        const offset = 35;
                         const labelX = agent.position.x + (dx / distance) * offset;
                         const labelY = agent.position.y + (dy / distance) * offset;
 
@@ -3703,15 +3895,38 @@
                     }
                 }
 
+                // 如果智能体正在工作，标签也要高亮
+                const labelClass = agent.status === 'working' ? 'agent-label highlighted' : 'agent-label';
+
                 return `
                     <div class="workflow-node ${agent.status}" 
+                         data-agent="${agent.name}"
                          style="left: ${agent.position.x}px; top: ${agent.position.y}px; position: absolute; transform: translate(-50%, -50%);"
-                         title="${agent.name}">
+                         title="${agent.name}"
+                         onmouseenter="highlightAgent('${agent.name}')"
+                         onmouseleave="unhighlightAgent('${agent.name}')">
                         <i class="${agent.emoji}" style="color: ${iconColor};"></i>
                     </div>
-                    <div class="agent-label" style="${labelStyle}">${agent.name}</div>
+                    <div class="${labelClass}" data-agent="${agent.name}" style="${labelStyle}">${agent.name}</div>
                 `;
             }).join('');
+        }
+
+        // 智能体节点高亮函数
+        function highlightAgent(agentName) {
+            // 高亮对应的标签
+            const label = document.querySelector(`.agent-label[data-agent="${agentName}"]`);
+            if (label) {
+                label.classList.add('highlighted');
+            }
+        }
+
+        function unhighlightAgent(agentName) {
+            // 取消高亮对应的标签
+            const label = document.querySelector(`.agent-label[data-agent="${agentName}"]`);
+            if (label) {
+                label.classList.remove('highlighted');
+            }
         }
 
         // ==================== Canvas Drawing ====================
@@ -3769,11 +3984,17 @@
             const from = fromAgent.position;
             const to = toAgent.position;
             const progress = conn.progress;
+            const isDefault = conn.isDefault;
+
+            // 根据是否是默认连线调整样式
+            const opacity = isDefault ? 0.15 : 0.8;
+            const lineWidth = isDefault ? 1 : 3;
+            const shadowBlur = isDefault ? 0 : 15;
 
             // Gradient
             const gradient = ctx.createLinearGradient(from.x, from.y, to.x, to.y);
-            gradient.addColorStop(0, 'rgba(255, 107, 0, 0.2)');
-            gradient.addColorStop(1, 'rgba(255, 107, 0, 0.8)');
+            gradient.addColorStop(0, `rgba(255, 107, 0, ${opacity * 0.3})`);
+            gradient.addColorStop(1, `rgba(255, 107, 0, ${opacity})`);
 
             ctx.beginPath();
             ctx.moveTo(from.x, from.y);
@@ -3783,27 +4004,30 @@
 
             ctx.lineTo(currentX, currentY);
             ctx.strokeStyle = gradient;
-            ctx.lineWidth = 3; // Increased from 2
+            ctx.lineWidth = lineWidth;
             ctx.lineCap = 'round';
-            ctx.shadowBlur = 15; // Increased from 10
-            ctx.shadowColor = 'rgba(255, 107, 0, 0.6)'; // Increased opacity
+            ctx.shadowBlur = shadowBlur;
+            ctx.shadowColor = 'rgba(255, 107, 0, 0.6)';
             ctx.stroke();
             ctx.shadowBlur = 0;
 
-            // Head Particle (larger)
-            ctx.beginPath();
-            ctx.arc(currentX, currentY, 4, 0, Math.PI * 2); // Increased from 3
-            ctx.fillStyle = '#FF6B00';
-            ctx.fill();
+            // 只有非默认连线才显示头部粒子
+            if (!isDefault) {
+                // Head Particle (larger)
+                ctx.beginPath();
+                ctx.arc(currentX, currentY, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#FF6B00';
+                ctx.fill();
 
-            // Glow around particle
-            ctx.beginPath();
-            ctx.arc(currentX, currentY, 8, 0, Math.PI * 2);
-            const particleGlow = ctx.createRadialGradient(currentX, currentY, 2, currentX, currentY, 8);
-            particleGlow.addColorStop(0, 'rgba(255, 107, 0, 0.4)');
-            particleGlow.addColorStop(1, 'rgba(255, 107, 0, 0)');
-            ctx.fillStyle = particleGlow;
-            ctx.fill();
+                // Glow around particle
+                ctx.beginPath();
+                ctx.arc(currentX, currentY, 8, 0, Math.PI * 2);
+                const particleGlow = ctx.createRadialGradient(currentX, currentY, 2, currentX, currentY, 8);
+                particleGlow.addColorStop(0, 'rgba(255, 107, 0, 0.4)');
+                particleGlow.addColorStop(1, 'rgba(255, 107, 0, 0)');
+                ctx.fillStyle = particleGlow;
+                ctx.fill();
+            }
         }
 
         function startAnimation() {
@@ -3815,13 +4039,22 @@
         }
 
         function addWorkflowConnection(fromIndex, toIndex) {
+            // 先移除目标智能体的默认连线（如果存在）
+            workflowConnections = workflowConnections.filter(
+                c => !(c.from === fromIndex && c.to === toIndex && c.isDefault)
+            );
+
             const connection = {
                 from: fromIndex,
                 to: toIndex,
                 progress: 0,
-                id: Date.now()
+                id: Date.now(),
+                isDefault: false  // 明确标记为活跃连线
             };
             workflowConnections.push(connection);
+
+            console.log('[连线] 添加高亮连线:', fromIndex, '->', toIndex);
+            console.log('[连线] 当前连线数:', workflowConnections.length);
 
             const duration = 800;
             const startTime = Date.now();
@@ -4433,7 +4666,7 @@
             if (e.isComposing) {
                 return;
             }
-            
+
             // 检查下拉菜单是否显示
             const dropdown = document.getElementById('mentionDropdown');
             const isDropdownVisible = dropdown && dropdown.classList.contains('show');
@@ -4672,12 +4905,38 @@
             // Add User Message to Chat
             addChatMessage('user', message);
 
+            // 从消息中提取@提及的智能体
+            const mentionedAgents = [];
+            const mentionRegex = /@([^\s@]+)/g;
+            let mentionMatch;
+            while ((mentionMatch = mentionRegex.exec(message)) !== null) {
+                const name = mentionMatch[1];
+                const found = agents.find(a => a.name === name);
+                if (found) mentionedAgents.push(found);
+            }
+
             // 1. Visual: Coordinator starts
             const coordinatorIndex = agents.findIndex(a => a.name === '协调者');
             if (coordinatorIndex !== -1) {
                 agents[coordinatorIndex].status = 'working';
                 renderAgents(); // Update visual state
             }
+
+            // 2. 立即显示执行日志（用户能看到正在发生什么）
+            const targetAgentName = mentionedAgents.length > 0 ? mentionedAgents[0].name : '协调者';
+            addExecutionLog('started', targetAgentName, '正在处理请求...');
+
+            // 3. 高亮连接到被@的智能体
+            mentionedAgents.forEach(agent => {
+                const agentIndex = agents.findIndex(a => a.name === agent.name);
+                if (coordinatorIndex !== -1 && agentIndex !== -1 && coordinatorIndex !== agentIndex) {
+                    // 添加高亮连线（非默认）
+                    addWorkflowConnection(coordinatorIndex, agentIndex);
+                    // 设置智能体状态为工作中
+                    agents[agentIndex].status = 'working';
+                }
+            });
+            renderAgents();
 
             try {
                 // Show loading indicator
@@ -4686,7 +4945,7 @@
                 // 创建 AbortController
                 currentAbortController = new AbortController();
 
-                // 2. Call API
+                // 2. Call Streaming API
                 const formData = new FormData();
                 formData.append('message', message);
 
@@ -4710,112 +4969,115 @@
                     formData.append('filename', currentActiveFile);
                 }
 
-                const response = await fetch('/api/chat', {
+                // 使用流式 API
+                const response = await fetch('/api/chat/stream', {
                     method: 'POST',
                     body: formData,
                     signal: currentAbortController.signal
                 });
-                const result = await response.json();
 
-                if (result.success) {
-                    const agentName = result.agent && result.agent.name ? result.agent.name : '助手';
+                // 处理 SSE 流
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let finalResult = null;
 
-                    // 解析用户消息中的所有@mention
-                    const mentions = [];
-                    try {
-                        // 使用 matchAll 或 fallback 到 match
-                        let mentionMatches;
-                        if (String.prototype.matchAll) {
-                            mentionMatches = message.matchAll(/@([^\s@]+)/g);
-                            for (const match of mentionMatches) {
-                                const mentionedName = match[1];
-                                const found = agents.find(a => a.name === mentionedName);
-                                if (found) {
-                                    mentions.push(mentionedName);
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop(); // 保留未完成的行
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.slice(6));
+                                console.log('[Stream]', data.type, data);
+
+                                switch (data.type) {
+                                    case 'start':
+                                        // 开始事件已在 addExecutionLog('started') 处理
+                                        break;
+
+                                    case 'step':
+                                        // 更新执行日志 - 显示每个步骤
+                                        addExecutionLog('processing', data.step || '处理中', data.message);
+                                        break;
+
+                                    case 'warning':
+                                        addExecutionLog('processing', '警告', data.message);
+                                        break;
+
+                                    case 'complete':
+                                        finalResult = data;
+                                        break;
+
+                                    case 'error':
+                                        addExecutionLog('error', '系统', data.message);
+                                        break;
+
+                                    case 'done':
+                                        // 流结束
+                                        break;
+                                }
+                            } catch (e) {
+                                console.warn('Parse SSE error:', e, line);
+                            }
+                        }
+                    }
+                }
+
+                hideLoading();
+
+                if (finalResult && finalResult.success) {
+                    const agentName = finalResult.agent && finalResult.agent.name ? finalResult.agent.name : '助手';
+                    const responseText = finalResult.response || '无响应';
+                    const charCount = finalResult.char_count || responseText.length;
+
+                    // 如果是协调者在处理，从响应文本中查找被调用的智能体
+                    if (agentName === '协调者') {
+                        agents.forEach(agent => {
+                            if (agent.name !== '协调者' && responseText.includes(agent.name)) {
+                                const agentIndex = agents.findIndex(a => a.name === agent.name);
+                                if (coordinatorIndex !== -1 && agentIndex !== -1) {
+                                    const existingConnection = workflowConnections.find(
+                                        c => c.from === coordinatorIndex && c.to === agentIndex && !c.isDefault
+                                    );
+                                    if (!existingConnection) {
+                                        addWorkflowConnection(coordinatorIndex, agentIndex);
+                                    }
+                                    agents[agentIndex].status = 'working';
+                                    renderAgents();
                                 }
                             }
-                        } else {
-                            // Fallback for older browsers
-                            const regex = /@([^\s@]+)/g;
-                            let match;
-                            while ((match = regex.exec(message)) !== null) {
-                                const mentionedName = match[1];
-                                const found = agents.find(a => a.name === mentionedName);
-                                if (found) {
-                                    mentions.push(mentionedName);
-                                }
-                            }
-                        }
-                    } catch (e) {
-                        console.error('Error parsing mentions:', e);
+                        });
                     }
 
-                    // 如果API返回了mentions信息，也添加进去
-                    try {
-                        if (result.routing_info && Array.isArray(result.routing_info.mentions)) {
-                            result.routing_info.mentions.forEach(mention => {
-                                if (typeof mention === 'string' && !mentions.includes(mention)) {
-                                    const found = agents.find(a => a.name === mention);
-                                    if (found) mentions.push(mention);
-                                } else if (mention && mention.name && !mentions.includes(mention.name)) {
-                                    const found = agents.find(a => a.name === mention.name);
-                                    if (found) mentions.push(mention.name);
-                                }
-                            });
-                        }
-                    } catch (e) {
-                        console.error('Error processing routing_info mentions:', e);
-                    }
+                    // 更新执行日志为完成状态
+                    addExecutionLog('completed', agentName, `已完成处理 (${charCount} 字符)`);
 
-                    // 如果没有找到任何mention，至少连接返回的agent
-                    if (mentions.length === 0 && agentName) {
-                        mentions.push(agentName);
-                    }
+                    // 内容视图区显示完整内容
+                    updateCenterPanel(responseText, agentName);
 
-                    // 连接所有被提到的智能体
-                    mentions.forEach(mentionedName => {
-                        const agentIndex = agents.findIndex(a => a.name === mentionedName);
-                        if (coordinatorIndex !== -1 && agentIndex !== -1 && coordinatorIndex !== agentIndex) {
-                            addWorkflowConnection(coordinatorIndex, agentIndex);
-
-                            // Delay highlight
-                            setTimeout(() => {
-                                agents[agentIndex].status = 'working';
-                                renderAgents();
-                            }, 800);
-                        }
-                    });
-
-                    // Hide loading and show response
+                    // 重置智能体状态
                     setTimeout(() => {
-                        hideLoading();
-                        const responseText = result.response || result.error || '无响应';
-                        addChatMessage('agent', responseText, agentName);
-
-                        // Update Center Panel Content (Mock for now)
-                        updateCenterPanel(responseText, agentName);
-
-                        // Reset status after a while (optional, or keep it)
-                        // setTimeout(() => {
-                        //     agents.forEach(a => a.status = 'idle');
-                        //     workflowConnections = [];
-                        //     renderAgents();
-                        // }, 3000);
-                    }, 1000);
-
-                } else {
-                    // Handle failure case
-                    hideLoading();
-                    const errorMsg = result.error || '请求失败';
-                    addChatMessage('system', '错误: ' + errorMsg);
+                        agents.forEach(a => {
+                            if (a.name !== '协调者') a.status = 'idle';
+                        });
+                        renderAgents();
+                    }, 2000);
+                } else if (!finalResult) {
+                    addExecutionLog('error', '系统', '未收到完整响应');
                 }
             } catch (e) {
                 console.error(e);
                 hideLoading();
                 if (e.name === 'AbortError') {
-                    addChatMessage('system', '任务已取消');
+                    addExecutionLog('error', '系统', '任务已取消');
                 } else {
-                    addChatMessage('system', 'Error: ' + e.message);
+                    addExecutionLog('error', '系统', '执行出错: ' + e.message);
                 }
             } finally {
                 // 恢复按钮状态
@@ -4863,6 +5125,19 @@
                     <div class="message-content">${text}</div>
                 `;
                 container.appendChild(messageDiv);
+            } else if (role === 'agent-summary') {
+                // 简化的执行摘要卡片（类似 Cursor 风格）
+                messageDiv.className = 'chat-message agent-message summary-card';
+                const agentIcon = getAgentIcon(agentName);
+                messageDiv.innerHTML = `
+                    <div class="message-avatar"><i class="${agentIcon}"></i></div>
+                    <div class="message-content summary-content">
+                        <div class="message-agent-name">${agentName}</div>
+                        <div class="summary-status">${text}</div>
+                        <div class="summary-hint">点击左侧「内容视图」查看详情</div>
+                    </div>
+                `;
+                container.appendChild(messageDiv);
             } else if (role === 'agent') {
                 messageDiv.className = 'chat-message agent-message';
                 const agentIcon = getAgentIcon(agentName);
@@ -4885,6 +5160,80 @@
                     <div class="message-content" style="color: #ff4444;">${text}</div>
                 `;
                 container.appendChild(messageDiv);
+            }
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // 添加执行日志（显示在问答区，让用户知道正在发生什么）
+        let currentExecutionLogId = null;
+        function addExecutionLog(status, agentName, message) {
+            const container = document.getElementById('chat-messages');
+            const agentIcon = getAgentIcon(agentName);
+            const timestamp = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            // 状态图标和颜色
+            const statusConfig = {
+                'started': { icon: 'fas fa-spinner fa-spin', color: '#FF6B00', text: '开始执行' },
+                'processing': { icon: 'fas fa-cog fa-spin', color: '#2196F3', text: '处理中' },
+                'completed': { icon: 'fas fa-check-circle', color: '#4CAF50', text: '已完成' },
+                'error': { icon: 'fas fa-times-circle', color: '#f44336', text: '执行失败' }
+            };
+
+            const config = statusConfig[status] || statusConfig['processing'];
+
+            if (status === 'started') {
+                // 创建新的执行日志卡片
+                const logId = 'exec-log-' + Date.now();
+                currentExecutionLogId = logId;
+
+                const logDiv = document.createElement('div');
+                logDiv.id = logId;
+                logDiv.className = 'chat-message execution-log';
+                logDiv.innerHTML = `
+                    <div class="message-avatar"><i class="${agentIcon}" style="color: ${config.color};"></i></div>
+                    <div class="message-content execution-content">
+                        <div class="execution-header">
+                            <span class="execution-agent">${agentName}</span>
+                            <span class="execution-time">${timestamp}</span>
+                        </div>
+                        <div class="execution-steps" id="${logId}-steps">
+                            <div class="execution-step" id="${logId}-main-step">
+                                <i class="${config.icon}" style="color: ${config.color};"></i>
+                                <span class="step-message">${message}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(logDiv);
+            } else if (currentExecutionLogId) {
+                // 更新现有的执行日志
+                const mainStep = document.getElementById(currentExecutionLogId + '-main-step');
+
+                if (status === 'completed' || status === 'error') {
+                    // 完成或错误时：替换第一个步骤的内容
+                    if (mainStep) {
+                        mainStep.innerHTML = `
+                            <i class="${config.icon}" style="color: ${config.color};"></i>
+                            <span class="step-message">${message}</span>
+                            <span class="step-time">${timestamp}</span>
+                        `;
+                    }
+                    currentExecutionLogId = null;
+                } else {
+                    // 其他状态：添加新步骤
+                    const stepsContainer = document.getElementById(currentExecutionLogId + '-steps');
+                    if (stepsContainer) {
+                        const stepDiv = document.createElement('div');
+                        stepDiv.className = 'execution-step';
+                        stepDiv.innerHTML = `
+                            <i class="${config.icon}" style="color: ${config.color};"></i>
+                            <span>${message}</span>
+                            <span class="step-time">${timestamp}</span>
+                        `;
+                        stepsContainer.appendChild(stepDiv);
+                    }
+                }
             }
 
             container.scrollTop = container.scrollHeight;
@@ -4926,6 +5275,46 @@
             let i = 0;
             element.innerHTML = '';
 
+            // 检测是否包含复杂 Markdown（表格、标题等）需要立即渲染
+            const hasComplexMarkdown = text.includes('|') && text.includes('---') || // 表格
+                text.match(/^#{1,6}\s/m) || // 标题
+                text.includes('```') || // 代码块
+                text.length > 2000; // 长文本
+
+            if (hasComplexMarkdown) {
+                // 对于复杂 Markdown，直接渲染不使用打字机效果
+                let processedText = text;
+                if (typeof marked !== 'undefined') {
+                    try {
+                        processedText = marked.parse(text);
+                    } catch (e) {
+                        console.warn('Marked parse error:', e);
+                        processedText = parseMarkdown(text);
+                    }
+                } else {
+                    processedText = parseMarkdown(text);
+                }
+                element.innerHTML = processedText;
+
+                // 为表格添加样式
+                element.querySelectorAll('table').forEach(table => {
+                    table.style.cssText = 'width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.9em;';
+                    table.querySelectorAll('th, td').forEach(cell => {
+                        cell.style.cssText = 'border: 1px solid var(--border); padding: 8px 12px; text-align: left;';
+                    });
+                    table.querySelectorAll('th').forEach(th => {
+                        th.style.cssText += 'background: var(--bg-tertiary); font-weight: 600;';
+                    });
+                });
+
+                // 滚动到底部
+                const container = element.closest('.chat-messages') || element.closest('#chat-messages');
+                if (container) {
+                    container.scrollTop = container.scrollHeight;
+                }
+                return;
+            }
+
             function type() {
                 if (i < text.length) {
                     // Handle simple markdown-like bolding for now
@@ -4951,6 +5340,15 @@
                     if (container) container.scrollTop = container.scrollHeight;
 
                     setTimeout(type, speed);
+                } else {
+                    // 打字完成后，应用完整的 Markdown 渲染
+                    let finalHtml = element.innerHTML;
+                    // 处理未被处理的标题
+                    finalHtml = finalHtml
+                        .replace(/### (.*?)<br>/g, '<h3 style="margin: 10px 0; font-size: 1.1em;">$1</h3>')
+                        .replace(/## (.*?)<br>/g, '<h2 style="margin: 12px 0; font-size: 1.2em;">$1</h2>')
+                        .replace(/# (.*?)<br>/g, '<h1 style="margin: 15px 0; font-size: 1.4em;">$1</h1>');
+                    element.innerHTML = finalHtml;
                 }
             }
             type();
@@ -5024,49 +5422,73 @@
                     </div>
                     <iframe class="html-preview" srcdoc="${escapeHtml(cleanCode)}" sandbox="allow-scripts allow-same-origin"></iframe>
                 </div>`);
-                return `__HTML_BLOCK_${htmlBlocks.length - 1}__`;
+                // 使用不会被 markdown 解析的占位符格式
+                return `%%%HTML_BLOCK_${htmlBlocks.length - 1}%%%`;
             });
 
             // 2. Extract Mermaid blocks
             const mermaidBlocks = [];
             const mermaidRegex = /```mermaid\s*([\s\S]*?)```/g;
-            processedContent = processedContent.replace(mermaidRegex, (match, code) => {
-                const cleanCode = escapeHtml(code.trim());
-                mermaidBlocks.push(`<div class="mermaid">${cleanCode}</div>`);
-                return `__MERMAID_BLOCK_${mermaidBlocks.length - 1}__`;
-            });
 
-            // 3. Simple markdown rendering (保留已有的 HTML 标签，如 <img>)
-            // 先提取所有 HTML 标签（如 <img>），避免被后续处理破坏
-            const htmlTags = [];
-            const htmlTagRegex = /<[^>]+>/g;
-            let tempContent = processedContent;
-            let match;
-            while ((match = htmlTagRegex.exec(processedContent)) !== null) {
-                htmlTags.push(match[0]);
-                tempContent = tempContent.replace(match[0], `__HTML_TAG_${htmlTags.length - 1}__`);
+            // 清理 Mermaid 代码中的无效语法
+            function cleanMermaidCode(code) {
+                let cleaned = code.trim();
+                // 移除 Markdown 加粗语法 **text**
+                cleaned = cleaned.replace(/\*\*([^*]+)\*\*/g, '$1');
+                // 移除 Markdown 斜体语法 *text*（但要小心不匹配 ** 内部的内容）
+                cleaned = cleaned.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '$1');
+                // 移除 Markdown 链接语法 [text](url)
+                cleaned = cleaned.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+                // 移除 backticks
+                cleaned = cleaned.replace(/`([^`]+)`/g, '$1');
+                // 移除多余的破折号序列（常见错误）
+                cleaned = cleaned.replace(/-{3,}/g, '--');
+                // 将智能引号替换为普通引号
+                cleaned = cleaned.replace(/["“”]/g, '"');
+                cleaned = cleaned.replace(/['‘’]/g, "'");
+                return cleaned;
             }
 
-            let htmlContent = tempContent
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/### (.*?)\n/g, '<h3>$1</h3>')
-                .replace(/## (.*?)\n/g, '<h2>$1</h2>')
-                .replace(/# (.*?)\n/g, '<h1>$1</h1>')
-                .replace(/\n/g, '<br>');
-
-            // 恢复 HTML 标签
-            htmlTags.forEach((tag, index) => {
-                htmlContent = htmlContent.replace(`__HTML_TAG_${index}__`, tag);
+            processedContent = processedContent.replace(mermaidRegex, (match, code) => {
+                const cleanedCode = cleanMermaidCode(code);
+                const escapedCode = escapeHtml(cleanedCode);
+                mermaidBlocks.push(`<div class="mermaid">${escapedCode}</div>`);
+                return `%%%MERMAID_BLOCK_${mermaidBlocks.length - 1}%%%`;
             });
+
+            // 3. 使用 marked 库渲染 Markdown（正确处理表格等复杂格式）
+            let htmlContent;
+            if (typeof marked !== 'undefined') {
+                try {
+                    htmlContent = marked.parse(processedContent);
+                } catch (e) {
+                    console.warn('Marked parse error, falling back to simple rendering:', e);
+                    // Fallback: 简单处理
+                    htmlContent = processedContent
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/### (.*?)\n/g, '<h3>$1</h3>')
+                        .replace(/## (.*?)\n/g, '<h2>$1</h2>')
+                        .replace(/# (.*?)\n/g, '<h1>$1</h1>')
+                        .replace(/\n/g, '<br>');
+                }
+            } else {
+                // 没有 marked 库时的 fallback
+                htmlContent = processedContent
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/### (.*?)\n/g, '<h3>$1</h3>')
+                    .replace(/## (.*?)\n/g, '<h2>$1</h2>')
+                    .replace(/# (.*?)\n/g, '<h1>$1</h1>')
+                    .replace(/\n/g, '<br>');
+            }
 
             // 4. Restore HTML blocks
             htmlBlocks.forEach((block, index) => {
-                htmlContent = htmlContent.replace(`__HTML_BLOCK_${index}__`, block);
+                htmlContent = htmlContent.replace(`%%%HTML_BLOCK_${index}%%%`, block);
             });
 
             // 5. Restore Mermaid blocks
             mermaidBlocks.forEach((block, index) => {
-                htmlContent = htmlContent.replace(`__MERMAID_BLOCK_${index}__`, block);
+                htmlContent = htmlContent.replace(`%%%MERMAID_BLOCK_${index}%%%`, block);
             });
 
             editorArea.innerHTML = `
@@ -5074,21 +5496,56 @@
                     <span style="font-size: 0.8rem; color: var(--primary); text-transform: uppercase;">AI 生成内容</span>
                     <h1 style="margin-top: 5px;">${agentName} 输出</h1>
                 </div>
-                <div style="line-height: 1.8; color: var(--text-primary);">
+                <div style="line-height: 1.7; color: var(--text-primary); font-size: 0.9rem;">
                     ${htmlContent}
                 </div>
             `;
 
-            // 6. Render Mermaid
+            // 6. Render Mermaid with better error handling
             if (mermaidBlocks.length > 0) {
-                try {
-                    mermaid.run({
-                        nodes: editorArea.querySelectorAll('.mermaid')
-                    });
-                } catch (e) {
-                    console.error('Mermaid rendering failed:', e);
-                }
+                const mermaidDivs = editorArea.querySelectorAll('.mermaid');
+                mermaidDivs.forEach(async (div, index) => {
+                    const code = div.textContent;
+                    try {
+                        // 预先验证语法
+                        if (typeof mermaid.parse === 'function') {
+                            await mermaid.parse(code);
+                        }
+                        // 渲染图表
+                        const { svg } = await mermaid.render(`mermaid-${Date.now()}-${index}`, code);
+                        div.innerHTML = svg;
+                    } catch (e) {
+                        console.error('Mermaid rendering failed:', e);
+                        // 显示友好的错误提示和原始代码
+                        div.innerHTML = `
+                            <div style="border: 1px solid rgba(255, 107, 0, 0.3); border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.3);">
+                                <div style="padding: 10px 15px; background: rgba(255, 107, 0, 0.1); border-bottom: 1px solid rgba(255, 107, 0, 0.2); display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-exclamation-triangle" style="color: #FF6B00;"></i>
+                                    <span style="color: #FF6B00; font-weight: 600;">Mermaid 图表渲染失败</span>
+                                </div>
+                                <div style="padding: 10px 15px; font-size: 0.85rem; color: var(--text-secondary);">
+                                    <div style="margin-bottom: 8px;">语法错误：${e.message || '无法解析图表代码'}</div>
+                                    <details style="cursor: pointer;">
+                                        <summary style="color: var(--primary);">查看原始代码</summary>
+                                        <pre style="margin-top: 8px; padding: 10px; background: #1e1e1e; border-radius: 4px; overflow-x: auto; font-size: 0.8rem; color: #d4d4d4; white-space: pre-wrap;">${code}</pre>
+                                    </details>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
             }
+
+            // 7. 为动态生成的表格添加样式
+            editorArea.querySelectorAll('table').forEach(table => {
+                table.style.cssText = 'width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.9rem; background: rgba(0,0,0,0.2); border-radius: 8px; overflow: hidden;';
+                table.querySelectorAll('th, td').forEach(cell => {
+                    cell.style.cssText = 'border: 1px solid var(--border); padding: 10px 14px; text-align: left;';
+                });
+                table.querySelectorAll('th').forEach(th => {
+                    th.style.cssText += 'background: var(--bg-tertiary); font-weight: 600; color: var(--primary);';
+                });
+            });
 
             // 7. Store HTML blocks for fullscreen function
             window.htmlPreviewBlocks = htmlBlocks.map((_, index) => {
@@ -6830,12 +7287,24 @@
         }
 
         async function loadBestPractices() {
+            console.log('[BestPractices] 开始加载最佳实践...');
             const container = document.getElementById('best-practices-list');
-            if (!container) return;
-            if (container.innerHTML.trim()) return;
+            if (!container) {
+                console.error('[BestPractices] 容器元素未找到！');
+                return;
+            }
+            // 移除 HTML 注释后检查是否有实际内容
+            const actualContent = container.innerHTML.replace(/<!--[\s\S]*?-->/g, '').trim();
+            if (actualContent) {
+                console.log('[BestPractices] 内容已加载，跳过');
+                return;
+            }
             try {
+                console.log('[BestPractices] 发送 API 请求...');
                 const res = await fetch('/api/prompt/best-practices');
                 const data = await res.json();
+                console.log('[BestPractices] API 响应:', data);
+
                 if (data && data.success) {
                     const grouped = {};
                     (data.practices || []).forEach(bp => {
@@ -6843,6 +7312,9 @@
                         if (!grouped[cat]) grouped[cat] = [];
                         grouped[cat].push(bp);
                     });
+
+                    console.log('[BestPractices] 分组结果:', grouped);
+
                     let html = '';
                     for (const [category, practices] of Object.entries(grouped)) {
                         html += `<h3 style="grid-column: 1 / -1; color: var(--text-secondary); font-size: 0.9rem; margin-top: 20px; border-bottom: 1px solid var(--border); padding-bottom: 5px;">${category}</h3>`;
@@ -6854,11 +7326,14 @@
                         `).join('');
                     }
                     container.innerHTML = html;
+                    console.log('[BestPractices] ✅ 内容加载完成');
                 } else {
+                    console.error('[BestPractices] API 返回失败');
                     container.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">加载失败</div>';
                 }
             } catch (e) {
-                container.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">加载失败</div>';
+                console.error('[BestPractices] 加载出错:', e);
+                container.innerHTML = `<div style="text-align: center; color: var(--text-secondary); padding: 20px;">加载失败: ${e.message}</div>`;
             }
         }
 
@@ -7416,7 +7891,14 @@
         function convertMermaidFences(md) {
             const regex = /```mermaid\n([\s\S]*?)```/g;
             return (md || '').replace(regex, (_, code) => {
-                return `<div class="mermaid">${escapeHtml(code)}</div>`;
+                // 清理 Mermaid 代码中的无效语法
+                let cleaned = code.trim();
+                cleaned = cleaned.replace(/\*\*([^*]+)\*\*/g, '$1'); // 移除加粗
+                cleaned = cleaned.replace(/\*([^*]+)\*/g, '$1'); // 移除斜体
+                cleaned = cleaned.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1'); // 移除链接
+                cleaned = cleaned.replace(/`([^`]+)`/g, '$1'); // 移除 backticks
+                cleaned = cleaned.replace(/-{3,}/g, '--'); // 移除过长的破折号
+                return `<div class="mermaid">${escapeHtml(cleaned)}</div>`;
             });
         }
         function renderVisualReviewReport(data) {

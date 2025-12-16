@@ -46,7 +46,7 @@ def test_alphafund_api():
     test_cases = [
         {
             "name": "基础测试（无深度研究）",
-            "topic": "英伟达",
+            "topic": "招商银行",
             "deep_research": False
         },
         {
@@ -178,6 +178,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 

@@ -891,8 +891,19 @@ async def list_files():
 async def simple_upload(file: UploadFile = File(...)):
     """仅上传文件，不进行处理"""
     try:
-        unique_id = str(uuid.uuid4())[:8]
-        file_path = os.path.join(UPLOAD_DIR, f"{unique_id}_{file.filename}")
+        original_filename = file.filename
+        base_name, ext = os.path.splitext(original_filename)
+        
+        # 尝试使用原始文件名
+        final_filename = original_filename
+        file_path = os.path.join(UPLOAD_DIR, final_filename)
+        
+        # 如果文件已存在，添加序号后缀
+        counter = 1
+        while os.path.exists(file_path):
+            final_filename = f"{base_name}({counter}){ext}"
+            file_path = os.path.join(UPLOAD_DIR, final_filename)
+            counter += 1
         
         with open(file_path, "wb") as f:
             content = await file.read()
@@ -901,7 +912,7 @@ async def simple_upload(file: UploadFile = File(...)):
         return {
             "success": True,
             "message": "文件上传成功",
-            "filename": f"{unique_id}_{file.filename}"
+            "filename": final_filename
         }
     except Exception as e:
         return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
@@ -1153,6 +1164,7 @@ async def chat_with_agent(
     try:
         # 处理文档（如果有）
         document_content = None
+        active_filename = None  # 记录当前活动文件名（用于上下文）
         
         if document:
             # 保存上传的文档
@@ -1168,6 +1180,7 @@ async def chat_with_agent(
             try:
                 file_type = detect_file_type(file_path)
                 document_content = read_file(file_path, file_type)
+                active_filename = document.filename
                 print(f"✅ 文档读取成功: {document.filename}")
                 print(f"   文件类型: {file_type}")
                 print(f"   内容长度: {len(document_content) if document_content else 0} 字符")
@@ -1187,18 +1200,29 @@ async def chat_with_agent(
         
         elif filename:
             # 从现有文件读取
+            active_filename = filename
             file_path = os.path.join(UPLOAD_DIR, filename)
+            print(f"📂 尝试读取文件: {file_path}")
             if os.path.exists(file_path):
                 try:
                     file_type = detect_file_type(file_path)
                     document_content = read_file(file_path, file_type)
-                    print(f"📂 读取现有文件: {filename}")
+                    print(f"✅ 读取现有文件成功: {filename}")
                     print(f"   文件类型: {file_type}")
                     print(f"   内容长度: {len(document_content) if document_content else 0} 字符")
                 except Exception as e:
                     print(f"❌ 读取文件失败: {e}")
+                    import traceback
+                    traceback.print_exc()
             else:
-                print(f"⚠️ 文件不存在: {filename}")
+                print(f"⚠️ 文件不存在于 uploads 目录: {filename}")
+                print(f"   完整路径: {file_path}")
+                # 列出 uploads 目录中的文件以便调试
+                try:
+                    files_in_dir = os.listdir(UPLOAD_DIR)
+                    print(f"   uploads 目录中的文件: {files_in_dir[:10]}{'...' if len(files_in_dir) > 10 else ''}")
+                except Exception as e:
+                    print(f"   无法列出目录: {e}")
         
         elif document_text:
             document_content = document_text
@@ -1209,6 +1233,7 @@ async def chat_with_agent(
         print(f"   消息: {message}")
         print(f"   场景: {scenario}")
         print(f"   有文档内容: {document_content is not None}")
+        print(f"   活动文件名: {active_filename}")
 
         if agent_id:
             try:
@@ -1259,7 +1284,15 @@ async def chat_with_agent(
                 }
             }
 
-        result = await multi_agent_system.chat(message, document_content, scenario)
+        # 如果有活动文件但没有读取到内容，在消息中添加文件上下文
+        enhanced_message = message
+        if active_filename and not document_content:
+            # 尝试告诉智能体用户正在预览什么文件
+            file_hint = f"\n\n[系统提示：用户当前正在预览文件「{active_filename}」，但文件内容未能读取。请根据文件名推断用户意图，或询问用户提供更多信息。]"
+            enhanced_message = message + file_hint
+            print(f"📎 添加文件上下文提示: {active_filename}")
+        
+        result = await multi_agent_system.chat(enhanced_message, document_content, scenario)
         
         print(f"[聊天API] multi_agent_system.chat 返回结果:")
         print(f"  success: {result.get('success')}")
@@ -1415,6 +1448,143 @@ async def draw_generate(
         return {"success": True, "html": grid, "results": results}
     except Exception as e:
         return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
+
+
+@app.post("/api/chat/stream")
+async def chat_with_agent_stream(
+    message: str = Form(...),
+    document: Optional[UploadFile] = File(None),
+    document_text: Optional[str] = Form(None),
+    filename: Optional[str] = Form(None),
+    scenario: Optional[str] = Form(None),
+    agent_id: Optional[str] = Form(None)
+):
+    """流式与智能体对话 - 使用 SSE 推送执行步骤"""
+    
+    async def event_generator():
+        import time
+        try:
+            # 发送开始事件
+            yield f"data: {json.dumps({'type': 'start', 'message': '开始处理请求...'}, ensure_ascii=False)}\n\n"
+            await asyncio.sleep(0.1)
+            
+            # 处理文档
+            document_content = None
+            active_filename = None
+            
+            if document:
+                yield f"data: {json.dumps({'type': 'step', 'step': '上传文档', 'message': f'正在处理上传的文档: {document.filename}'}, ensure_ascii=False)}\n\n"
+                await asyncio.sleep(0.1)
+                
+                file_ext = os.path.splitext(document.filename)[1].lower()
+                unique_id = str(uuid.uuid4())[:8]
+                file_path = os.path.join(UPLOAD_DIR, f"{unique_id}_{document.filename}")
+                
+                with open(file_path, "wb") as f:
+                    content = await document.read()
+                    f.write(content)
+                
+                try:
+                    file_type = detect_file_type(file_path)
+                    document_content = read_file(file_path, file_type)
+                    active_filename = document.filename
+                    yield f"data: {json.dumps({'type': 'step', 'step': '文档解析', 'message': f'文档解析成功，共 {len(document_content)} 字符'}, ensure_ascii=False)}\n\n"
+                except Exception as e:
+                    yield f"data: {json.dumps({'type': 'warning', 'message': f'文档解析失败: {str(e)}'}, ensure_ascii=False)}\n\n"
+                finally:
+                    if os.path.exists(file_path):
+                        try:
+                            os.remove(file_path)
+                        except:
+                            pass
+            
+            elif filename:
+                active_filename = filename
+                file_path = os.path.join(UPLOAD_DIR, filename)
+                yield f"data: {json.dumps({'type': 'step', 'step': '读取文件', 'message': f'正在读取文件: {filename}'}, ensure_ascii=False)}\n\n"
+                await asyncio.sleep(0.1)
+                
+                if os.path.exists(file_path):
+                    try:
+                        file_type = detect_file_type(file_path)
+                        document_content = read_file(file_path, file_type)
+                        yield f"data: {json.dumps({'type': 'step', 'step': '文件解析', 'message': f'文件解析成功，共 {len(document_content)} 字符'}, ensure_ascii=False)}\n\n"
+                    except Exception as e:
+                        yield f"data: {json.dumps({'type': 'warning', 'message': f'文件解析失败: {str(e)}'}, ensure_ascii=False)}\n\n"
+            
+            elif document_text:
+                document_content = document_text
+                yield f"data: {json.dumps({'type': 'step', 'step': '使用文本', 'message': f'使用提供的文本内容，共 {len(document_text)} 字符'}, ensure_ascii=False)}\n\n"
+            
+            # 处理消息
+            enhanced_message = message
+            if agent_id:
+                try:
+                    agent_obj = multi_agent_system.registry.get(agent_id)
+                    if agent_obj:
+                        enhanced_message = f"@{agent_obj.name} {message}"
+                except:
+                    pass
+            
+            # 解析目标智能体
+            yield f"data: {json.dumps({'type': 'step', 'step': '路由分析', 'message': '正在分析请求，确定目标智能体...'}, ensure_ascii=False)}\n\n"
+            await asyncio.sleep(0.2)
+            
+            # 如果有活动文件但没有读取到内容
+            if active_filename and not document_content:
+                file_hint = f"\n\n[系统提示：用户当前正在预览文件「{active_filename}」，但文件内容未能读取。请根据文件名推断用户意图。]"
+                enhanced_message = message + file_hint
+            
+            # 解析 @ 提及
+            import re
+            mentions = re.findall(r'@([^\s@]+)', enhanced_message)
+            if mentions:
+                agents_str = '、'.join(mentions[:3])
+                yield f"data: {json.dumps({'type': 'step', 'step': '智能体调用', 'message': f'正在调用智能体: {agents_str}'}, ensure_ascii=False)}\n\n"
+            else:
+                yield f"data: {json.dumps({'type': 'step', 'step': '智能体调用', 'message': '正在由协调者处理请求...'}, ensure_ascii=False)}\n\n"
+            await asyncio.sleep(0.2)
+            
+            # 调用多智能体系统
+            yield f"data: {json.dumps({'type': 'step', 'step': 'LLM处理', 'message': '正在生成响应，请稍候...'}, ensure_ascii=False)}\n\n"
+            
+            result = await multi_agent_system.chat(enhanced_message, document_content, scenario)
+            
+            if result["success"]:
+                agent_info = result.get("agent", {})
+                response_text = result.get("response", "")
+                agent_name = agent_info.get('name', '智能体')
+                
+                step_msg = {'type': 'step', 'step': '响应生成', 'message': f'{agent_name} 已完成处理'}
+                yield f"data: {json.dumps(step_msg, ensure_ascii=False)}\n\n"
+                await asyncio.sleep(0.1)
+                
+                # 发送最终结果
+                complete_msg = {'type': 'complete', 'success': True, 'agent': agent_info, 'response': response_text, 'char_count': len(response_text)}
+                yield f"data: {json.dumps(complete_msg, ensure_ascii=False)}\n\n"
+            else:
+                error_msg = result.get("error", "处理失败")
+                yield f"data: {json.dumps({'type': 'error', 'message': error_msg}, ensure_ascii=False)}\n\n"
+        
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            yield f"data: {json.dumps({'type': 'error', 'message': f'处理失败: {str(e)}'}, ensure_ascii=False)}\n\n"
+        
+        # 发送结束标记
+        yield f"data: {json.dumps({'type': 'done'}, ensure_ascii=False)}\n\n"
+    
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"
+        }
+    )
+
+
 
 @app.post("/api/chat/clear")
 async def clear_chat():

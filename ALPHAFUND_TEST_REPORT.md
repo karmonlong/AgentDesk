@@ -70,7 +70,7 @@ pip install google-generativeai
 5. **测试 API**
    ```bash
    curl -X POST http://localhost:8000/api/alphafund/start \
-     -F "topic=英伟达" \
+     -F "topic=招商银行" \
      -F "deep_research=false"
    ```
 
@@ -98,6 +98,7 @@ pip install google-generativeai
 ❌ **未完成功能测试**: 需要启动服务后进行完整测试
 
 建议先修复依赖问题，然后进行完整的功能测试。
+
 
 
 

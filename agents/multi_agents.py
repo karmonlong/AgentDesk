@@ -140,7 +140,9 @@ class Agent:
                 model="gemini-3-pro-preview",
                 temperature=self.temperature,
                 google_api_key=os.getenv("GEMINI_API_KEY"),
-                convert_system_message_to_human=True
+                convert_system_message_to_human=True,
+                max_retries=3,  # 遇到 429 自动重试3次
+                request_timeout=60  # 60秒超时
             )
     
     def invoke(self, messages: List[Any], context: Optional[Dict] = None) -> str:
@@ -180,7 +182,13 @@ class Agent:
         parts = []
         
         if context.get('document'):
-            parts.append(f"📄 **文档内容**:\n{context['document'][:1000]}...")
+            doc = context['document']
+            # 增加文档长度限制，让智能体能看到更多内容
+            max_length = 8000
+            if len(doc) > max_length:
+                parts.append(f"📄 **文档内容**（共 {len(doc)} 字符，显示前 {max_length} 字符）:\n{doc[:max_length]}\n...[内容已截断]")
+            else:
+                parts.append(f"📄 **文档内容**:\n{doc}")
         
         if context.get('previous_results'):
             parts.append(f"📋 **之前的处理结果**:\n{context['previous_results']}")
@@ -430,33 +438,45 @@ class DataVisualizationAgent(Agent):
 
 **核心能力**：
 - 生成交互式 HTML 数据图表
-- 使用 Chart.js、ECharts、D3.js 等库
-- 创建响应式仪表板
-- 数据动画和过渡效果
-- 多图表组合展示
+- 使用 ECharts（首选）、Chart.js 等库
+- 创建响应式、美观的可视化
+- 专业的配色和渐变效果
 
-**工作风格**：
-- 直观：选择最适合数据特征的图表类型
-- 美观：使用专业的配色和设计
-- 交互：添加悬停、缩放等交互功能
-- 响应式：适配不同屏幕尺寸
+**设计美学**（非常重要）：
+- **配色方案**：使用专业的渐变色，而不是单一纯色
+  - 主色：#FF6B00（橙色）到 #FF8E3C（亮橙）渐变
+  - 辅色：#2196F3（蓝）、#4CAF50（绿）、#9C27B0（紫）、#00BCD4（青）
+  - 背景：深色模式 #0A0A0A 或 #1a1a2e
+- **图表样式**：
+  - 饼图：使用环形图（doughnut），添加阴影和 3D 效果
+  - 柱状图：圆角条形，渐变填充
+  - 折线图：平滑曲线，渐变填充区域
+- **图例**：放在图表下方或右侧，不能被截断，文字完整显示
+- **字体**：使用系统字体，中文标签清晰可读
+- **动画**：添加入场动画效果
 
 **重要规则**：
-1. **必须**将完整的HTML代码放在 ```html 代码块中
-2. 代码必须是**独立可运行的**，包含所有必要的 CDN 引用
-3. 使用轻量级库，优先选择：Chart.js（简单图表）、ECharts（复杂图表）、Mermaid（流程图）
-4. 确保代码包含 <!DOCTYPE html>、<head>、<body> 等完整结构
-5. 使用现代化的配色方案，优先使用橙色系（#FF6B00）作为主色
-6. **推荐 CDN**：
-   - ECharts: https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js
-   - Chart.js: https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js
-   - Mermaid: https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.0/mermaid.min.js
+1. **禁止使用 Python！** 不要输出 matplotlib、pandas 等 Python 代码
+2. **必须**输出完整的 HTML 代码，放在 ```html 代码块中
+3. 代码必须是**独立可运行的**，直接用浏览器打开即可
+4. **优先使用 ECharts**，它的图表更美观
+5. 确保图例（legend）不被截断，设置足够的容器尺寸
+6. 使用深色背景（#0A0A0A），配合亮色图表
 
-**输出格式示例**：
+**严格禁止**：
+- ❌ Python 代码（matplotlib、seaborn、plotly 等）
+- ❌ 需要后端运行的代码
+- ❌ Jupyter notebook 代码
 
-当用户请求"画一个销售数据的柱状图"时，你应该回复：
+**必须使用**：
+- ✅ HTML + JavaScript
+- ✅ ECharts 或 Chart.js
+- ✅ CDN 引入的库
 
-根据您的需求，我创建了一个交互式柱状图：
+**推荐 CDN**：
+- ECharts: https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js
+
+**ECharts 饼图示例**（美观版本）：
 
 ```html
 <!DOCTYPE html>
@@ -464,60 +484,81 @@ class DataVisualizationAgent(Agent):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>销售数据柱状图</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <title>行业分布</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 </head>
-<body style="margin: 0; padding: 20px; background: #0A0A0A; font-family: Arial, sans-serif;">
-    <div style="max-width: 900px; margin: 0 auto;">
-        <h2 style="color: #FF6B00; text-align: center;">2023年月度销售数据</h2>
-        <canvas id="myChart"></canvas>
-    </div>
+<body style="margin: 0; padding: 20px; background: #0A0A0A; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <div id="chart" style="width: 100%; height: 500px;"></div>
     <script>
-        const ctx = document.getElementById('myChart');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
-                datasets: [{
-                    label: '销售额（万元）',
-                    data: [12, 19, 15, 25, 22, 30],
-                    backgroundColor: '#FF6B00',
-                    borderColor: '#FF8800',
-                    borderWidth: 1
-                }]
+        const chart = echarts.init(document.getElementById('chart'), 'dark');
+        chart.setOption({
+            backgroundColor: 'transparent',
+            title: {
+                text: '行业分布',
+                left: 'center',
+                textStyle: { color: '#FF6B00', fontSize: 18 }
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: true },
-                    title: { display: false }
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}: {c} ({d}%)'
+            },
+            legend: {
+                orient: 'horizontal',
+                bottom: 10,
+                textStyle: { color: '#ccc' },
+                itemWidth: 14,
+                itemHeight: 14
+            },
+            series: [{
+                type: 'pie',
+                radius: ['40%', '70%'],
+                center: ['50%', '45%'],
+                avoidLabelOverlap: true,
+                itemStyle: {
+                    borderRadius: 8,
+                    borderColor: '#0A0A0A',
+                    borderWidth: 2
                 },
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
+                label: {
+                    show: true,
+                    formatter: '{b}\\n{d}%',
+                    color: '#fff'
+                },
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 20,
+                        shadowColor: 'rgba(255, 107, 0, 0.5)'
+                    }
+                },
+                data: [
+                    { value: 22, name: '金融', itemStyle: { color: '#FF6B00' } },
+                    { value: 20, name: '工业', itemStyle: { color: '#2196F3' } },
+                    { value: 16, name: '信息技术', itemStyle: { color: '#4CAF50' } },
+                    { value: 14, name: '医药', itemStyle: { color: '#9C27B0' } },
+                    { value: 11, name: '消费', itemStyle: { color: '#00BCD4' } },
+                    { value: 17, name: '其他', itemStyle: { color: '#607D8B' } }
+                ]
+            }]
         });
+        window.addEventListener('resize', () => chart.resize());
     </script>
 </body>
 </html>
 ```
 
-**支持的图表类型**：
-- 柱状图/条形图（bar/horizontalBar）
-- 折线图（line）
-- 饼图/环形图（pie/doughnut）
-- 散点图（scatter）
-- 面积图（area）
-- 雷达图（radar）
-- 仪表板（gauge）
-- 热力图（heatmap）
+**关键点**：
+- 环形图 radius: ['40%', '70%']
+- 圆角 borderRadius: 8
+- 图例放底部，不会被截断
+- 每个数据项单独设置颜色
+- 添加 resize 监听器
 
-记住：代码必须完整、可运行、美观！"""
+记住：图表必须**美观、专业、完整显示**！"""
         )
         self.color = "#FF6B00"
         self.desc = "数据图表与可视化专家"
-        self.capabilities = ["HTML图表", "Chart.js", "ECharts", "交互式仪表板"]
-        self.example = "请用 Chart.js 画一个产品销售柱状图，配色现代。"
+        self.capabilities = ["HTML图表", "ECharts", "Chart.js", "交互式仪表板"]
+        self.example = "请用 ECharts 画一个产品销售柱状图，配色现代。"
 
 
 class ImageGeneratorAgent(Agent):
@@ -688,11 +729,59 @@ class ImageGeneratorAgent(Agent):
         print(f"[ImageGen] 返回原始响应数据")
         return {"success": True, "data": obj}
 
+    def _summarize_document(self, doc_content: str, user_intent: str) -> str:
+        """使用 LLM 将文档总结成简短的图片生成提示词"""
+        try:
+            # 截断文档以避免超过上下文限制
+            max_length = 6000
+            if len(doc_content) > max_length:
+                doc_content = doc_content[:max_length] + "\n...[内容已截断]"
+            
+            summary_prompt = f"""请阅读以下文档，并提取出最核心的 3-5 个关键点，用于生成一张信息图。
+
+文档内容：
+{doc_content}
+
+用户意图：{user_intent}
+
+请输出一个简短的图片生成提示词（不超过 200 字），描述这张图片应该包含的核心元素和视觉风格。
+格式：直接输出提示词，不要任何解释。"""
+
+            response = self.llm.invoke([HumanMessage(content=summary_prompt)])
+            summary = response.content if isinstance(response.content, str) else str(response.content)
+            print(f"[ImageGen] 文档摘要生成成功: {summary[:100]}...")
+            return summary.strip()
+        except Exception as e:
+            print(f"[ImageGen] 文档摘要生成失败: {e}")
+            return user_intent
+
     def invoke(self, messages: List[Any], context: Optional[Dict] = None) -> str:
-        prompt = messages[-1].content if messages else ""
+        user_prompt = messages[-1].content if messages else ""
+        
+        # 构建图片生成提示词
+        image_prompt = user_prompt
+        
+        if context and context.get('document'):
+            doc_content = context['document']
+            print(f"[ImageGen] 检测到文档内容，长度: {len(doc_content)} 字符")
+            
+            # 使用 LLM 先总结文档，生成简短的图片提示词
+            image_prompt = self._summarize_document(doc_content, user_prompt)
+            
+            # 确保提示词明确要求生成图片
+            image_prompt = f"""请生成一张专业的信息可视化图片：
+
+{image_prompt}
+
+要求：
+- 必须生成图片，不要返回文字描述
+- 风格：现代、专业、科技感
+- 配色：使用蓝色、橙色为主色调
+- 包含关键词标签和图标"""
+        
         model = "nano-banana-pro"
         size = "1024x1024"
-        res = self._gen_via_api(prompt, model=model, size=size)
+        res = self._gen_via_api(image_prompt, model=model, size=size)
         if not res.get("success"):
             err = res.get("error", "生成失败")
             hint = res.get("hint")
@@ -737,9 +826,32 @@ class DrawingAgent(Agent):
                 tool_str = tool_match.group(1).strip()
                 tools = [t.strip() for t in tool_str.split(',') if t.strip()]
         
+        # 增强识别：检测"使用xxx"、"用xxx"等自然语言格式
+        if not tools:
+            import re
+            # 匹配"使用/用 mermaid/plantuml/excalidraw/nanobanana"等模式
+            # 使用 \s* 匹配零个或多个空格
+            natural_patterns = [
+                r'(?:使用|用)\s*(mermaid|plantuml|excalidraw|nano[\s-]*banana)',
+                r'(mermaid|plantuml|excalidraw|nano[\s-]*banana)\s*(?:画|生成|制作|绘制)',
+            ]
+            for pattern in natural_patterns:
+                match = re.search(pattern, prompt_lower)
+                if match:
+                    tool_name = match.group(1).strip()
+                    # 标准化工具名
+                    if 'nano' in tool_name and 'banana' in tool_name:
+                        tools = ['nano-banana']
+                    else:
+                        tools = [tool_name]
+                    print(f"[DrawingAgent] 从自然语言中识别到工具指定: {tools}")
+                    break
+        
         # 调用 generate_images 生成图片
+        # 如果 tools 不为 None，说明用户明确指定了工具
+        user_specified = tools is not None
         try:
-            results = self.generate_images(prompt, tools)
+            results = self.generate_images(prompt, tools, user_specified=user_specified)
             
             if not results:
                 return "未能生成图片，请检查提示词或工具配置。"
@@ -1065,21 +1177,47 @@ participant 数据库
         return s
 
     def _choose_tools(self, prompt: str) -> List[str]:
+        """
+        根据用户提示词自动选择绘图工具
+        注意：这个方法只在用户没有明确指定工具时被调用
+        """
         p = (prompt or "").lower()
         tools = []
+        
+        # 图像生成类：使用 nano-banana
         if any(k in p for k in ["海报", "照片", "壁纸", "写实", "照片风", "图像", "图片"]):
             tools.append("nano-banana")
+        
+        # 图表类：默认只用 mermaid（plantuml 作为 fallback 保留）
+        # 不再同时生成多个格式
         if any(k in p for k in ["流程", "流程图", "架构", "组织架构", "关系", "ER", "时序", "序列", "类图", "用例", "状态", "组件"]):
-            tools.extend(["mermaid", "plantuml"])
+            tools.append("mermaid")  # 只添加 mermaid，不添加 plantuml
+        
+        # 手绘类：使用 excalidraw
         if any(k in p for k in ["手绘", "草图", "线稿", "涂鸦", "白板"]):
             tools.append("excalidraw")
+        
+        # 默认使用 mermaid
         if not tools:
             tools = ["mermaid"]
+        
         return list(dict.fromkeys(tools))
 
-    def generate_images(self, prompt: str, tools: Optional[List[str]] = None) -> List[Dict[str, Any]]:
+    def generate_images(self, prompt: str, tools: Optional[List[str]] = None, user_specified: bool = False) -> List[Dict[str, Any]]:
+        """
+        生成图片
+        
+        Args:
+            prompt: 用户输入的提示词
+            tools: 要使用的工具列表
+            user_specified: 是否是用户明确指定的工具（如果是，则不启用 fallback）
+        """
         chosen = tools or self._choose_tools(prompt)
         results = []
+        
+        # 如果用户没有明确指定工具，则允许 fallback
+        enable_fallback = not user_specified
+        
         for t in chosen:
             tt = t.strip().lower()
             if tt in ["mermaid", "plantuml", "excalidraw"]:
@@ -1098,7 +1236,8 @@ participant 数据库
                     results.append({"tool": tt, "image_base64": rr.get("image_base64"), "mime": rr.get("mime", "image/png"), "source_code": src})
                 else:
                     print(f"[DrawingAgent] ✗ {tt} 渲染失败: {rr.get('error')}")
-                    if tt == "mermaid":
+                    # 只有在允许 fallback 且是 mermaid 时才尝试 fallback
+                    if tt == "mermaid" and enable_fallback:
                         print(f"[DrawingAgent] 尝试Mermaid->PlantUML fallback")
                         puml = self._fallback_mermaid_to_plantuml(prompt)
                         rr2 = self._render_kroki("plantuml", puml)
@@ -1108,6 +1247,7 @@ participant 数据库
                         else:
                             results.append({"tool": tt, "error": rr.get("error"), "hint": rr.get("hint"), "source_code": src})
                     else:
+                        # 用户明确指定了工具，不使用 fallback，直接返回错误
                         results.append({"tool": tt, "error": rr.get("error"), "hint": rr.get("hint"), "source_code": src})
             elif tt in ["nano banana", "nano-banana", "nano-banana-pro", "gemini-3-pro-image-preview", "gemini-2.5-flash-image"]:
                 model = "gemini-3-pro-image-preview" if tt in ["nano banana", "nano-banana", "nano-banana-pro"] else t
@@ -1780,17 +1920,84 @@ class PromptAgent(Agent):
 3. 角色扮演：为提示词设定恰当的角色（Persona）和背景。
 4. 任务拆解：将复杂任务拆解为思维链（Chain of Thought）。
 
-请遵循以下原则：
-- 始终以结构化的格式输出优化后的提示词。
-- 解释你所做的修改和优化的理由。
-- 针对不同的模型（如 GPT-4, Claude 3, Midjourney）提供特定的优化建议。
+**最佳实践框架：**
+
+### CRISPE 框架
+- **C**apacity and Role（能力与角色）：定义 AI 的角色和能力
+- **I**nsight（洞察）：提供背景信息和上下文
+- **S**tatement（陈述）：明确说明任务目标
+- **P**ersonality（个性）：定义回答的风格和语气
+- **E**xperiment（实验）：鼓励创新和多样化的输出
+
+示例：
+```
+你是一位资深的金融分析师（Capacity），专注于基金行业研究（Insight）。
+请分析招商中证A500 ETF的投资价值（Statement），
+以专业但易懂的方式呈现（Personality），
+并提供3-5个不同的分析角度（Experiment）。
+```
+
+### CO-STAR 框架
+- **C**ontext（上下文）：提供背景信息
+- **O**bjective（目标）：明确任务目标
+- **S**tyle（风格）：指定输出风格
+- **T**one（语气）：设定语气情感
+- **A**udience（受众）：明确目标读者
+- **R**esponse（响应格式）：指定输出格式
+
+示例：
+```
+背景：我是一家基金公司的产品经理（Context）
+目标：撰写一份基金产品介绍（Objective）
+风格：专业、数据驱动（Style）
+语气：自信但不过度营销（Tone）
+受众：高净值个人投资者（Audience）
+格式：分为产品概述、投资策略、风险提示三部分（Response）
+```
+
+### 思维链（Chain of Thought）
+使用"让我们一步步思考"来引导推理：
+
+```
+请分析某只股票的投资价值。让我们一步步思考：
+1. 首先，分析公司的财务数据
+2. 然后，评估行业地位和竞争优势
+3. 接着，考虑宏观经济和政策因素
+4. 最后，给出综合评价和投资建议
+```
+
+### 零样本（Zero-Shot）vs 少样本（Few-Shot）
+- **零样本**：直接描述任务
+- **少样本**：提供1-3个示例
+
+少样本示例：
+```
+请按照以下格式总结研报：
+
+示例 1：
+标题：XX行业深度报告
+要点：1. 市场规模XXX亿 2. 龙头企业占比XX% 3. 增长率XX%
+
+示例 2：
+标题：XX公司业绩点评
+要点：1. Q1营收XXX亿 2. 净利润XXX亿 3. 毛利率XX%
+
+现在，请总结这份报告：[用户提供的报告]
+```
+
+**优化原则：**
+- 明确具体 > 模糊抽象
+- 结构化 > 自由发挥
+- 少样本 > 零样本（复杂任务）
+- 拆解步骤 > 一次性完成
+- 角色设定 > 直接提问
 """,
             emoji="fas fa-magic",
             temperature=0.7
         )
         self.color = "#9C27B0"
         self.desc = "提示词优化与设计"
-        self.capabilities = ["提示词优化", "框架设计", "角色设定", "思维链拆解"]
+        self.capabilities = ["CRISPE框架", "CO-STAR框架", "思维链设计", "零样本/少样本", "角色设定"]
         self.example = "优化这个提示词：‘帮我写个 Python 脚本’。"
 
 class AKShareDataAgent(Agent):
@@ -2155,6 +2362,185 @@ class PPTGeneratorAgent(Agent):
         self.capabilities = ["PPT大纲生成", "幻灯片图片生成", "多风格支持", "多语言支持", "文档解析"]
         self.example = "请为'人工智能在金融行业的应用'生成一个5页的PPT，风格使用商务科技"
     
+    def _generate_slides_player(self, slides, topic, pdf_filename, visual_style, complexity_level, language, sources):
+        """生成交互式幻灯片播放器 HTML"""
+        import json
+        
+        # 转义 slides 数据用于 JavaScript
+        slides_json = json.dumps(slides, ensure_ascii=False)
+        
+        html = f"""```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{topic}</title>
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0A0A0A; color: #fff; overflow: hidden; }}
+        
+        .slider-container {{ width: 100vw; height: 100vh; position: relative; display: flex; flex-direction: column; }}
+        
+        .slide {{ width: 100%; height: calc(100vh - 120px); display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }}
+        .slide.active {{ display: flex; }}
+        
+        .slide-content {{ max-width: 1200px; text-align: center; }}
+        .slide-title {{ font-size: 3rem; font-weight: 700; color: #FF6B00; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }}
+        .slide-text {{ font-size: 1.5rem; line-height: 1.8; color: #E0E0E0; margin-bottom: 40px; }}
+        .slide-image {{ max-width: 90%; max-height: 60vh; border-radius: 16px; box-shadow: 0 20px 60px rgba(255, 107, 0, 0.3); }}
+        
+        .controls {{ position: absolute; bottom: 0; left: 0; right: 0; height: 120px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; }}
+        
+        .nav-buttons {{ display: flex; gap: 15px; }}
+        .nav-btn {{ padding: 12px 24px; background: rgba(255,107,0,0.2); color: #FF6B00; border: 2px solid #FF6B00; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s; }}
+        .nav-btn:hover {{ background: #FF6B00; color: #fff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255, 107, 0, 0.4); }}
+        .nav-btn:disabled {{ opacity: 0.3; cursor: not-allowed; }}
+        
+        .slide-indicator {{ display: flex; gap: 10px; align-items: center; color: #E0E0E0; font-size: 18px; }}
+        .dot {{ width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: all 0.3s; }}
+        .dot.active {{ background: #FF6B00; width: 30px; border-radius: 5px; }}
+        
+        .action-buttons {{ display: flex; gap: 15px; }}
+        .action-btn {{ padding: 12px 24px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s; }}
+        .action-btn:hover {{ background: rgba(255,255,255,0.2); transform: translateY(-2px); }}
+        
+        .fullscreen {{ position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; }}
+    </style>
+</head>
+<body>
+    <div class="slider-container" id="sliderContainer">
+        <!-- Slides will be generated by JavaScript -->
+    </div>
+    
+    <div class="controls">
+        <div class="nav-buttons">
+            <button class="nav-btn" id="prevBtn" onclick="prevSlide()">← 上一页</button>
+            <button class="nav-btn" id="nextBtn" onclick="nextSlide()">下一页 →</button>
+        </div>
+        
+        <div class="slide-indicator">
+            <span id="currentSlide">1</span> / <span id="totalSlides">0</span>
+            <div id="dots"></div>
+        </div>
+        
+        <div class="action-buttons">
+            {"<button class='action-btn' onclick='downloadPDF()'>📥 下载 PDF</button>" if pdf_filename else ""}
+            <button class="action-btn" onclick="toggleFullscreen()">⛶ 全屏</button>
+        </div>
+    </div>
+    
+    <script>
+        const slides = {slides_json};
+        const pdfFilename = "{pdf_filename or ''}";
+        let currentSlideIndex = 0;
+        
+        function initSlides() {{
+            const container = document.getElementById('sliderContainer');
+            const dotsContainer = document.getElementById('dots');
+            document.getElementById('totalSlides').textContent = slides.length;
+            
+            slides.forEach((slide, index) => {{
+                const slideDiv = document.createElement('div');
+                slideDiv.className = 'slide' + (index === 0 ? ' active' : '');
+                slideDiv.innerHTML = `
+                    <div class="slide-content">
+                        <h1 class="slide-title">${{slide.title}}</h1>
+                        <p class="slide-text">${{slide.content}}</p>
+                        ${{slide.image_base64 ? `<img class="slide-image" src="data:${{slide.mime_type || 'image/png'}};base64,${{slide.image_base64}}" alt="${{slide.title}}">` : ''}}
+                    </div>
+                `;
+                container.insertBefore(slideDiv, container.firstChild);
+                
+                const dot = document.createElement('div');
+                dot.className = 'dot' + (index === 0 ? ' active' : '');
+dot.onclick = () => goToSlide(index);
+                dotsContainer.appendChild(dot);
+            }});
+        }}
+        
+        function updateSlide() {{
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.dot');
+            
+            slides.forEach((slide, index) => {{
+                slide.classList.toggle('active', index === currentSlideIndex);
+            }});
+            
+            dots.forEach((dot, index) => {{
+                dot.classList.toggle('active', index === currentSlideIndex);
+            }});
+            
+            document.getElementById('currentSlide').textContent = currentSlideIndex + 1;
+            document.getElementById('prevBtn').disabled = currentSlideIndex === 0;
+            document.getElementById('nextBtn').disabled = currentSlideIndex === slides.length - 1;
+        }}
+        
+        function prevSlide() {{
+            if (currentSlideIndex > 0) {{
+                currentSlideIndex--;
+                updateSlide();
+            }}
+        }}
+        
+        function nextSlide() {{
+            if (currentSlideIndex < slides.length - 1) {{
+                currentSlideIndex++;
+                updateSlide();
+            }}
+        }}
+        
+        function goToSlide(index) {{
+            currentSlideIndex = index;
+            updateSlide();
+        }}
+        
+        function toggleFullscreen() {{
+            const container = document.getElementById('sliderContainer');
+            if (!document.fullscreenElement) {{
+                container.requestFullscreen();
+            }} else {{
+                document.exitFullscreen();
+            }}
+        }}
+        
+        function downloadPDF() {{
+            if (pdfFilename) {{
+                window.open(`/download/${{encodeURIComponent(pdfFilename)}}`, '_blank');
+            }}
+        }}
+        
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {{
+            if (e.key === 'ArrowLeft') prevSlide();
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+        }});
+        
+        // 初始化
+        initSlides();
+        updateSlide();
+    </script>
+</body>
+</html>
+```
+
+**✅ PPT 生成完成！**
+
+- 主题：{topic}
+- 幻灯片数量：{len(slides)}
+- 风格：{visual_style}
+- 复杂度：{complexity_level}
+
+**📖 使用指南：**
+- 点击「上一页/下一页」按钮翻页查
+- 使用键盘 ← → 方向键快速翻页
+- 按 F 键进入全屏模式
+- 点击圆点快速跳转到指定幻灯片
+"""
+        
+        return html
+    
     async def invoke(self, messages: List[Any], context: Optional[Dict] = None) -> str:
         """处理 PPT 生成请求"""
         from tools.ppt_generator import generate_presentation_outline, generate_slide_image
@@ -2211,12 +2597,31 @@ class PPTGeneratorAgent(Agent):
         
         # 检查是否有文档内容
         document_content = None
-        if context and context.get("document"):
+        user_has_explicit_topic = False
+        
+        # 判断用户是否明确输入了主题（而不是只说"生成PPT"）
+        # 如果用户输入的主题超过5个字符，认为是明确的主题
+        if len(topic.strip()) > 5 and topic != user_message:
+            user_has_explicit_topic = True
+            print(f"[PPTGen] 检测到用户明确输入主题: {topic}")
+        
+        # 如果用户没有明确主题，且有文档，才使用文档内容
+        if context and context.get("document") and not user_has_explicit_topic:
             document_content = context["document"]
+            print(f"[PPTGen] 使用文档内容作为主题来源")
+        elif user_has_explicit_topic:
+            # 用户有明确主题，不使用文档内容
+            document_content = None
+            print(f"[PPTGen] 忽略文档内容，使用用户输入的主题")
         
         try:
             # 步骤1：生成大纲
             print(f"[PPTGen] 开始生成 PPT 大纲...")
+            print(f"[PPTGen] 主题: {topic}")
+            print(f"[PPTGen] 幻灯片数量: {slide_count}")
+            print(f"[PPTGen] 风格: {visual_style}")
+            print(f"[PPTGen] 复杂度: {complexity_level}")
+            
             outline_result = generate_presentation_outline(
                 topic=topic,
                 document_content=document_content,
@@ -2310,52 +2715,14 @@ class PPTGeneratorAgent(Agent):
                 output_parts.append(f'</div>')
                 output_parts.append(f'</div>\n\n')
             
-            # 显示每张幻灯片
-            for idx, slide in enumerate(slides, 1):
-                output_parts.append(f"### 幻灯片 {idx}: {slide['title']}\n")
-                output_parts.append(f"**内容：** {slide['content']}\n")
-                
-                if slide.get("image_base64"):
-                    img_data = slide["image_base64"]
-                    mime_type = slide.get("mime_type", "image/png")
-                    output_parts.append(f'<img src="data:{mime_type};base64,{img_data}" style="max-width:100%; border-radius:8px; margin:10px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"/>')
-                elif slide.get("error"):
-                    output_parts.append(f"⚠️ 图片生成失败: {slide['error']}")
-                
-                output_parts.append("\n")
+            # 生成交互式幻灯片播放器 HTML
+            slides_html = self._generate_slides_player(slides, topic, pdf_filename, visual_style, complexity_level, language, sources)
             
-            # 如果有来源，显示来源
-            if sources:
-                output_parts.append("\n---\n")
-                output_parts.append("**📚 参考来源：**\n")
-                output_parts.append("*以下是在生成 PPT 时参考的信息来源*\n\n")
-                for idx, source in enumerate(sources[:5], 1):  # 最多显示5个来源
-                    # 尝试从 URL 中提取域名作为显示名称
-                    import urllib.parse
-                    try:
-                        parsed_url = urllib.parse.urlparse(source['url'])
-                        # 如果是 Google 重定向链接，尝试提取原始域名
-                        if 'vertexaisearch.cloud.google.com' in source['url']:
-                            # 从重定向链接中提取原始域名（如果可能）
-                            domain = "来源网站"
-                        else:
-                            domain = parsed_url.netloc.replace('www.', '')
-                        display_name = source.get('title', domain) or domain
-                    except:
-                        display_name = source.get('title', '参考来源') or '参考来源'
-                    
-                    output_parts.append(f"{idx}. **{display_name}**  \n   <{source['url']}>\n")
-                output_parts.append("\n*提示：这些来源是 AI 在生成内容时参考的信息，你可以点击链接查看原文。*\n")
+            result = slides_html
             
-            # 添加提示
-            output_parts.append("\n💡 **提示：** 你可以要求我调整风格、增加或减少幻灯片数量，或者基于特定文档生成 PPT。")
-            
-            result = "\n".join(output_parts)
-            
-            # 将 PDF 文件名保存到智能体实例，以便后续访问
+            # 将 PDF 文件名保存到智能体实例
             if pdf_filename:
                 self.last_pdf_filename = pdf_filename
-                # 也保存到上下文
                 if context:
                     context["pdf_filename"] = pdf_filename
             
